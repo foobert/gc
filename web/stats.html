@@ -1,0 +1,23 @@
+---
+layout: default
+title: Stats
+scripts:
+  - db.js
+  - index.js
+  - backbone.min.js
+---
+
+<script>
+    var Geocache = Backbone.Model.extend({
+    });
+
+    var GeocacheList = Backbone.Collection.exted({
+        model: Geocache,
+    });
+
+    var Geocaches = new GeocacheList;
+
+    var GeocacheView = Backbone.View.extend({
+        tagName: 'li',
+
+    });

@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'rubygems'
+require 'bundler/setup'
+
+require 'cachecache'
+require 'yaml'
+require 'ostruct'
+
+require 'cachecache/server'
+
+config = OpenStruct.new(YAML.load_file('config.yml'))
+
+cacheCache = CacheCache2.new(config)
+
+cmd = ARGV.shift
+case cmd
+when "login"
+    cacheCache.login ARGV.shift
+when "logs"
+    ARGV.each {|username| cacheCache.update_logs username }
+when "search"
+    p *ARGV
+    cacheCache.search_caches *ARGV.map {|x| x.to_f }
+when "clean"
+    cacheCache.clean
+when "serve"
+    app = CacheCache::Server
+    app.run!
+when "poi"
+    cacheCache.csv ARGV.shift
+else
+    puts "Usage: #{$0} CMD"
+    puts "Where CMD is one of"
+    puts
+    puts "search"
+    puts "logs"
+    puts "clean"
+end
+# vi: ft=ruby

@@ -1,0 +1,94 @@
+---
+layout: default
+title: POI Generator
+scripts:
+  - db.js
+  - poi.js
+  - index.js
+  - FileSaver.js
+  - jszip.min.js
+---
+
+<div class="row">
+    <div class="col-md-12">
+        <form role="form" action="javascript:void(0);">
+            <div class="form-group">
+                <label>Geocache Types</label>
+                <div class="checkbox">
+                    <label>
+                        <input class="type" type="checkbox"
+                        id="type-traditional" value="traditional" checked/>
+                        Traditional Cache
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input class="type" type="checkbox" id="type-multi"
+                        value="multi" checked/> Multi Cache
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input class="type" type="checkbox" id="type-earth"
+                        value="earth" checked/> Earth Cache
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input class="type" type="checkbox" id="type-letterbox" value="letterbox" checked/> Letterbox
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input class="type" type="checkbox" id="type-webcam"
+                        value="webcam" checked/> Webcam Cache
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Exclude finds by
+                    <input type="text" class="form-control" id="username" placeholder="Username" style="width: 200px"/>
+                </label>
+                <span class="help-block">The person's logs must have been indexed before. Unknown usernames are silently ignored to respect user privacy.</span>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="add-icons"/> Include custom icons
+                </label>
+                <span class="help-block">Generates custom POI icons.</span>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="gpx"/> Generate GPX
+                </label>
+                <span class="help-block">Generates GPX instead of CSV.</span>
+            </div>
+            <div class="form-group">
+                <label>Near
+                    <input type="text" class="form-control" id="near" style="width: 200px"/>
+                </label>
+                <span class="help-block">Format: 55.123456 11.12346</span>
+            </div>
+            <button id="generate" type="submit" class="btn btn-default" data-loading-text="Generating...">Submit</button>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">POI Download</h4>
+      </div>
+      <div class="modal-body">
+        <p id="status-text"></p>
+        <ul id="status-types"></ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="download" type="button" class="btn btn-primary" disabled="disabled">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

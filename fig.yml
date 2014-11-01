@@ -1,0 +1,22 @@
+app:
+    build: app
+    ports:
+        - "81:4567"
+    links:
+        - db
+    environment:
+        RACK_ENV: production
+
+db:
+    build: db
+    ports:
+        - "28080:8080"
+        - "38015:28015"
+        - "39015:29015"
+
+web:
+    build: web
+    ports:
+        - "80:4000"
+    links:
+        - app

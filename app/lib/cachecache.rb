@@ -1,0 +1,87 @@
+require 'date'
+require 'time'
+require 'logging'
+
+require 'cachecache/geocaching'
+require 'cachecache/db2'
+require 'cachecache/poi'
+
+class CacheCache2
+    def initialize(config)
+        Logging.logger.root.appenders = Logging.appenders.stdout
+        Logging.logger.root.level = config.log || :info
+
+        @logger = Logging.logger[self]
+        @config = config
+        @db = CacheCache::DB.new(config.db)
+        @geo = CacheCache::Geocaching.new
+    end
+
+    def login(password)
+        accessToken = @geo.login(@config.user, password, @config.consumerKey)
+        puts accessToken
+    end
+
+    def update_logs(username)
+        lastlog = @db.get_latest_log(username)
+        @logger.debug "LastLog: #{lastlog}"
+
+        logs = @geo.userLogs(@config.accessToken, username, lastlog)
+        @logger.debug "Retrieved #{logs.size} logs since #{lastlog}"
+
+        if logs.empty?
+            puts "No new logs for #{username}."
+            return
+        end
+
+        @db.save_logs(logs)
+
+        puts "Latest logs for #{username}:"
+        logs.each do |log|
+            name = @db.get_geocache_name(log["CacheCode"])
+            puts " - #{log["CacheCode"]} #{name}"
+        end
+    end
+
+    def search_caches(lat, lon)
+        count_total = 0
+        count_updated = 0
+        @logger.debug "Searching near #{lat} #{lon}"
+        @geo.searchMany(@config.accessToken, lat, lon, 5000) do |caches|
+            @logger.debug "Found #{caches.size} caches"
+            count_total += caches.size
+
+            caches.group_by {|gc| @db.need_update?(gc) }.each do |update, gcs|
+                codes = gcs.map {|gc| gc["Code"] }
+                if true or update
+                    @logger.debug "Updating #{codes.size} caches"
+                    count_updated += codes.size
+                    #full = @geo.details(@config.accessToken, codes)
+                    full = gcs
+                    @db.save_geocaches full
+                    @logger.debug "Limits: Lite #{@geo.liteLeft}, Full #{@geo.fullLeft}"
+                else
+                    @logger.debug "Touching #{codes.size} caches"
+                    @db.touch_geocaches codes
+                end
+            end
+        end
+        puts "Found #{count_total} and updated #{count_updated} (#{(count_updated.to_f / count_total * 100).to_i}%) geocaches."
+    end
+
+    def csv(username)
+        geocaches = @db.get_geocaches exclude_finds_by: username
+        poi = CacheCache::POI.new
+        print poi.csv(geocaches).join
+    end
+
+    def clean
+        old = @couch.byAge(5)
+        if old.empty?
+            puts "No old geocaches found."
+        else
+            puts "Found #{old.size} old geocaches. Deleting.."
+            @couch.delete_bulk old.map {|o| {"_id" => o["id"], "_rev" => o["value"]["rev"]} }
+        end
+    end
+end
