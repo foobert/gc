@@ -11,7 +11,6 @@ RUN gem install bundler
 # Install app.
 ADD bin /app/bin/
 ADD lib /app/lib/
-ADD config.yml /app/config.yml
 ADD Gemfile /app/Gemfile
 ADD Gemfile.lock /app/Gemfile.lock
 RUN cd /app && bundle install --deployment

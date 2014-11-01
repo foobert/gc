@@ -9,7 +9,14 @@ require 'ostruct'
 
 require 'cachecache/server'
 
-config = OpenStruct.new(YAML.load_file('config.yml'))
+# TODO clean up config parsing once I figure out how I want to manage it
+config_defaults = File.exist?('config.yml') ? YAML.load_file('config.yml') : {}
+config = OpenStruct.new(config_defaults)
+config.accessToken = ENV['GC_ACCESS_TOKEN'] if ENV['GC_ACCESS_TOKEN']
+config.consumerKey = ENV['GC_CONSUMER_KEY'] if ENV['GC_CONSUMER_KEY']
+config.user = ENV['GC_USER'] if ENV['GC_USER']
+config.db = ENV['GC_DB'] if ENV['GC_DB']
+config.log = ENV['GC_LOG'] if ENV['GC_LOG']
 
 cacheCache = CacheCache2.new(config)
 
