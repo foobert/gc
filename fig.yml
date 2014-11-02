@@ -1,7 +1,7 @@
 app:
     build: app
     ports:
-        - "81:4567"
+        - "82:4567"
     links:
         - db
     environment:
@@ -17,6 +17,6 @@ db:
 web:
     build: web
     ports:
-        - "80:4000"
+        - "81:4000"
     links:
         - app
