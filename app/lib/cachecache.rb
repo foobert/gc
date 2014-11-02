@@ -13,7 +13,7 @@ class CacheCache2
 
         @logger = Logging.logger[self]
         @config = config
-        @db = CacheCache::DB.new(config.db)
+        @db = CacheCache::DB.new
         @geo = CacheCache::Geocaching.new
     end
 
