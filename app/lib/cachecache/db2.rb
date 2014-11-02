@@ -149,7 +149,12 @@ module CacheCache
         end
 
         def get_latest_log(username)
-            _run {|r| r.table('logs')['data'].filter({"Finder" => {"UserName" => username}}).order_by(r.desc("VisitDate")).limit(1)["Code"] }.first
+            _run do |r|
+                r.table('logs')['data']
+                .filter({"Finder" => {"UserName" => username}})
+                .order_by(r.desc("UTCCreateDate"))
+                .limit(1)["Code"]
+            end.first
         end
 
         def save_log(log)
