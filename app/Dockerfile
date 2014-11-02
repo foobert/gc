@@ -13,7 +13,7 @@ RUN gem install bundler
 # Install app.
 ADD bin /app/bin/
 ADD lib /app/lib/
-ADD vendor /app/vendor
+#ADD vendor /app/vendor
 ADD Gemfile /app/Gemfile
 ADD Gemfile.lock /app/Gemfile.lock
 RUN cd /app && bundle install --deployment
