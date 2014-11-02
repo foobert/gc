@@ -175,7 +175,7 @@ module CacheCache
 
         def _connect
             db = ENV['GC_DB_1_PORT_28015_TCP'] || ENV['DB']
-            @logger.info "Using db #{db}"
+            @logger.debug "Using db #{db}"
             db_uri = URI(db)
             conn = r.connect(:host => db_uri.host, :port => db_uri.port, :db => 'gc')
             result = yield conn
