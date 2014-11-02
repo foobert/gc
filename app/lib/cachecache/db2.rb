@@ -69,6 +69,7 @@ module CacheCache
         end
 
         def get_geocache_name(gc)
+            return nil if gc.nil?
             _run {|r| r.table('geocaches').get(gc.downcase).default({"data" => {"Name" => nil }})["data"]["Name"] }
         end
 
