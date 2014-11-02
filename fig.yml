@@ -13,6 +13,8 @@ db:
         - "28080:8080"
         - "38015:28015"
         - "39015:29015"
+    volumes:
+        - /var/lib/gc:/db
 
 web:
     build: web
