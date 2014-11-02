@@ -3,6 +3,7 @@ require 'logging'
 require 'time'
 require 'set'
 require 'uri'
+require 'connection_pool'
 
 module CacheCache
     class DB
@@ -11,11 +12,18 @@ module CacheCache
         def initialize
             @logger = Logging.logger[self]
 
+            @db_uri = URI(ENV['GC_DB_1_PORT_28015_TCP'] || ENV['DB'])
+            @logger.debug "Using db #{@db_uri}"
+            @pool = ConnectionPool.new do
+                r.connect(:host => @db_uri.host, :port => @db_uri.port, :db => 'gc')
+            end
+
             tries = 0
             begin
                 dbs = _run {|r| r.db_list() }
                 _init_db() if not dbs.include? 'gc'
-            rescue
+            rescue => ex
+                @logger.error ex
                 if (tries += 1) < 5
                     @logger.warn "DB connection failed. Retrying..."
                     sleep 1
@@ -180,12 +188,10 @@ module CacheCache
         end
 
         def _connect
-            db = ENV['GC_DB_1_PORT_28015_TCP'] || ENV['DB']
-            @logger.debug "Using db #{db}"
-            db_uri = URI(db)
-            conn = r.connect(:host => db_uri.host, :port => db_uri.port, :db => 'gc')
-            result = yield conn
-            conn.close
+            result = nil
+            @pool.with do |conn|
+                result = yield conn
+            end
             result
         end
 
