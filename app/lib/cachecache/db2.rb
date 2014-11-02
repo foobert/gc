@@ -11,8 +11,19 @@ module CacheCache
         def initialize
             @logger = Logging.logger[self]
 
-            dbs = _run {|r| r.db_list() }
-            _init_db() if not dbs.include? 'gc'
+            tries = 0
+            begin
+                dbs = _run {|r| r.db_list() }
+                _init_db() if not dbs.include? 'gc'
+            rescue
+                if trues += 1 < 5
+                    @logger.warn "DB connection failed. Retrying..."
+                    sleep 1
+                    retry
+                else
+                    raise
+                end
+            end
         end
 
         def get_geocache(id)
