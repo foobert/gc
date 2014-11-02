@@ -16,7 +16,7 @@ module CacheCache
                 dbs = _run {|r| r.db_list() }
                 _init_db() if not dbs.include? 'gc'
             rescue
-                if trues += 1 < 5
+                if (tries += 1) < 5
                     @logger.warn "DB connection failed. Retrying..."
                     sleep 1
                     retry
