@@ -129,7 +129,7 @@ module CacheCache
                 id = data["Code"].downcase
                 {id: id, updated: now, data: data}
             end
-            _run {|r| r.table('geocaches').insert(docs, conflic: 'replace') }
+            _run {|r| r.table('geocaches').insert(docs, conflict: 'replace') }
         end
 
         def touch_geocache(id)
