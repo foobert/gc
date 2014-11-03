@@ -53,11 +53,10 @@ class CacheCache2
 
             caches.group_by {|gc| @db.need_update?(gc) }.each do |update, gcs|
                 codes = gcs.map {|gc| gc["Code"] }
-                if true or update
+                if update
                     @logger.debug "Updating #{codes.size} caches"
                     count_updated += codes.size
-                    #full = @geo.details(@config.accessToken, codes)
-                    full = gcs
+                    full = @geo.details(@config.accessToken, codes)
                     @db.save_geocaches full
                     @logger.debug "Limits: Lite #{@geo.liteLeft}, Full #{@geo.fullLeft}"
                 else
