@@ -76,7 +76,6 @@ module CacheCache
             data = livePost('/LiveV6IAP/Geocaching.svc/SearchForGeocaches', req)
 
             status = data["Status"]
-            p status
             return nil if status.nil? or status["StatusCode"] != 0
 
             @liteLeft = data["CacheLimits"]["CachesLeft"]

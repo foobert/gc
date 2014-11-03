@@ -27,7 +27,6 @@ when "login"
 when "logs"
     ARGV.each {|username| cacheCache.update_logs username }
 when "search"
-    p *ARGV
     cacheCache.search_caches *ARGV.map {|x| x.to_f }
 when "clean"
     cacheCache.clean
