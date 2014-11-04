@@ -30,7 +30,7 @@ class CacheCache2
         @logger.debug "Retrieved #{logs.size} logs since #{lastlog}"
 
         if logs.empty?
-            puts "No new logs for #{username}."
+            @logger.debug "No new logs for #{username}."
             return
         end
 
