@@ -16,8 +16,10 @@ $("#generate").click(function() {
     var selectedTypes = $("input.type[type='checkbox']:checked").map(function(i, c) { return c.value; }).toArray();
     var downloadImages = document.getElementById("add-icons").checked;
     var format = document.getElementById('gpx').checked ? 'gpx' : 'csv';
-    var near = $("#near").val();
 
+    downloadObjects = [];
+    $("#download").attr('disabled', '');
+    $("#status-types").empty();
     $("#dialog").modal();
     btn.button("reset");
 
@@ -61,7 +63,7 @@ $("#generate").click(function() {
             }
         };
 
-        POI.generate(username, type, near, format, function(err, data) {
+        POI.generate(username, type, format, function(err, data) {
             if (err) throw err;
             pushDownloadObject(type + '.' + format, data);
             console.log("Downloaded POIs of type " + type);
