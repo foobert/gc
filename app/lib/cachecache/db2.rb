@@ -82,32 +82,23 @@ module CacheCache
         end
 
         def geofence(lat0, lng0, lat1, lng1)
-            lat_matches = _connect do |c|
-                q = r.table('geocaches').between(lat0, lat1, {:index => 'lat'})['data'].pluck('Code', 'Name', 'Latitude', 'Longitude', 'ContainerType', 'CacheType')
-                q.run(c).to_a
-            end
-
-            lng_matches = _connect do |c|
-                q = r.table('geocaches').between(lng0, lng1, {:index => 'lng'})['data']['Code']
-                Set.new q.run(c).to_a
-            end
-
-            geocaches = lat_matches.select {|g| lng_matches.include? g['Code'] }
-            #geocaches.reject! {|g| g['CacheType']['GeocacheTypeId'] != 137 }
-
-=begin
+            geocaches = []
             _connect do |c|
-                q = r.table('geocaches').filter do |g|
-                    g['data']['Latitude'].gt(lat0).and(
-                    g['data']['Latitude'].lt(lat1)).and(
-                    g['data']['Longitude'].gt(lng0)).and(
-                    g['data']['Longitude'].lt(lng1))
+                begin
+                    r.table('geocaches').index_status('coords').run(c)
+                rescue
+                    @logger.warn "creating coords index"
+                    r.table('geocaches').index_create('coords', :geo => true) { |doc|
+                        {"$reql_type$" => "GEOMETRY", "coordinates" => [doc['data']['Longitude'], doc['data']['Latitude']], "type" => "Point"}
+                    }.run(c)
                 end
-                q = q['data'].pluck('Code', 'Name', 'Latitude', 'Longitude')
-                q.run(c).to_a
+
+                q = r.table('geocaches').get_intersecting(r.polygon(r.point(lng0, lat0), r.point(lng0, lat1), r.point(lng1, lat1), r.point(lng1, lat0)), {:index => 'coords'})
+                q = q['data'].pluck('Code', 'Name', 'Latitude', 'Longitude', {'CacheType' => 'GeocacheTypeId'})
+                geocaches = q.run(c).to_a
             end
-=end
-            geocaches
+
+            return geocaches
         end
 
         def need_update?(gc)

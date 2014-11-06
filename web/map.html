@@ -4,30 +4,51 @@
         <link rel="stylesheet" href="css/MarkerCluster.css" />
         <link rel="stylesheet" href="css/MarkerCluster.Default.css" />
         <script src="js/leaflet.js"></script>
-        <script src="js/leaflet.markercluster.js"></script>
         <style>
-            #map { height: 500px; }
+            body {
+                margin: 0px;
+                padding: 0px;
+            }
+            #map {
+                width: 100%;
+                height: 100%;
+                padding: 0px;
+                margin: 0px;
+            }
         </style>
     </head>
     <body>
-        <p>
-            <span id="lat"></span> <span id="lng"></span>
-        </p>
         <div id="map"></div>
         <script>
 
-var earthIcon = L.icon({
-    iconUrl: 'img/earthcache.gif',
-    shadowUrl: null,
+var makeIcon = function(img) {
+    return L.icon({
+        iconUrl: 'img/' + img + '.gif',
+        shadowUrl: null,
+        iconSize:     [32, 32], // size of the icon
+        shadowSize:   [0, 0], // size of the shadow
+        iconAnchor:   [16, 16], // point of the icon which will correspond to marker's location
+        shadowAnchor: [0, 0],  // the same for the shadow
+        popupAnchor:  [0, -16] // point from which the popup should open relative to the iconAnchor
+    });
+};
 
-    iconSize:     [32, 32], // size of the icon
-    shadowSize:   [0, 0], // size of the shadow
-    iconAnchor:   [16, 16], // point of the icon which will correspond to marker's location
-    shadowAnchor: [0, 0],  // the same for the shadow
-    popupAnchor:  [0, -16] // point from which the popup should open relative to the iconAnchor
-});
 
-            var map = L.map('map').setView([57.186309, 14.622862], 13);
+var icons = {
+    2: makeIcon('2'), 
+    3: makeIcon('3'),
+    4: makeIcon('4'),
+    5: makeIcon('5'),
+    6: makeIcon('6'),
+    8: makeIcon('8'),
+    11: makeIcon('11'),
+    13: makeIcon('13'),
+    137: makeIcon('137'),
+    453: makeIcon('453'),
+    1858: makeIcon('1858'),
+};
+
+            var map = L.map('map').setView([51.186309, 12.622862], 13);
 
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: 'openstreetmap',
@@ -45,17 +66,16 @@ var earthIcon = L.icon({
                 map.setZoom(lastZoom);
             }
 
-            var markerGroup = L.markerClusterGroup();
-            map.addLayer(markerGroup);
-
             refreshMarkers();
 
             map.on('moveend', onMapMove);
 
             map.on('click', function(e) {
                 console.log(e.latlng);
+                /*
                 document.getElementById('lat').innerHTML = e.latlng.lat;
                 document.getElementById('lng').innerHTML = e.latlng.lng;
+                */
             });
 
             function onMapMove(e) {
@@ -66,7 +86,7 @@ var earthIcon = L.icon({
             var markers = [];
 
             function removeMarkers() {
-                markers.forEach(function(m) { markerGroup.removeLayer(m); });
+                markers.forEach(function(m) { map.removeLayer(m); });
                 markers = [];
             }
 
@@ -89,16 +109,17 @@ var earthIcon = L.icon({
                         removeMarkers();
                         for (var i = 0; i < geocaches.length; i++) {
                             var gc = geocaches[i];
-                            var marker = L.marker([gc.Latitude, gc.Longitude], {icon: earthIcon});//.addTo(map);
+                            var icon = icons[gc.CacheType.GeocacheTypeId];
+                            var marker = L.marker([gc.Latitude, gc.Longitude], {icon: icon});//.addTo(map);
                             marker.bindPopup('<div><p>' + gc.Code + ' ' +
                                     gc.Name + '</p><p>' + gc.Latitude + ' ' +
                                     gc.Longitude + '</p></div>');
                             markers.push(marker);
-                            markerGroup.addLayer(marker);
+                            marker.addTo(map);
                         }
                     }
                 };
-                ajax.open('GET', 'http://localhost:4567/geofence' +
+                ajax.open('GET', 'http://api.gc.funkenburg.net/geofence' +
                         '?lat0=' + minll.lat + '&lng0=' + minll.lng +
                         '&lat1=' + maxll.lat + '&lng1=' + maxll.lng);
                 ajax.send();
