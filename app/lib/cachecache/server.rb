@@ -50,7 +50,9 @@ module CacheCache
         end
 
         get '/geofence' do
-            geocaches = @db.geofence(params[:lat0].to_f, params[:lng0].to_f, params[:lat1].to_f, params[:lng1].to_f)
+            box = [params[:lat0].to_f, params[:lng0].to_f, params[:lat1].to_f, params[:lng1].to_f]
+            exclude = params[:exclude] ? params[:exclude].split(',') : nil
+            geocaches = @db.geofence box: box, exclude_finds_by: exclude
             json geocaches
         end
     end

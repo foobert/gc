@@ -63,11 +63,8 @@ module CacheCache
                     'Latitude', 'Longitude')
                 q.run(c).to_a
             end
-            if opts[:exclude_finds_by]
-                username = opts[:exclude_finds_by]
-                logs = Set.new(get_logs(username: username).map {|l| l['CacheCode']})
-                geocaches.reject! {|g| logs.include? g['Code'] }
-            end
+
+            geocaches = _filterLogs(geocaches, opts[:exclude_finds_by])
 
             if opts[:near]
                 geocaches.reject! {|g| g['Longitude'] < lng0 || g['Longitude'] > lng1 }
@@ -81,7 +78,11 @@ module CacheCache
             _run {|r| r.table('geocaches').get(gc.downcase).default({"data" => {"Name" => nil }})["data"]["Name"] }
         end
 
-        def geofence(lat0, lng0, lat1, lng1)
+        def geofence(opts = {})
+            box = opts[:box]
+            return [] unless box
+
+            lat0, lng0, lat1, lng1 = *box
             geocaches = []
             _connect do |c|
                 begin
@@ -97,6 +98,8 @@ module CacheCache
                 q = q['data'].pluck('Code', 'Name', 'Latitude', 'Longitude', {'CacheType' => 'GeocacheTypeId'})
                 geocaches = q.run(c).to_a
             end
+
+            geocaches = _filterLogs(geocaches, opts[:exclude_finds_by])
 
             return geocaches
         end
@@ -193,6 +196,17 @@ module CacheCache
                 r.db('gc').table_create('logs').run(conn)
             end
             @logger.info 'Database initialized'
+        end
+
+        def _filterLogs(geocaches, users)
+            return geocaches unless users
+            @logger.debug "Filtering #{geocaches.size} geocaches against #{users.inspect}"
+            users = [users] unless users.is_a? Array
+            return geocaches if users.empty?
+            logs = Set.new
+            users.each {|username| logs += get_logs(username: username).map {|l| l['CacheCode'] } }
+            @logger.debug "Found #{logs.size} caches to filter"
+            return geocaches.reject {|g| logs.include? g['Code'] }
         end
     end
 end
