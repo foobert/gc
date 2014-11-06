@@ -119,9 +119,22 @@ var icons = {
                         }
                     }
                 };
-                ajax.open('GET', 'http://api.gc.funkenburg.net/geofence' +
-                        '?lat0=' + minll.lat + '&lng0=' + minll.lng +
-                        '&lat1=' + maxll.lat + '&lng1=' + maxll.lng);
+                var server = localStorage.getItem('server');
+                var url;
+                if (server === null) {
+                    url = 'http://api.gc.funkenburg.net';
+                } else {
+                    url = server;
+                }
+                url += '/geofence?lat0=' + minll.lat + '&lng0=' + minll.lng +
+                       '&lat1=' + maxll.lat + '&lng1=' + maxll.lng;
+
+                var exclude = localStorage.getItem('excludeFinds');
+                if (exclude !== null) {
+                    url += '&exclude=' + exclude;
+                }
+
+                ajax.open('GET', url);
                 ajax.send();
             }
         </script>
