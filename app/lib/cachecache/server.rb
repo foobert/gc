@@ -53,7 +53,7 @@ module CacheCache
         end
 
         def _getOpts
-            %i{bounds excludeFinds typeIds}.inject({}) {|h, k| h[k] = params[k].nil? ? nil : JSON.parse(params[k]); h }
+            [:bounds, :excludeFinds, :typeIds].inject({}) {|h, k| h[k] = params[k].nil? ? nil : JSON.parse(params[k]); h }
         end
     end
 end
