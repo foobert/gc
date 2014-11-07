@@ -126,12 +126,16 @@ var icons = {
                 } else {
                     url = server;
                 }
-                url += '/geofence?lat0=' + minll.lat + '&lng0=' + minll.lng +
-                       '&lat1=' + maxll.lat + '&lng1=' + maxll.lng;
+                url += '/geocaches?bounds=[' + minll.lat + ',' + minll.lng +
+                       ',' + maxll.lat + ',' + maxll.lng + ']';
 
                 var exclude = localStorage.getItem('excludeFinds');
                 if (exclude !== null) {
-                    url += '&exclude=' + exclude;
+                    url += '&excludeFinds=' + exclude;
+                }
+                var types = localStorage.getItem('typeIds');
+                if (types !== null) {
+                    url += '&typeIds=' + types;
                 }
 
                 ajax.open('GET', url);

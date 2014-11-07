@@ -28,7 +28,8 @@ module CacheCache
         end
 
         get '/geocaches' do
-            json @db.get_geocaches.map {|g| g['Code'] }
+            opts = _getOpts()
+            json @db.get_geocaches(opts)#.map {|g| g['Code'] }
         end
 
         get %r{/geocaches/(GC.+)} do |id|
@@ -38,22 +39,21 @@ module CacheCache
         end
 
         get '/poi.csv' do
-            geocaches = @db.get_geocaches exclude_finds_by: params[:exclude], near: params[:near]
+            opts = _getOpts()
+            geocaches = @db.get_geocaches(opts)
             pois = @poi.csv(geocaches, type: (params[:type] || "").to_sym)
             [200, {'Content-Type' => 'text/csv;charset=utf-8;'}, pois]
         end
 
         get '/poi.gpx' do
-            geocaches = @db.get_geocaches exclude_finds_by: params[:exclude], near: params[:near]
+            opts = _getOpts()
+            geocaches = @db.get_geocaches(opts)
             gpx = @poi.gpx(geocaches, type: (params[:type] || "").to_sym)
             [200, {'Content-Type' => 'application/xml'}, gpx]
         end
 
-        get '/geofence' do
-            box = [params[:lat0].to_f, params[:lng0].to_f, params[:lat1].to_f, params[:lng1].to_f]
-            exclude = params[:exclude] ? params[:exclude].split(',') : nil
-            geocaches = @db.geofence box: box, exclude_finds_by: exclude
-            json geocaches
+        def _getOpts
+            %i{bounds excludeFinds typeIds}.inject({}) {|h, k| h[k] = params[k].nil? ? nil : JSON.parse(params[k]); h }
         end
     end
 end

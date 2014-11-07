@@ -18,20 +18,8 @@ module CacheCache
                 r.connect(:host => @db_uri.host, :port => @db_uri.port, :db => 'gc')
             end
 
-            tries = 0
-            begin
-                dbs = _run {|r| r.db_list() }
-                _init_db() if not dbs.include? 'gc'
-            rescue => ex
-                @logger.error ex
-                if (tries += 1) < 5
-                    @logger.warn "DB connection failed. Retrying..."
-                    sleep 1
-                    retry
-                else
-                    raise
-                end
-            end
+            _check_db()
+            _init_inidices()
         end
 
         def get_geocache(id)
@@ -39,18 +27,22 @@ module CacheCache
         end
 
         def get_geocaches(opts = {})
-            opts[:near] = nil if opts[:near] == ""
-            if opts[:near]
-                center_lat, center_lng = *(opts[:near].split(',').map {|x| x.to_f })
-                lat0 = center_lat - 0.5
-                lat1 = center_lat + 0.5
-                lng0 = center_lng - 0.5
-                lng1 = center_lng + 0.5
-            end
+            @logger.debug "get_geocaches, opts: #{opts.inspect}"
             geocaches = _connect do |c|
                 q = r.table('geocaches')
-                if opts[:near]
-                    q = q.between(lat0, lat1, {:index => 'lat'})
+                if opts[:bounds]
+                    @logger.debug "filtering by geofence"
+                    lat0, lng0, lat1, lng1 = *opts[:bounds]
+                    bounds = r.polygon(
+                        r.point(lng0, lat0),
+                        r.point(lng0, lat1),
+                        r.point(lng1, lat1),
+                        r.point(lng1, lat0))
+                    q = q.get_intersecting(bounds, {:index => 'coords'})
+                end
+                if opts[:typeIds]
+                    @logger.debug "filtering by typeIds"
+                    q = q.filter {|doc| opts[:typeIds][1..-1].inject(doc['data']['CacheType']['GeocacheTypeId'].eq(opts[:typeIds].first)) {|s, x| s | doc['data']['CacheType']['GeocacheTypeId'].eq(x) }}
                 end
                 q = q['data']
                 q = q.pluck(
@@ -61,14 +53,13 @@ module CacheCache
                     'Difficulty', 'Terrain',
                     'EncodedHints',
                     'Latitude', 'Longitude')
+                @logger.debug q.inspect
                 q.run(c).to_a
             end
 
-            geocaches = _filterLogs(geocaches, opts[:exclude_finds_by])
+            geocaches = _filterLogs(geocaches, opts[:excludeFinds])
 
-            if opts[:near]
-                geocaches.reject! {|g| g['Longitude'] < lng0 || g['Longitude'] > lng1 }
-            end
+            @logger.debug "found #{geocaches.size} geocaches"
 
             geocaches
         end
@@ -76,32 +67,6 @@ module CacheCache
         def get_geocache_name(gc)
             return nil if gc.nil?
             _run {|r| r.table('geocaches').get(gc.downcase).default({"data" => {"Name" => nil }})["data"]["Name"] }
-        end
-
-        def geofence(opts = {})
-            box = opts[:box]
-            return [] unless box
-
-            lat0, lng0, lat1, lng1 = *box
-            geocaches = []
-            _connect do |c|
-                begin
-                    r.table('geocaches').index_status('coords').run(c)
-                rescue
-                    @logger.warn "creating coords index"
-                    r.table('geocaches').index_create('coords', :geo => true) { |doc|
-                        {"$reql_type$" => "GEOMETRY", "coordinates" => [doc['data']['Longitude'], doc['data']['Latitude']], "type" => "Point"}
-                    }.run(c)
-                end
-
-                q = r.table('geocaches').get_intersecting(r.polygon(r.point(lng0, lat0), r.point(lng0, lat1), r.point(lng1, lat1), r.point(lng1, lat0)), {:index => 'coords'})
-                q = q['data'].pluck('Code', 'Name', 'Latitude', 'Longitude', {'CacheType' => 'GeocacheTypeId'})
-                geocaches = q.run(c).to_a
-            end
-
-            geocaches = _filterLogs(geocaches, opts[:exclude_finds_by])
-
-            return geocaches
         end
 
         def need_update?(gc)
@@ -189,6 +154,23 @@ module CacheCache
             result
         end
 
+        def _check_db
+            tries = 0
+            begin
+                dbs = _run {|r| r.db_list() }
+                _init_db() if not dbs.include? 'gc'
+            rescue => ex
+                @logger.error ex
+                if (tries += 1) < 5
+                    @logger.warn "DB connection failed. Retrying..."
+                    sleep 1
+                    retry
+                else
+                    raise
+                end
+            end
+        end
+
         def _init_db
             _connect do |conn|
                 r.db_create('gc').run(conn)
@@ -196,6 +178,27 @@ module CacheCache
                 r.db('gc').table_create('logs').run(conn)
             end
             @logger.info 'Database initialized'
+        end
+
+        def _init_inidices
+            _connect do |c|
+                _create_index(c, 'coords', :geo => true) do |doc|
+                        {"$reql_type$" => "GEOMETRY", "coordinates" => [doc['data']['Longitude'], doc['data']['Latitude']], "type" => "Point"}
+                end
+
+                _create_index(c, 'GeocacheTypeId') do |doc|
+                    doc['data']['CacheType']['GeocacheTypeId']
+                end
+            end
+        end
+
+        def _create_index(connection, name, opts = {}, &idx)
+            begin
+                r.table('geocaches').index_status(name).run(connection)
+            rescue
+                @logger.info "creating index #{name}"
+                r.table('geocaches').index_create(name, opts, idx).run(connection)
+            end
         end
 
         def _filterLogs(geocaches, users)
