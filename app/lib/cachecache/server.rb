@@ -29,13 +29,18 @@ module CacheCache
 
         get '/geocaches' do
             opts = _getOpts()
-            json @db.get_geocaches(opts)#.map {|g| g['Code'] }
+            json @db.get_geocaches(opts)
         end
 
         get %r{/geocaches/(GC.+)} do |id|
             geocache =  @db.get_geocache(id)
             return 404 if geocache.nil?
             json geocache['data']
+        end
+
+        get '/gcs' do
+            opts = _getOpts()
+            json @db.get_geocaches(opts).map {|g| g['Code'] }
         end
 
         get '/poi.csv' do
@@ -53,7 +58,40 @@ module CacheCache
         end
 
         def _getOpts
-            [:bounds, :excludeFinds, :typeIds].inject({}) {|h, k| h[k] = params[k].nil? ? nil : JSON.parse(params[k]); h }
+            @logger.debug "Params: #{params.inspect}"
+            opts = Hash.new
+
+            unless params[:bounds].nil?
+                halt 400, "Bounds must have four values" unless params[:bounds].is_a? Array and params[:bounds].size == 4
+                opts[:bounds] = params[:bounds].map {|x| x.to_f }
+            end
+
+            unless params[:excludeFinds].nil?
+                opts[:excludeFinds] = _opt_to_array(params[:excludeFinds])
+            end
+
+            unless params[:excludeDisabled].nil?
+                opts[:excludeDisabled] = _opt_to_bool(params[:excludeDisabled])
+            end
+
+            unless params[:typeIds].nil?
+                opts[:typeIds] = _opt_to_array(params[:typeIds].map {|x| x.to_i })
+            end
+
+            unless params[:full].nil?
+                opts[:full] = _opt_to_bool(params[:full])
+            end
+
+            opts
+        end
+
+        def _opt_to_array(ary)
+            return ary if ary.is_a? Array
+            return [ary]
+        end
+
+        def _opt_to_bool(val)
+            return val == "1"
         end
     end
 end

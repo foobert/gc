@@ -126,16 +126,20 @@ var icons = {
                 } else {
                     url = server;
                 }
-                url += '/geocaches?bounds=[' + minll.lat + ',' + minll.lng +
-                       ',' + maxll.lat + ',' + maxll.lng + ']';
+                url += '/geocaches?bounds[]=' + minll.lat + '&bounds[]=' + minll.lng +
+                       '&bounds[]=' + maxll.lat + '&bounds[]=' + maxll.lng;
 
-                var exclude = localStorage.getItem('excludeFinds');
-                if (exclude !== null) {
-                    url += '&excludeFinds=' + exclude;
+                var excludes = localStorage.getItem('excludeFinds');
+                if (excludes !== null) {
+                    JSON.parse(excludes).forEach(function(exclude) {
+                        url += '&excludeFinds[]=' + exclude;
+                    });
                 }
                 var types = localStorage.getItem('typeIds');
                 if (types !== null) {
-                    url += '&typeIds=' + types;
+                    JSON.parse(types).forEach(function(typeId) {
+                        url += '&typeIds[]=' + typeId;
+                    });
                 }
 
                 ajax.open('GET', url);

@@ -44,16 +44,23 @@ module CacheCache
                     @logger.debug "filtering by typeIds"
                     q = q.filter {|doc| opts[:typeIds][1..-1].inject(doc['data']['CacheType']['GeocacheTypeId'].eq(opts[:typeIds].first)) {|s, x| s | doc['data']['CacheType']['GeocacheTypeId'].eq(x) }}
                 end
+                if opts[:excludeDisabled]
+                    @logger.debug "filtering archived and unavailable"
+                    q = q.filter({:data => {:Archived => false, :Available => true }})
+                end
                 q = q['data']
-                q = q.pluck(
-                    'Code', 'Name',
-                    {'CacheType' => 'GeocacheTypeId'},
-                    {'ContainerType' => 'ContainerTypeName'},
-                    'Available', 'Archived',
-                    'Difficulty', 'Terrain',
-                    'EncodedHints',
-                    'Latitude', 'Longitude')
-                @logger.debug q.inspect
+                unless opts[:full]
+                    q = q.pluck(
+                        'Code', 'Name',
+                        {'CacheType' => 'GeocacheTypeId'},
+                        {'ContainerType' => 'ContainerTypeName'},
+                        'Available', 'Archived',
+                        'Difficulty', 'Terrain',
+                        'EncodedHints',
+                        'Attributes',
+                        'Latitude', 'Longitude')
+                end
+                @logger.debug "search query: #{q.inspect}"
                 q.run(c).to_a
             end
 
