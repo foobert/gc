@@ -4,8 +4,13 @@ MAINTAINER 0x002a@gmail.com
 # Update package sources.
 RUN apt-get update
 
+# Install build tools.
+RUN apt-get install -y build-essential git-core curl
+
 # Install ruby.
-RUN apt-get install -y ruby2.0 ruby-dev ruby2.0-dev make
+RUN curl -L -o ruby-install-0.5.0.tar.gz https://github.com/postmodern/ruby-install/archive/v0.5.0.tar.gz
+RUN tar xzf ruby-install-0.5.0.tar.gz && cd ruby-install-0.5.0 && make install
+RUN ruby-install --system ruby 2.1.4
 RUN gem install bundler
 
 # Install nodejs
@@ -21,4 +26,4 @@ EXPOSE 4000
 
 WORKDIR /web
 ENTRYPOINT ["jekyll"]
-CMD ["serve"]
+CMD ["serve", "--host", "0.0.0.0"]

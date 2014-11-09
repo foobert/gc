@@ -22,6 +22,7 @@ module CacheCache
 
         configure :development do
             register Sinatra::Reloader
+            set :bind, '0.0.0.0'
         end
 
         before do

@@ -13,15 +13,19 @@ RUN tar xzf ruby-install-0.5.0.tar.gz && cd ruby-install-0.5.0 && make install
 RUN ruby-install --system ruby 2.1.4
 RUN gem install bundler
 
+# Install nodejs
+RUN apt-get install -y nodejs
+
+# Install jekyll
+RUN gem install jekyll
+
 # Install app.
-ADD bin /app/bin/
-ADD lib /app/lib/
-ADD Gemfile /app/Gemfile
-ADD Gemfile.lock /app/Gemfile.lock
-RUN cd /app && bundle install --deployment
+ADD . /web
 
-EXPOSE 4567
+VOLUME ["/web"]
 
-WORKDIR /app
-ENTRYPOINT ["/app/bin/cachecache"]
-CMD ["serve"]
+EXPOSE 4000
+
+WORKDIR /web
+ENTRYPOINT ["jekyll"]
+CMD ["serve", "--host", "0.0.0.0", "--watch", "--force_polling"]

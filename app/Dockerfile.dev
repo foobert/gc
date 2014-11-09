@@ -13,14 +13,9 @@ RUN tar xzf ruby-install-0.5.0.tar.gz && cd ruby-install-0.5.0 && make install
 RUN ruby-install --system ruby 2.1.4
 RUN gem install bundler
 
-# Install app.
-ADD bin /app/bin/
-ADD lib /app/lib/
-ADD Gemfile /app/Gemfile
-ADD Gemfile.lock /app/Gemfile.lock
-RUN cd /app && bundle install --deployment
-
 EXPOSE 4567
+
+VOLUME ["/app"]
 
 WORKDIR /app
 ENTRYPOINT ["/app/bin/cachecache"]
