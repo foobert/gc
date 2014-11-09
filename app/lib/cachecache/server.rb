@@ -87,6 +87,10 @@ module CacheCache
                 opts[:full] = _opt_to_bool(params[:full])
             end
 
+            unless params[:stale].nil?
+                opts[:stale] = _opt_to_bool(params[:stale])
+            end
+
             opts
         end
 

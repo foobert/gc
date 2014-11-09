@@ -9,6 +9,8 @@ module CacheCache
     class DB
         include RethinkDB::Shortcuts
 
+        MAX_STALE_AGE = 3 * 24 * 60 * 60 # 3 days
+
         def initialize
             @logger = Logging.logger[self]
 
@@ -39,6 +41,10 @@ module CacheCache
                         r.point(lng1, lat1),
                         r.point(lng1, lat0))
                     q = q.get_intersecting(bounds, {:index => 'coords'})
+                end
+                unless opts[:stale]
+                    @logger.debug "filtering stale geocaches"
+                    q = q.filter {|doc| r.now() - r.iso8601(doc['updated']) < MAX_STALE_AGE }
                 end
                 if opts[:typeIds]
                     @logger.debug "filtering by typeIds"
