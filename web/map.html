@@ -244,7 +244,7 @@ function refreshMarkers() {
     } else {
         url = server;
     }
-    url += '/geocaches?bounds[]=' + minll.lat + '&bounds[]=' + minll.lng +
+    url += '/geocaches?excludeDisabled=1&bounds[]=' + minll.lat + '&bounds[]=' + minll.lng +
         '&bounds[]=' + maxll.lat + '&bounds[]=' + maxll.lng;
 
     var excludes = localStorage.getItem('excludeFinds');
