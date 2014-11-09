@@ -1,25 +1,153 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
-        <link rel="stylesheet" href="css/leaflet.css" />
-        <link rel="stylesheet" href="css/MarkerCluster.css" />
-        <link rel="stylesheet" href="css/MarkerCluster.Default.css" />
-        <script src="js/leaflet.js"></script>
+        <title>Geocaching Map</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
         <style>
-            body {
-                margin: 0px;
-                padding: 0px;
-            }
-            #map {
-                width: 100%;
-                height: 100%;
-                padding: 0px;
-                margin: 0px;
-            }
+html, body, #map {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.filter {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#filter-list {
+    position: relative;
+    right: 0px;
+}
+
+img.gctype {
+    height: 16px;
+    width: 16px;
+}
+
+li span.glyphicon {
+    text-align: right;
+    color: red;
+}
         </style>
     </head>
     <body>
         <div id="map"></div>
+        <div class="filter">
+            <div class="btn-toolbar" role="toolbar">
+                <div class="btn-group btn-group-xs typeFilters" data-toggle="buttons">
+                    <button data-type="2" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/2.gif"/></button>
+                    <button data-type="3" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/3.gif"/></button>
+                    <button data-type="5" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/5.gif"/></button>
+                    <button data-type="6" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/6.gif"/></button>
+                    <button data-type="8" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/8.gif"/></button>
+                    <button data-type="11" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/11.gif"/></button>
+                    <button data-type="13" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/13.gif"/></button>
+                    <button data-type="137" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/137.gif"/></button>
+                    <button data-type="453" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/453.gif"/></button>
+                    <button data-type="1858" type="button" class="btn btn-default"><img class="gctype" src="http://gc.funkenburg.net/img/1858.gif"/></button>
+                </div>
+            </div>
+            <form id="filter-form" role="form">
+                <input type="text" id="text" class="form-control" placeholder="Filter..."/>
+            </form>
+            <ul id="filter-list" class="list-group">
+            </ul>
+        </div>
+
         <script>
+function loadTypeIds() {
+    var typeIds = localStorage.getItem('typeIds');
+    if (typeIds === null) {
+        typeIds = $(".typeFilters button").map(function() { return $(this).data('type'); }).get();
+        localStorage.setItem('typeIds', JSON.stringify(typeIds));
+    } else {
+        typeIds = JSON.parse(typeIds);
+    }
+    typeIds.forEach(function(typeId) {
+        $('.typeFilters button[data-type=' + typeId + ']').addClass('active');
+    });
+}
+
+function loadExcludeFinds() {
+    var excludeFinds = localStorage.getItem('excludeFinds');
+    if (excludeFinds !== null) {
+        JSON.parse(excludeFinds).forEach(function(username) {
+            var li = '<li class="list-group-item" data-username="' + username + '">' + username + '<span class="glyphicon glyphicon-remove"></span></li>';
+            $('#filter-list').append(li); 
+        });
+    }
+}
+
+function addExcludeFind(username) {
+    var excludes = localStorage.getItem('excludeFinds');
+    if (excludes === null) {
+        excludes = [];
+    } else {
+        excludes = JSON.parse(excludes);
+    }
+    if (excludes.indexOf(username) === -1) {
+        var li = '<li class="list-group-item" data-username="' + username + '">' + username + '<span class="glyphicon glyphicon-remove"></span></li>';
+        $('#filter-list').append(li); 
+
+        excludes.push(username);
+        localStorage.setItem('excludeFinds', JSON.stringify(excludes));
+        refreshMarkers();
+    }
+}
+
+$(function() {
+    loadTypeIds();
+    loadExcludeFinds();
+    $('.typeFilters button').on('click', function() {
+        var btn = $(this);
+        var typeId = btn.data('type');
+        console.log(typeId);
+        var typeIds = localStorage.getItem('typeIds');
+        var enabled = !btn.hasClass('active');
+        if (typeIds === null) { typeIds = []; } else { typeIds = JSON.parse(typeIds); }
+        var idx = typeIds.indexOf(typeId);
+        if (idx !== -1) {
+            typeIds.splice(idx, 1);
+        }
+        if (enabled) {
+            typeIds.push(typeId);
+        }
+        localStorage.setItem('typeIds', JSON.stringify(typeIds));
+        refreshMarkers();
+    });
+
+    $('#filter-form').on('submit', function(event){
+        var input = $('#text');
+        var username = input.val();
+        event.preventDefault();
+        if (username) { 
+            addExcludeFind(username);
+            input.val(''); 
+        }
+    });
+
+    $('#filter-list').delegate('.glyphicon-remove', 'click', function() {
+        var li = $(this).parent();
+        var username = li.data('username');
+        var excludes = localStorage.getItem('excludeFinds');
+        if (excludes !== null) {
+            excludes = JSON.parse(excludes);
+            var idx = excludes.indexOf(username);
+            if (idx !== -1) {
+                excludes.splice(idx, 1);
+                localStorage.setItem('excludeFinds', JSON.stringify(excludes));
+                refreshMarkers();
+            }
+        }
+        li.remove();
+    });
+});
 
 var makeIcon = function(img) {
     return L.icon({
@@ -33,9 +161,8 @@ var makeIcon = function(img) {
     });
 };
 
-
 var icons = {
-    2: makeIcon('2'), 
+    2: makeIcon('2'),
     3: makeIcon('3'),
     4: makeIcon('4'),
     5: makeIcon('5'),
@@ -48,103 +175,94 @@ var icons = {
     1858: makeIcon('1858'),
 };
 
-            var map = L.map('map').setView([51.186309, 12.622862], 13);
+var map = L.map('map').setView([51.186309, 12.622862], 13);
 
-            L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-                attribution: 'openstreetmap',
-                maxZoom: 18
-            }).addTo(map);
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: 'openstreetmap',
+    maxZoom: 18
+}).addTo(map);
 
-            var lastPos = localStorage.getItem('lastPos');
-            if (lastPos !== null) {
-                lastPos = JSON.parse(lastPos);
-                map.setView([lastPos.lat, lastPos.lng]);
+var lastPos = localStorage.getItem('lastPos');
+if (lastPos !== null) {
+    lastPos = JSON.parse(lastPos);
+    map.setView([lastPos.lat, lastPos.lng]);
+}
+var lastZoom = localStorage.getItem('lastZoom');
+if (lastZoom !== null) {
+    lastZoom = JSON.parse(lastZoom);
+    map.setZoom(lastZoom);
+}
+
+refreshMarkers();
+
+map.on('moveend', onMapMove);
+
+function onMapMove(e) {
+    savePos();
+    refreshMarkers();
+}
+
+var markers = [];
+
+function removeMarkers() {
+    markers.forEach(function(m) { map.removeLayer(m); });
+    markers = [];
+}
+
+function savePos() {
+    localStorage.setItem('lastPos', JSON.stringify(map.getCenter()));
+    localStorage.setItem('lastZoom', JSON.stringify(map.getZoom()));
+}
+
+function refreshMarkers() {
+    var bounds = map.getBounds();
+    var minll = bounds.getSouthWest();
+    var maxll = bounds.getNorthEast();
+
+    // look ma, no jquery
+    var ajax = new XMLHttpRequest();
+    ajax.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var geocaches = JSON.parse(ajax.responseText);
+            removeMarkers();
+            for (var i = 0; i < geocaches.length; i++) {
+                var gc = geocaches[i];
+                var icon = icons[gc.CacheType.GeocacheTypeId];
+                var marker = L.marker([gc.Latitude, gc.Longitude], {icon: icon});//.addTo(map);
+                marker.bindPopup('<div><p>' + gc.Code + ' ' +
+                        gc.Name + '</p><p>' + gc.Latitude + ' ' +
+                        gc.Longitude + '</p></div>');
+                markers.push(marker);
+                marker.addTo(map);
             }
-            var lastZoom = localStorage.getItem('lastZoom');
-            if (lastZoom !== null) {
-                lastZoom = JSON.parse(lastZoom);
-                map.setZoom(lastZoom);
-            }
+        }
+    };
+    var server = localStorage.getItem('server');
+    var url;
+    if (server === null) {
+        url = 'http://api.gc.funkenburg.net';
+    } else {
+        url = server;
+    }
+    url += '/geocaches?bounds[]=' + minll.lat + '&bounds[]=' + minll.lng +
+        '&bounds[]=' + maxll.lat + '&bounds[]=' + maxll.lng;
 
-            refreshMarkers();
+    var excludes = localStorage.getItem('excludeFinds');
+    if (excludes !== null) {
+        JSON.parse(excludes).forEach(function(exclude) {
+                url += '&excludeFinds[]=' + exclude;
+                });
+    }
+    var types = localStorage.getItem('typeIds');
+    if (types !== null) {
+        JSON.parse(types).forEach(function(typeId) {
+                url += '&typeIds[]=' + typeId;
+                });
+    }
 
-            map.on('moveend', onMapMove);
-
-            map.on('click', function(e) {
-                console.log(e.latlng);
-                /*
-                document.getElementById('lat').innerHTML = e.latlng.lat;
-                document.getElementById('lng').innerHTML = e.latlng.lng;
-                */
-            });
-
-            function onMapMove(e) {
-                savePos();
-                refreshMarkers();
-            }
-
-            var markers = [];
-
-            function removeMarkers() {
-                markers.forEach(function(m) { map.removeLayer(m); });
-                markers = [];
-            }
-
-            function savePos() {
-                console.log('savePos');
-                localStorage.setItem('lastPos', JSON.stringify(map.getCenter()));
-                localStorage.setItem('lastZoom', JSON.stringify(map.getZoom()));
-            }
-
-            function refreshMarkers() {
-                var bounds = map.getBounds();
-                var minll = bounds.getSouthWest();
-                var maxll = bounds.getNorthEast();
-
-                // look ma, no jquery
-                var ajax = new XMLHttpRequest();
-                ajax.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        var geocaches = JSON.parse(ajax.responseText);
-                        removeMarkers();
-                        for (var i = 0; i < geocaches.length; i++) {
-                            var gc = geocaches[i];
-                            var icon = icons[gc.CacheType.GeocacheTypeId];
-                            var marker = L.marker([gc.Latitude, gc.Longitude], {icon: icon});//.addTo(map);
-                            marker.bindPopup('<div><p>' + gc.Code + ' ' +
-                                    gc.Name + '</p><p>' + gc.Latitude + ' ' +
-                                    gc.Longitude + '</p></div>');
-                            markers.push(marker);
-                            marker.addTo(map);
-                        }
-                    }
-                };
-                var server = localStorage.getItem('server');
-                var url;
-                if (server === null) {
-                    url = 'http://api.gc.funkenburg.net';
-                } else {
-                    url = server;
-                }
-                url += '/geocaches?bounds[]=' + minll.lat + '&bounds[]=' + minll.lng +
-                       '&bounds[]=' + maxll.lat + '&bounds[]=' + maxll.lng;
-
-                var excludes = localStorage.getItem('excludeFinds');
-                if (excludes !== null) {
-                    JSON.parse(excludes).forEach(function(exclude) {
-                        url += '&excludeFinds[]=' + exclude;
-                    });
-                }
-                var types = localStorage.getItem('typeIds');
-                if (types !== null) {
-                    JSON.parse(types).forEach(function(typeId) {
-                        url += '&typeIds[]=' + typeId;
-                    });
-                }
-
-                ajax.open('GET', url);
-                ajax.send();
-            }
+    ajax.open('GET', url);
+    ajax.send();
+}
         </script>
     </body>
 </html>
