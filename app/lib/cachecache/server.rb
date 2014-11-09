@@ -1,6 +1,7 @@
 require 'logging'
 require 'sinatra/base'
 require 'sinatra/json'
+require 'sinatra/reloader'
 
 require 'cachecache/db2'
 require 'cachecache/poi'
@@ -17,6 +18,10 @@ module CacheCache
 
             @db = CacheCache::DB.new
             @poi = CacheCache::POI.new
+        end
+
+        configure :development do
+            register Sinatra::Reloader
         end
 
         before do
