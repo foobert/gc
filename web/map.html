@@ -229,7 +229,7 @@ function refreshMarkers() {
                 var gc = geocaches[i];
                 var icon = icons[gc.CacheType.GeocacheTypeId];
                 var marker = L.marker([gc.Latitude, gc.Longitude], {icon: icon});//.addTo(map);
-                marker.bindPopup('<div><p>' + gc.Code + ' ' +
+                marker.bindPopup('<div><p><a href="http://coord.info/' + gc.Code + '">' + gc.Code + '</a> ' +
                         gc.Name + '</p><p>' + gc.Latitude + ' ' +
                         gc.Longitude + '</p></div>');
                 markers.push(marker);
