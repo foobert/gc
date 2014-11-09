@@ -71,7 +71,7 @@ module CacheCache
                 "GeocachingLogCount" => 5,
                 "TrackableLogCount" => 0,
                 "PointRadius" => {"DistanceInMeters" => "#{DISTANCE}.000000", "Point" => {"Latitude" => lat, "Longitude" => lon }},
-                "GeocacheExclusions" => {"Archived" => false, "Available" => true, "Premium" => false }
+                "GeocacheExclusions" => {"Archived" => false, "Available" => false, "Premium" => false }
             }
             data = livePost('/LiveV6IAP/Geocaching.svc/SearchForGeocaches', req)
 
