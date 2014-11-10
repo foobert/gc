@@ -70,8 +70,7 @@ module CacheCache
                 "MaxPerPage" => MAX_PER_PAGE,
                 "GeocachingLogCount" => 5,
                 "TrackableLogCount" => 0,
-                "PointRadius" => {"DistanceInMeters" => "#{DISTANCE}.000000", "Point" => {"Latitude" => lat, "Longitude" => lon }},
-                "GeocacheExclusions" => {"Archived" => false, "Available" => false, "Premium" => false }
+                "PointRadius" => {"DistanceInMeters" => "#{DISTANCE}.000000", "Point" => {"Latitude" => lat, "Longitude" => lon }}
             }
             data = livePost('/LiveV6IAP/Geocaching.svc/SearchForGeocaches', req)
 
@@ -92,7 +91,7 @@ module CacheCache
                 "GeocacheLogCount" => 5,
                 "TrackableLogCount" => 0,
             }
-            data = livePost('/LiveV6/Geocaching.svc/GetMoreGeocaches', req)
+            data = livePost('/LiveV6IAP/Geocaching.svc/GetMoreGeocaches', req)
             status = data["Status"]
             if status.nil? or status["StatusCode"] != 0
                 p status
