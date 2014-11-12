@@ -35,6 +35,8 @@ when "serve"
     app.run!
 when "poi"
     cacheCache.csv ARGV.shift
+when "get"
+    cacheCache.get ARGV
 else
     puts "Usage: #{$0} CMD"
     puts "Where CMD is one of"

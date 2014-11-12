@@ -74,6 +74,13 @@ class CacheCache2
         print poi.csv(geocaches).join
     end
 
+    def get(ids)
+        @logger.debug "Updating #{ids.size} caches"
+        full = @geo.details(@config.accessToken, ids)
+        @db.save_geocaches full
+        @logger.debug "Limits: Lite #{@geo.liteLeft}, Full #{@geo.fullLeft}"
+    end
+
     def clean
         old = @couch.byAge(5)
         if old.empty?

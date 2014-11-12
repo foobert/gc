@@ -2,6 +2,7 @@ require 'date'
 require 'net/http'
 require 'json'
 require 'rest_client'
+require 'enumerator'
 
 module CacheCache
     class Geocaching
@@ -129,19 +130,23 @@ module CacheCache
         end
 
         def details(accessToken, codes)
-            req = {
-                "AccessToken" => accessToken,
-                "IsLite" => false,
-                "MaxPerPage" => codes.size,
-                "GeocachingLogCount" => 5,
-                "TrackableLogCount" => 0,
-                "CacheCode" => { "CacheCodes" => codes }
-            }
-            data = livePost('/LiveV6IAP/Geocaching.svc/SearchForGeocaches', req)
-            status = data["Status"]
-            return nil if status.nil? or status["StatusCode"] != 0
-            @fullLeft = data["CacheLimits"]["CachesLeft"]
-            return data["Geocaches"]
+            result = []
+            codes.each_slice(50) do |slice|
+                req = {
+                    "AccessToken" => accessToken,
+                    "IsLite" => false,
+                    "MaxPerPage" => slice.size,
+                    "GeocachingLogCount" => 5,
+                    "TrackableLogCount" => 0,
+                    "CacheCode" => { "CacheCodes" => slice }
+                }
+                data = livePost('/LiveV6IAP/Geocaching.svc/SearchForGeocaches', req)
+                status = data["Status"]
+                return nil if status.nil? or status["StatusCode"] != 0
+                @fullLeft = data["CacheLimits"]["CachesLeft"]
+                result += data["Geocaches"]
+            end
+            result
         end
 
         def userLogs(accessToken, username, lastlog)
