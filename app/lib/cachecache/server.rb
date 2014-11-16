@@ -2,6 +2,7 @@ require 'logging'
 require 'sinatra/base'
 require 'sinatra/json'
 require 'sinatra/reloader'
+require 'sinatra/namespace'
 
 require 'cachecache/db2'
 require 'cachecache/poi'
@@ -20,6 +21,9 @@ module CacheCache
             @poi = CacheCache::POI.new
         end
 
+        register Sinatra::Namespace
+        set :path, (ENV['GC_APP_PATH'] || '/api')
+
         configure :development do
             register Sinatra::Reloader
             set :bind, '0.0.0.0'
@@ -29,38 +33,50 @@ module CacheCache
             headers 'Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Methods' => ['OPTIONS', 'GET']
         end
 
-        get '/' do
-            json({'info' => 'cachecache'})
+        if settings.path != '' and settings.path != '/'
+            get '/' do
+                redirect to(settings.path + '/')
+            end
+
+            get settings.path do
+                redirect to(settings.path + '/')
+            end
         end
 
-        get '/geocaches' do
-            opts = _getOpts()
-            json @db.get_geocaches(opts)
-        end
+        namespace settings.path do
+            get '/' do
+                json({'info' => 'cachecache'})
+            end
 
-        get %r{/geocaches/(GC.+)} do |id|
-            geocache =  @db.get_geocache(id)
-            return 404 if geocache.nil?
-            json geocache['data']
-        end
+            get '/geocaches' do
+                opts = _getOpts()
+                json @db.get_geocaches(opts)
+            end
 
-        get '/gcs' do
-            opts = _getOpts()
-            json @db.get_geocaches(opts).map {|g| g['Code'] }
-        end
+            get %r{/geocaches/(GC.+)} do |id|
+                geocache =  @db.get_geocache(id)
+                return 404 if geocache.nil?
+                json geocache['data']
+            end
 
-        get '/poi.csv' do
-            opts = _getOpts()
-            geocaches = @db.get_geocaches(opts)
-            pois = @poi.csv(geocaches, type: (params[:type] || "").to_sym)
-            [200, {'Content-Type' => 'text/csv;charset=utf-8;'}, pois]
-        end
+            get '/gcs' do
+                opts = _getOpts()
+                json @db.get_geocaches(opts).map {|g| g['Code'] }
+            end
 
-        get '/poi.gpx' do
-            opts = _getOpts()
-            geocaches = @db.get_geocaches(opts)
-            gpx = @poi.gpx(geocaches, type: (params[:type] || "").to_sym)
-            [200, {'Content-Type' => 'application/xml'}, gpx]
+            get '/poi.csv' do
+                opts = _getOpts()
+                geocaches = @db.get_geocaches(opts)
+                pois = @poi.csv(geocaches, type: (params[:type] || "").to_sym)
+                [200, {'Content-Type' => 'text/csv;charset=utf-8;'}, pois]
+            end
+
+            get '/poi.gpx' do
+                opts = _getOpts()
+                geocaches = @db.get_geocaches(opts)
+                gpx = @poi.gpx(geocaches, type: (params[:type] || "").to_sym)
+                [200, {'Content-Type' => 'application/xml'}, gpx]
+            end
         end
 
         def _getOpts
