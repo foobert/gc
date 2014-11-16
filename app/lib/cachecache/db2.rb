@@ -196,7 +196,10 @@ module CacheCache
         def _init_inidices
             _connect do |c|
                 _create_index(c, 'coords', :geo => true) do |doc|
-                        {"$reql_type$" => "GEOMETRY", "coordinates" => [doc['data']['Longitude'], doc['data']['Latitude']], "type" => "Point"}
+                    # Workaround until https://github.com/rethinkdb/rethinkdb/issues/3287 is released
+                    {"$reql_type$" => "GEOMETRY",
+                     "coordinates" => [doc['data']['Longitude'], doc['data']['Latitude']],
+                     "type" => "Point"}
                 end
 
                 _create_index(c, 'GeocacheTypeId') do |doc|
@@ -209,8 +212,8 @@ module CacheCache
             begin
                 r.table('geocaches').index_status(name).run(connection)
             rescue
-                @logger.info "creating index #{name}"
-                r.table('geocaches').index_create(name, opts, idx).run(connection)
+                @logger.info "creating index '#{name}'"
+                r.table('geocaches').index_create(name, opts, &idx).run(connection)
             end
         end
 
