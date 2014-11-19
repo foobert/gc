@@ -73,7 +73,7 @@ describe CacheCache::Geocaching do
                 .with(:query => {'format' => 'json'})
                 .to_return(:status => [500, 'awww snap'])
 
-            error = lambda { @geo.search_geocaches('', 0, 0, 1000) {|geocaches| } }.must_raise GeocachingError
+            error = lambda { @geo.search_geocaches('', 0, 0, 1000) {|geocaches| } }.must_raise CacheCache::GeocachingError
             error.message.must_match /awww snap/
             error.message.must_match /500/
         end
@@ -89,7 +89,7 @@ describe CacheCache::Geocaching do
                 .to_return(:status => [500, 'awww snap'])
 
             result = []
-            error = lambda { @geo.search_geocaches('', 0, 0, 1000) {|geocaches| result += geocaches } }.must_raise GeocachingError
+            error = lambda { @geo.search_geocaches('', 0, 0, 1000) {|geocaches| result += geocaches } }.must_raise CacheCache::GeocachingError
             error.message.must_match /awww snap/
             error.message.must_match /500/
 
@@ -102,7 +102,7 @@ describe CacheCache::Geocaching do
                 .with(:query => {'format' => 'json'})
                 .to_return(:body => {'Status' => {'StatusCode' => 55, 'StatusMessage' => 'Search not found'}}.to_json)
                 .to_raise
-            lambda { @geo.search_geocaches('', 0, 0, 1000) {|geocaches| } }.must_raise GeocachingError
+            lambda { @geo.search_geocaches('', 0, 0, 1000) {|geocaches| } }.must_raise CacheCache::GeocachingError
         end
     end
 
@@ -147,7 +147,7 @@ describe CacheCache::Geocaching do
                 .with(:query => {'format' => 'json'})
                 .to_return(:status => [500, 'awww snap'])
 
-            error = lambda { @geo.get_geocaches('TOKEN', ['GC001']) }.must_raise GeocachingError
+            error = lambda { @geo.get_geocaches('TOKEN', ['GC001']) }.must_raise CacheCache::GeocachingError
             error.message.must_match /awww snap/
             error.message.must_match /500/
         end

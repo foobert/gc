@@ -212,7 +212,8 @@ module CacheCache
             @logger.debug "API Limit (#{type}): #{liteLeft}"
         end
     end
+
+    class GeocachingError < StandardError
+    end
 end
 
-class GeocachingError < StandardError
-end
