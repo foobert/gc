@@ -12,31 +12,11 @@ module CacheCache
             geocaches = _filter_geocaches(geocaches, opts)
             @logger.debug "generating csv of #{geocaches.size} geocaches"
 
-            geocaches.map! do |g|
-                type = case g['CacheType']['GeocacheTypeId']
-                       when 2
-                           'T'
-                       when 3
-                           'M'
-                       when 5
-                           'L'
-                       when 11
-                           'W'
-                       when 137
-                           'E'
-                       end
-                code = g['Code'][2..-1]
-                skill = g['Difficulty'].to_s + '/' + g['Terrain'].to_s
-                size = g['ContainerType']['ContainerTypeName'][0..0]
-                hint = fix_csv_string(g['EncodedHints'] || '')[0, 4 * 48]
-                name = fix_csv_string(g['Name'])
-                lat = g['Latitude']
-                lon = g['Longitude']
-
-                key = "#{code} #{size} #{type} #{skill}\n#{name}"
-                desc = hint
-
-                "#{lon},#{lat},\"#{key}\",\"#{desc}\"\n"
+            geocaches.map! do |geocache|
+                name, desc = _get_name_and_desc(geocache, method(:_fix_csv_string))
+                lat = geocache['Latitude']
+                lon = geocache['Longitude']
+                "#{lon},#{lat},\"#{name}\",\"#{desc}\"\n"
             end
         end
 
@@ -54,41 +34,51 @@ xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/
 version="1.1"
 creator="cachecache">
 EOS
-            geocaches.each do |g|
-                type = case g['CacheType']['GeocacheTypeId']
-                       when 2
-                           'T'
-                       when 3
-                           'M'
-                       when 5
-                           'L'
-                       when 11
-                           'W'
-                       when 137
-                           'E'
-                       end
-                code = g['Code'][2..-1]
-                skill = g['Difficulty'].to_s + '/' + g['Terrain'].to_s
-                size = g['ContainerType']['ContainerTypeName'][0..0]
-                hint = fix_xml_string(g['EncodedHints'] || '')[0, 4 * 48]
-                name = fix_xml_string(g['Name'])
-                lat = g['Latitude']
-                lon = g['Longitude']
-
-                key = "#{code} #{size} #{type} #{skill}\n#{name}"
-                desc = hint
+            geocaches.each do |geocache|
+                name, desc = _get_name_and_desc(geocache, method(:_fix_xml_string))
+                lat = geocache['Latitude']
+                lon = geocache['Longitude']
                 output << "<wpt lat=\"#{lat}\" lon=\"#{lon}\">\n"
-                output << "<name>#{key}</name>\n"
+                output << "<name>#{name}</name>\n"
                 output << "<cmt>#{desc}</cmt>\n"
                 output << "<type>Geocache</type>\n"
                 output << "</wpt>\n"
-                output
             end
             output << "</gpx>"
             output
         end
 
         private
+        def _get_name_and_desc(geocache, string_fixer = nil)
+            type = case geocache['CacheType']['GeocacheTypeId']
+                   when 2
+                       'T'
+                   when 3
+                       'M'
+                   when 5
+                       'L'
+                   when 11
+                       'W'
+                   when 137
+                       'E'
+                   end
+            code = geocache['Code'][2..-1]
+            skill = geocache['Difficulty'].to_s + '/' + geocache['Terrain'].to_s
+            size = geocache['ContainerType']['ContainerTypeName'][0..0]
+            tmp_hint = geocache['EncodedHints'] || ''
+            tmp_hint = string_fixer[tmp_hint] if string_fixer
+            hint = tmp_hint[0, 4 * 48]
+            name = geocache['Name']
+            name = string_fixer[name] if string_fixer
+            lat = geocache['Latitude']
+            lon = geocache['Longitude']
+
+            return [
+                "#{code} #{size} #{type} #{skill}\n#{name}",
+                hint
+            ]
+        end
+
         def _filter_geocaches(geocaches, opts)
             allowed_types = _get_allowed_types(opts[:type])
             @logger.debug "allowed types: #{allowed_types.inspect}"
@@ -119,14 +109,14 @@ EOS
             end
         end
 
-        def fix_xml_string(s)
+        def _fix_xml_string(s)
             s.gsub! '&', '&amp;'
             s.gsub! '<', '&lt;'
             s.gsub! '>', '&gt;'
             s
         end
 
-        def fix_csv_string(s)
+        def _fix_csv_string(s)
             s.gsub! 'ä', 'ae'
             s.gsub! 'ö', 'oe'
             s.gsub! 'ü', 'ue'
