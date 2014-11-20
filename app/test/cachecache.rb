@@ -4,3 +4,4 @@ require 'bundler/setup'
 
 require './test/cachecache/geocaching.rb'
 require './test/cachecache/poi.rb'
+require './test/cachecache/server.rb'

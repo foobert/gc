@@ -9,16 +9,15 @@ require 'cachecache/poi'
 
 module CacheCache
     class Server < Sinatra::Base
-        def initialize(app = nil)
+        def initialize(app = nil, deps = {})
             super(app)
 
             Logging.logger.root.appenders = Logging.appenders.stdout
             Logging.logger.root.level = :debug
 
-            @logger = Logging.logger[self]
-
-            @db = CacheCache::DB.new
-            @poi = CacheCache::POI.new
+            @logger = deps[:logger] || Logging.logger[self]
+            @db = deps[:db] || CacheCache::DB.new
+            @poi = deps[:poi] || CacheCache::POI.new
         end
 
         register Sinatra::Namespace
@@ -43,6 +42,14 @@ module CacheCache
             end
         end
 
+
+        # WTF namespacing does not work with regexes?
+        get /^#{settings.path}\/geocaches\/(GC.+)/ do |id|
+            geocache =  @db.get_geocache(id)
+            return 404 if geocache.nil?
+            json geocache
+        end
+
         namespace settings.path do
             get '/' do
                 json({'info' => 'cachecache'})
@@ -51,12 +58,6 @@ module CacheCache
             get '/geocaches' do
                 opts = _getOpts()
                 json @db.get_geocaches(opts)
-            end
-
-            get %r{/geocaches/(GC.+)} do |id|
-                geocache =  @db.get_geocache(id)
-                return 404 if geocache.nil?
-                json geocache['data']
             end
 
             get '/gcs' do
