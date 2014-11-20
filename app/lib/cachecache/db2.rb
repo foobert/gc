@@ -24,8 +24,10 @@ module CacheCache
             _init_inidices()
         end
 
+        # Gets a single geocache from the database.
+        # @param id [String] the id (GC number) of the geocache
         def get_geocache(id)
-            _run {|r| r.table('geocaches').get(id.downcase) }
+            _run {|r| r.table('geocaches').get(id.downcase).default({'data' => nil})['data'] }
         end
 
         def get_geocaches(opts = {})
