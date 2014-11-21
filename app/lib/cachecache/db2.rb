@@ -52,6 +52,11 @@ module CacheCache
                     @logger.debug "filtering by typeIds"
                     q = q.filter {|doc| opts[:typeIds][1..-1].inject(doc['data']['CacheType']['GeocacheTypeId'].eq(opts[:typeIds].first)) {|s, x| s | doc['data']['CacheType']['GeocacheTypeId'].eq(x) }}
                 end
+                if opts[:attributeIds]
+                    @logger.debug "filtering by attributeIds"
+                    expected = opts[:attributeIds].map {|k,v| { 'AttributeTypeID' => k, 'IsOn' => v } }
+                    q = q.filter {|doc| r.expr(expected).difference(doc['data']['Attributes']).count().eq(0) }
+                end
                 if opts[:excludeDisabled]
                     @logger.debug "filtering archived and unavailable"
                     q = q.filter({:data => {:Archived => false, :Available => true }})

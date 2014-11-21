@@ -1,6 +1,7 @@
 ENV['RACK_ENV'] = 'test'
 
 require 'rack/test'
+require 'set'
 require 'cachecache/server'
 
 include Rack::Test::Methods
@@ -18,6 +19,10 @@ class MockDb
         'EncodedHints' => 'HintHint',
         'Available' => true,
         'Archived' => false,
+        'Attributes' => [
+            { 'AttributeTypeID' => 1, 'IsOn' => true },
+            { 'AttributeTypeID' => 2, 'IsOn' => false },
+        ],
     }
     GC002 = {
         'Code' => 'GC002',
@@ -31,6 +36,9 @@ class MockDb
         'EncodedHints' => 'HintHint',
         'Available' => true,
         'Archived' => false,
+        'Attributes' => [
+            { 'AttributeTypeID' => 1, 'IsOn' => true },
+        ],
     }
     GC003 = {
         'Code' => 'GC003',
@@ -44,10 +52,21 @@ class MockDb
         'EncodedHints' => 'HintHint',
         'Available' => true,
         'Archived' => false,
+        'Attributes' => [
+            { 'AttributeTypeID' => 2, 'IsOn' => false },
+        ],
     }
 
     def get_geocaches(opts = {})
-        return [GC001, GC002, GC003]
+        result = [GC001, GC002, GC003]
+        if opts[:attributeIds]
+            result.select! do |gc|
+                exp = Set.new(opts[:attributeIds].map {|k,v| {'AttributeTypeID' => k, 'IsOn' => v} })
+                tmp = (exp - Set.new(gc['Attributes']))
+                tmp.size == 0
+            end
+        end
+        result
     end
 
     def get_geocache(id)
@@ -98,6 +117,21 @@ describe 'server' do
         it 'should return a list of geocaches' do
             get '/api/geocaches'
             JSON.parse(last_response.body).must_equal [MockDb::GC001, MockDb::GC002, MockDb::GC003]
+        end
+
+        it 'should filter by positive attributes' do
+            get '/api/geocaches?attributeIds[]=1'
+            JSON.parse(last_response.body).must_equal [MockDb::GC001, MockDb::GC002]
+        end
+
+        it 'should filter by negative attributes' do
+            get '/api/geocaches?attributeIds[]=!2'
+            JSON.parse(last_response.body).must_equal [MockDb::GC001, MockDb::GC003]
+        end
+
+        it 'should filter by combined attributes' do
+            get '/api/geocaches?attributeIds[]=1&attributeIds[]=!2'
+            JSON.parse(last_response.body).must_equal [MockDb::GC001]
         end
     end
 

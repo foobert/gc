@@ -58,6 +58,25 @@ li span.glyphicon {
             </form>
             <ul id="filter-list" class="list-group">
             </ul>
+            <div class="btn-group" role="group">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Positive
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu attributeFilters" role="menu" id="attributeFiltersYes"></ul>
+                </div>
+
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Negative
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu attributeFilters" role="menu" id="attributeFiltersNo"></ul>
+                </div>
+            </div>
+            <div id="activeAttributeIds">
+            </div>
         </div>
 
         <script>
@@ -72,6 +91,87 @@ function loadTypeIds() {
     typeIds.forEach(function(typeId) {
         $('.typeFilters button[data-type=' + typeId + ']').addClass('active');
     });
+}
+
+
+var attributes = {
+    1: 'dogs',
+    2: 'fee',
+    3: 'rappelling',
+    4: 'boat',
+    5: 'scuba',
+    6: 'kids',
+    7: 'onehour',
+    8: 'scenic',
+    9: 'hiking',
+    10: 'climbing',
+    11: 'wading',
+    12: 'swimming',
+    13: 'available',
+    14: 'night',
+    15: 'winter',
+    16: 'cactus',
+    17: 'poisonoak',
+    18: 'dangerousanimals',
+    19: 'ticks',
+    20: 'mine',
+    21: 'cliff',
+    22: 'hunting',
+    23: 'danger',
+    24: 'wheelchair',
+    25: 'parking',
+    26: 'public',
+    27: 'water',
+    28: 'restrooms',
+    29: 'phone',
+    30: 'picnic',
+    31: 'camping',
+    32: 'bicycles',
+    33: 'motorcycles',
+    34: 'quads',
+    35: 'jeeps',
+    36: 'snowmobiles',
+    37: 'horses',
+    38: 'campfires',
+    39: 'thorn',
+    40: 'stealth',
+    41: 'stroller',
+    42: 'firstaid',
+    43: 'cow',
+    44: 'flashlight',
+    45: 'landf',
+    46: 'rv',
+    47: 'field_puzzle',
+    48: 'UV',
+    49: 'snowshoes',
+    50: 'skiis',
+    51: 's-tool',
+    52: 'nightcache',
+    53: 'parkngrab',
+    54: 'AbandonedBuilding',
+    55: 'hike_short',
+    56: 'hike_med',
+    57: 'hike_long',
+    58: 'fuel',
+    59: 'food',
+    60: 'wirelessbeacon',
+    61: 'partnership',
+    62: 'seasonal',
+    63: 'touristOK',
+    64: 'treeclimbing',
+    65: 'frontyard',
+    66: 'teamwork',
+};
+
+function initAttributeFilters() {
+    for (var id in attributes) {
+        var name = attributes[id];
+        var label = name.charAt(0).toUpperCase() + name.substring(1);
+        var yes = '<li role="presentation"><a role="menuitem" data-attributeId="' + id + '" tabindex="-1" href="#">' + label + '</a></li>';
+        var no = '<li role="presentation"><a role="menuitem" data-attributeId="!' + id + '" tabindex="-1" href="#">No ' + name + '</a></li>';
+        $("#attributeFiltersYes").append(yes);
+        $("#attributeFiltersNo").append(no);
+    }
 }
 
 function loadExcludeFinds() {
@@ -101,9 +201,75 @@ function addExcludeFind(username) {
     }
 }
 
+function addAttributeFilter(id) {
+    id = "" + id;
+
+    var plainId, oppositeId, isOn;
+    if (id.indexOf('!') === -1) {
+        plainId = id;
+        oppositeId = '!' + id;
+        isOn = true;
+    } else {
+        plainId = id.substring(1);
+        oppositeId = plainId;
+        isOn = false;
+    }
+
+    var attributeIds = [];
+    var tmp = localStorage.getItem('attributeIds');
+    if (tmp !== null) {
+        attributeIds = JSON.parse(tmp);
+    }
+
+    var oppositeIdx = attributeIds.indexOf(oppositeId);
+    if (oppositeIdx !== -1) {
+        // opposite attribute id is active, remove it
+        attributeIds.splice(oppositeIdx, 1);
+        $(document.getElementById('attributeFilter-' + oppositeId)).remove();
+    }
+
+    var idx = attributeIds.indexOf(id);
+    if (idx !== -1) {
+        // attribute id is already active, remove it
+        attributeIds.splice(idx, 1);
+        $(document.getElementById('attributeFilter-' + id)).remove();
+    } else {
+        // attribute it is not active, add it
+        addAttributeIcon(id);
+        attributeIds.push(id);
+    }
+    localStorage.setItem('attributeIds', JSON.stringify(attributeIds));
+    refreshMarkers();
+}
+
+function addAttributeIcon(id) {
+    var plainId, isOn;
+    if (id.indexOf('!') === -1) {
+        plainId = id;
+        isOn = true;
+    } else {
+        plainId = id.substring(1);
+        isOn = false;
+    }
+    var name = attributes[plainId];
+    var suffix = isOn ? 'yes' : 'no';
+    var icon = '<img id="attributeFilter-' + id + '" src="http://www.geocaching.com/images/attributes/' + name + '-' + suffix + '.gif"/>';
+    $("#activeAttributeIds").append(icon);
+}
+
+function loadAttributeFilters() {
+    var tmp = localStorage.getItem('attributeIds');
+    if (tmp !== null) {
+        var attributeIds = JSON.parse(tmp);
+        attributeIds.forEach(function(id) { addAttributeIcon(id); });
+    }
+}
+
 $(function() {
     loadTypeIds();
     loadExcludeFinds();
+    initAttributeFilters();
+    loadAttributeFilters();
     $('.typeFilters button').on('click', function() {
         var btn = $(this);
         var typeId = btn.data('type');
@@ -146,6 +312,13 @@ $(function() {
             }
         }
         li.remove();
+    });
+
+    $('.attributeFilters').delegate('li a', 'click', function() {
+        var a = $(this);
+        var attr = a.data('attributeid');
+        event.preventDefault();
+        addAttributeFilter(attr);
     });
 });
 
@@ -257,6 +430,12 @@ function refreshMarkers() {
     if (types !== null) {
         JSON.parse(types).forEach(function(typeId) {
                 url += '&typeIds[]=' + typeId;
+                });
+    }
+    var attributes = localStorage.getItem('attributeIds');
+    if (attributes !== null) {
+        JSON.parse(attributes).forEach(function(attributeId) {
+                url += '&attributeIds[]=' + attributeId;
                 });
     }
 

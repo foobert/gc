@@ -101,6 +101,13 @@ module CacheCache
                 opts[:typeIds] = _opt_to_array(params[:typeIds].map {|x| x.to_i })
             end
 
+            unless params[:attributeIds].nil?
+                opts[:attributeIds] = _opt_to_array(params[:attributeIds]).inject(Hash.new) do |h, a|
+                    h[$2.to_i] = $1 != '!' if a =~ /^(!?)(\d+)$/
+                    h
+                end
+            end
+
             unless params[:full].nil?
                 opts[:full] = _opt_to_bool(params[:full])
             end
