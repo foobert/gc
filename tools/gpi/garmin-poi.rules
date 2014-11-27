@@ -1,0 +1,3 @@
+# Runs a script to download and install geocache POI files to a Garmin Mass Storage
+# Vendor and model ID match the mass storage of a Garmin eTrex HCx
+ACTION=="add", SUBSYSTEM=="block", KERNEL=="sd[a-z]1", ENV{ID_VENDOR_ID}=="091e", ENV{ID_MODEL_ID}=="22b6", RUN+="/usr/local/bin/poi-udev.sh %k"
