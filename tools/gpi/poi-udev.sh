@@ -4,7 +4,7 @@
 # where sdX is the device corresponding to you Garmin mass storage
 set -e
 
-if [ -z $1 ]
+if [ -z $1 ]; then
     echo "Usage: $0 sdX" >&2
     exit 1
 fi
