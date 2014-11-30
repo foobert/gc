@@ -6,6 +6,7 @@ require 'sinatra/namespace'
 
 require 'cachecache/db2'
 require 'cachecache/poi'
+require 'cachecache/atom'
 
 module CacheCache
     class Server < Sinatra::Base
@@ -58,6 +59,15 @@ module CacheCache
             get '/geocaches' do
                 opts = _getOpts()
                 json @db.get_geocaches(opts)
+            end
+
+            # /geocaches with format atom?
+            get '/feed' do
+                opts = _getOpts()
+                opts[:full] = true
+                #opts[:orderBy] = {:index => 'UTCPlaceDate'}
+                geocaches = @db.get_geocaches(opts)
+                [200, {'Content-Type' => 'application/atom+xml'}, Atom.new.generate(geocaches)]
             end
 
             get '/gcs' do

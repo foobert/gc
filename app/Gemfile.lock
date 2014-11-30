@@ -3,6 +3,7 @@ GEM
   specs:
     addressable (2.3.6)
     backports (3.6.4)
+    builder (3.2.2)
     connection_pool (2.1.0)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
@@ -49,6 +50,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  builder
   connection_pool
   logging
   rest_client

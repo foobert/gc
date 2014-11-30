@@ -32,6 +32,7 @@ module CacheCache
 
         def get_geocaches(opts = {})
             @logger.debug "get_geocaches, opts: #{opts.inspect}"
+            query_start = Time.now
             geocaches = _connect do |c|
                 q = r.table('geocaches')
                 if opts[:bounds]
@@ -78,8 +79,10 @@ module CacheCache
             end
 
             geocaches = _filterLogs(geocaches, opts[:excludeFinds])
+            query_stop = Time.now
+            query_elapsed = (query_stop - query_start) * 1000.0
 
-            @logger.debug "found #{geocaches.size} geocaches"
+            @logger.debug "found #{geocaches.size} geocaches in #{query_elapsed} msec"
 
             geocaches
         end
