@@ -1,5 +1,5 @@
 window.DB = (function() {
-    var server = "http://gc.funkenburg.net/api/";
+    var server = "https://gc.funkenburg.net/api/";
     //server = "http://localhost:5984/gc";
 
     var check = function(cb) {

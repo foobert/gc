@@ -1,7 +1,7 @@
 window.POI = (function() {
 
     var generatePoi = function(username, type, format, cb) {
-        _download('http://gc.funkenburg.net/api/poi.' + format + '?excludeFinds=' + username + '&type=' + type, cb);
+        _download('https://gc.funkenburg.net/api/poi.' + format + '?excludeFinds=' + username + '&type=' + type, cb);
     };
 
     var downloadImage = function(type, cb) {
