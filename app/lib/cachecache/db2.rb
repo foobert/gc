@@ -72,7 +72,7 @@ module CacheCache
                         'Difficulty', 'Terrain',
                         'EncodedHints',
                         'Attributes',
-                        'Latitude', 'Longitude')
+                        'Latitude', 'Longitude','updated')
                 end
                 @logger.debug "search query: #{q.inspect}"
                 q.run(c).to_a
