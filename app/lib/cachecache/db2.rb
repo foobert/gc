@@ -27,7 +27,10 @@ module CacheCache
         # Gets a single geocache from the database.
         # @param id [String] the id (GC number) of the geocache
         def get_geocache(id)
-            _run {|r| r.table('geocaches').get(id.downcase).default({'data' => nil})['data'] }
+            doc = _run {|r| r.table('geocaches').get(id.downcase).default({'data' => nil}) }
+            result = doc['data']
+            result['meta'] = {'updated' => doc['updated'] }
+            result
         end
 
         def get_geocaches(opts = {})
@@ -62,20 +65,24 @@ module CacheCache
                     @logger.debug "filtering archived and unavailable"
                     q = q.filter({:data => {:Archived => false, :Available => true }})
                 end
-                q = q['data']
-                unless opts[:full]
-                    q = q.pluck(
-                        'Code', 'Name',
-                        {'CacheType' => 'GeocacheTypeId'},
-                        {'ContainerType' => 'ContainerTypeName'},
-                        'Available', 'Archived',
-                        'Difficulty', 'Terrain',
-                        'EncodedHints',
-                        'Attributes',
-                        'Latitude', 'Longitude','updated')
-                end
                 @logger.debug "search query: #{q.inspect}"
                 q.run(c).to_a
+            end
+
+            geocaches.map! do |g|
+                mapped = Hash.new
+                if opts[:full]
+                    mapped = g['data']
+                else
+                    simple = %w{ Code Name Available Archived Difficulty Terrain EncodedHints Attributes Latitude Longitude }
+                    simple.each {|x| mapped[x] = g['data'][x] }
+                    # TODO this should be more generic
+                    mapped['CacheType'] = {'GeocacheTypeId' => g['data']['CacheType']['GeocacheTypeId']}
+                    mapped['ContainerType'] = {'ContainerTypeName' => g['data']['ContainerType']['ContainerTypeName']}
+                end
+
+                mapped['meta'] = { 'updated' => g['updated'] }
+                mapped
             end
 
             geocaches = _filterLogs(geocaches, opts[:excludeFinds])
