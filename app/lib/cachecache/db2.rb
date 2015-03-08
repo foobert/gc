@@ -69,6 +69,16 @@ module CacheCache
                 q.run(c).to_a
             end
 
+            if opts[:maxAge]
+                tp = TimeParser.new
+                now = Time.now.utc
+                maxAge = opts[:maxAge] * 24 * 60 * 60
+                geocaches.select! do |g|
+                    age = now - tp.parse(g['data']['UTCPlaceDate'])
+                    age <= maxAge
+                end
+            end
+
             geocaches.map! do |g|
                 mapped = Hash.new
                 if opts[:full]

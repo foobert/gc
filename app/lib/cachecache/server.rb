@@ -126,6 +126,10 @@ module CacheCache
                 opts[:stale] = _opt_to_bool(params[:stale])
             end
 
+            unless params[:maxAge].nil?
+                opts[:maxAge] = params[:maxAge].to_i
+            end
+
             opts
         end
 
