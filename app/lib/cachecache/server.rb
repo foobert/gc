@@ -53,7 +53,7 @@ module CacheCache
 
         namespace settings.path do
             get '/' do
-                json({'info' => 'cachecache'})
+                json({'info' => 'cachecache', 'test' => 'foo'})
             end
 
             get '/geocaches' do
