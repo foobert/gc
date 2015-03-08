@@ -17,7 +17,7 @@ geocaches = null
 debug "using API server at #{server}"
 debug "using self URL #{self}"
 
-app.get '/', Promise.coroutine (req, res, next) ->
+app.get '/*', Promise.coroutine (req, res, next) ->
 
     if not geocaches? or not lastFetch? or new Date - lastFetch > 60000
         debug 'fetching geocaches'
