@@ -1,0 +1,20 @@
+{
+  "name": "gc-feed",
+  "version": "0.0.1",
+  "description": "generates an atom feed of geocaches",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/foobert/gc.git"
+  },
+  "scripts": {
+    "start": "node_modules/.bin/coffee server.coffee"
+  },
+  "dependencies": {
+    "bluebird": "^2.9.13",
+    "coffee-script": "^1.9.1",
+    "debug": "^2.1.2",
+    "express": "^4.12.2",
+    "jade": "^1.9.2",
+    "superagent-as-promised": "^2.0.0"
+  }
+}

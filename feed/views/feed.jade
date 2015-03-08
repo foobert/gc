@@ -1,0 +1,15 @@
+doctype xml
+feed(xmlns='http://www.w3.org/2005/Atom')
+    id= self
+    title(type='text') Geocaches
+    updated= updated
+    link(href=self rel='self')
+    each geocache in geocaches
+        entry
+            id= geocache.Code
+            author
+                name= geocache.Owner.UserName
+            title #{geocache.Code} - #{geocache.Name}
+            link(rel='alternate' type='text/html' href=geocache.Url)
+            published= geocache.UTCPlaceDate
+            updated= geocache.UTCPlaceDate
