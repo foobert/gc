@@ -21,14 +21,20 @@ app.get '/*', Promise.coroutine (req, res, next) ->
 
     if not geocaches? or not lastFetch? or new Date - lastFetch > 60000
         debug 'fetching geocaches'
-        apiRes = yield request
-            .get "#{server}/geocaches"
-            .accept 'application/json'
-            .query
-                full: 1
-                maxAge: 14
-        geocaches = apiRes.body
-        lastFetch = new Date
+        try
+            apiRes = yield request
+                .get "#{server}/geocaches"
+                .accept 'application/json'
+                .query
+                    full: 1
+                    maxAge: 14
+            geocaches = apiRes.body
+            lastFetch = new Date
+        catch e
+            console.error "Unable to get upstream geocaches: #{e}"
+            res.status 500
+            res.send 'Failed to get upstream data'
+            return
 
     xml = template
         self: self
@@ -38,4 +44,4 @@ app.get '/*', Promise.coroutine (req, res, next) ->
     res.send xml
 
 app.set 'x-powered-by', false
-app.listen 8080
+app.listen 8081
