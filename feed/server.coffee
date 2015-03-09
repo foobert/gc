@@ -51,7 +51,7 @@ app.get '/*', Promise.coroutine (req, res, next) ->
 
     xml = template
         self: self
-        updated: '2015-01-01'
+        updated: '2015-01-02'
         geocaches: geocaches
     res.set 'Content-Type', 'application/atom+xml'
     res.send xml
