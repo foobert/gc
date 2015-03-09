@@ -29,6 +29,15 @@ fixTimestamps = (geocaches) ->
     geocaches.forEach (geocache) ->
         geocache.UTCPlaceDate = parseTime geocache.UTCPlaceDate
 
+sort = (geocaches) ->
+    geocaches.sort (a, b) ->
+        if a.UTCPlaceDate < b.UTCPlaceDate
+            1
+        else if a.UTCPlaceDate == b.UTCPlaceDate
+            0
+        else
+            -1
+
 app.get '/*', Promise.coroutine (req, res, next) ->
 
     if not geocaches? or not lastFetch? or new Date - lastFetch > 60000
@@ -40,8 +49,11 @@ app.get '/*', Promise.coroutine (req, res, next) ->
                 .query
                     full: 1
                     maxAge: 14
+
             geocaches = apiRes.body
             fixTimestamps geocaches
+            geocaches = sort geocaches
+
             lastFetch = new Date
         catch e
             console.error "Unable to get upstream geocaches: #{e}"
