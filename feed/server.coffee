@@ -63,7 +63,7 @@ app.get '/*', Promise.coroutine (req, res, next) ->
 
     xml = template
         self: self
-        updated: '2015-03-10 19:58:00'
+        updated: geocaches[0]?.UTCPlaceDate or new Date().toISOString()
         geocaches: geocaches
     res.set 'Content-Type', 'application/atom+xml'
     res.send xml
