@@ -1,5 +1,6 @@
 mixin content(geocache)
-    h1= geocache.Name / geocache.CacheType.GeocacheTypeName / geocache.ContainerType.ContainerTypeName / geocache.Difficulty / geocache.Terrain
+    h1 geocache.Name
+    h3 #{geocache.CacheType.GeocacheTypeName} / #{geocache.ContainerType.ContainerTypeName} / #{geocache.Difficulty} / #{geocache.Terrain}
 
 doctype xml
 feed(xmlns='http://www.w3.org/2005/Atom')
