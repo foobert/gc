@@ -6,7 +6,7 @@ require 'enumerator'
 module CacheCache
     class Geocaching
         MAX_PER_PAGE = 50
-        MAX_LOGS = 200
+        MAX_LOGS = 30
         SEARCH_DISTANCE = 50000
 
         def initialize
