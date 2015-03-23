@@ -1,0 +1,25 @@
+{
+  "name": "gc-rest",
+  "version": "0.0.1",
+  "description": "manages the geocache database abstraction",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/foobert/gc.git"
+  },
+  "scripts": {
+    "start": "node_modules/.bin/coffee --nodejs --harmony index.coffee",
+    "test": "node_modules/.bin/mocha --harmony"
+  },
+  "dependencies": {
+    "bluebird": "^2.9.13",
+    "body-parser": "^1.12.2",
+    "coffee-script": "^1.9.1",
+    "express": "^4.12.2",
+    "pg": "^4.3.0",
+    "squel": "^3.10.0",
+    "superagent-as-promised": "^2.0.0"
+  },
+  "devDependencies": {
+    "chai": "^2.1.2"
+  }
+}
