@@ -11,6 +11,11 @@ calculateRoute = Promise.coroutine (
         "from [#{startLatitude}, #{startLongitude}] " +
         "to [#{destinationLatitude}, #{destinationLongitude}]"
 
+    # Calculate route using the API from YOURS
+    # See http://wiki.openstreetmap.org/wiki/YOURS#Routing_API
+    #
+    # Other alternatives:
+    # http://wiki.openstreetmap.org/wiki/Routing/online_routers
     response = yield request
         .get "http://www.yournavigation.org/api/1.0/gosmore.php"
         .query
