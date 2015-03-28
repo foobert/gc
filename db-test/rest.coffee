@@ -2,13 +2,32 @@ express = require 'express'
 bodyParser = require 'body-parser'
 Promise = require 'bluebird'
 JSONStream = require 'JSONStream'
+
 GeocacheService = require './geocache-service'
+AccessService = require './access-service'
+
 geocacheService = new GeocacheService
+accessService = new AccessService
 
 app = express()
 
 app.set 'x-powered-by', false
 app.use bodyParser.json()
+
+app.use (err, req, res, next) ->
+    console.error err
+    res
+        .status 500
+        .send ':-('
+
+app.use Promise.coroutine (req, res, next) ->
+    isValid = yield accessService.validate req.path, req.method, req.get 'X-Token'
+    if isValid
+        next()
+    else
+        res
+            .status 403
+            .send 'Valid API token required'
 
 app.get '/geocaches', Promise.coroutine (req, res, next) ->
     res.set 'Content-Type', 'application/json'

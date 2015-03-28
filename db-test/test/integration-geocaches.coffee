@@ -1,53 +1,22 @@
 {expect} = require 'chai'
 Promise = require 'bluebird'
 request = require 'superagent-as-promised'
-pg = require 'pg'
-Promise.promisifyAll pg
-squel = require 'squel'
 
 url = 'http://localhost:8081'
-connectionString = 'postgres://localhost/gc'
+token = 'b4e124aa-96d9-4774-9565-b7e728561e4c'
 
 setupDatabase = Promise.coroutine (geocaches) ->
     response = yield request
         .del  "#{url}/geocaches"
+        .set 'X-Token', token
     expect(response.status).to.equal 202
 
     response = yield request
         .put "#{url}/geocaches"
         .set 'Content-Type', 'application/json'
+        .set 'X-Token', token
         .send geocaches
     expect(response.status).to.equal 201
-
-    #[client, done] = yield pg.connectAsync connectionString
-    #try
-        #yield client.queryAsync squel.delete().from('geocaches').toString()
-        #for geocache in geocaches
-            #sql = squel.insert()
-                #.into 'geocaches'
-                #.set 'id', geocache.id
-                #.set 'updated', geocache.updated
-                #.set 'data', JSON.stringify geocache.data
-                #.toString()
-            #yield client.queryAsync sql
-    #finally
-        #done()
-
-checkDatabase = Promise.coroutine ->
-    [client, done] = yield pg.connectAsync connectionString
-    try
-        sql = squel.select()
-            .from 'geocaches'
-            .field 'upper(trim(id))'
-            .field 'updated'
-            .field 'data'
-            .toString()
-        result = yield client.queryAsync sql
-        for row in result.rows
-            row.updated = row.updated.toISOString()
-        return result.rows
-    finally
-        done()
 
 gc = (id, options) ->
     defaults =
@@ -70,13 +39,6 @@ gc = (id, options) ->
         a
 
     merge defaults, options
-
-gcRest = (geocache) ->
-    result = JSON.parse JSON.stringify geocache.data
-    result.meta =
-        id: geocache.id
-        updated: geocache.updated
-    return result
 
 describe 'REST routes for geocaches', ->
     before Promise.coroutine ->
@@ -260,6 +222,7 @@ describe 'REST routes for geocaches', ->
             putResponse = yield request
                 .put "#{url}/geocaches"
                 .set 'Content-Type', 'application/json'
+                .set 'X-Token', token
                 .send [a]
 
             getResponse = yield request
@@ -268,4 +231,43 @@ describe 'REST routes for geocaches', ->
 
             expect(getResponse.body).to.deep.equal [a]
 
-        it 'should only allow POST with a valid API key'
+        it 'should should reject POSTs without a valid API key', Promise.coroutine ->
+            yield setupDatabase []
+
+            a = gc '100', meta: updated: new Date().toISOString()
+
+            try
+                putResponse = yield request
+                    .put "#{url}/geocaches"
+                    .set 'Content-Type', 'application/json'
+                    .set 'X-Token', 'invalid'
+                    .send [a]
+            catch err
+
+            expect(err.status).to.equal 403
+
+            getResponse = yield request
+                .get "#{url}/geocaches"
+                .set 'Accept', 'application/json'
+
+            expect(getResponse.body).to.deep.equal []
+
+        it 'should should reject POSTs with a missing API key', Promise.coroutine ->
+            yield setupDatabase []
+
+            a = gc '100', meta: updated: new Date().toISOString()
+
+            try
+                putResponse = yield request
+                    .put "#{url}/geocaches"
+                    .set 'Content-Type', 'application/json'
+                    .send [a]
+            catch err
+
+            expect(err.status).to.equal 403
+
+            getResponse = yield request
+                .get "#{url}/geocaches"
+                .set 'Accept', 'application/json'
+
+            expect(getResponse.body).to.deep.equal []
