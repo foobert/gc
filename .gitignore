@@ -4,3 +4,4 @@ app/vendor/bundle
 web/_site
 **/*.swp
 **/*.swo
+tags
