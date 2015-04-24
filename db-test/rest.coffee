@@ -5,7 +5,7 @@ JSONStream = require 'JSONStream'
 
 module.exports = (services) ->
     accessService = services.access
-    geocachingService = services.geocaching
+    geocacheService = services.geocache
 
     app = express()
 
