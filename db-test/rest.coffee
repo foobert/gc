@@ -19,13 +19,15 @@ module.exports = (services) ->
             .send ':-('
 
     app.use Promise.coroutine (req, res, next) ->
-        isValid = yield accessService.validate req.path, req.method, req.get 'X-Token'
-        if isValid
-            next()
-        else
-            res
-                .status 403
-                .send 'Valid API token required'
+        if req.method in ['GET', 'HEAD', 'OPTIONS']
+            return next()
+
+        if yield accessService.check req.get 'X-Token'
+            return next()
+
+        res
+            .status 403
+            .send 'Valid API token required'
 
     app.get '/geocaches', Promise.coroutine (req, res, next) ->
         res.set 'Content-Type', 'application/json'
