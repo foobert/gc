@@ -1,19 +1,23 @@
+uuid = require 'uuid'
 pg = require 'pg'
 squel = require 'squel'
-highland = require 'highland'
 Promise = require 'bluebird'
 Promise.promisifyAll pg
 
 class AccessService
-    validate: Promise.coroutine (route, method, token) ->
-        return true if method in ['GET', 'OPTIONS', 'HEAD']
+    constructor: (@connectionString) ->
 
-        yield @checkToken token
+    init: Promise.coroutine ->
+        token = yield @getToken()
+        if not token?
+            token = yield @addToken()
+        return token
+        #console.log "Token: #{token}"
 
-    checkToken: Promise.coroutine (token) ->
+    check: Promise.coroutine (token) ->
         return false if not token?
 
-        [client, done] = yield pg.connectAsync 'postgres://localhost/gc'
+        [client, done] = yield pg.connectAsync @connectionString
         try
             sql = squel.select()
                 .from 'tokens'
@@ -28,4 +32,34 @@ class AccessService
         finally
             done()
 
+    addToken: Promise.coroutine ->
+        token = uuid.v4()
+        [client, done] = yield pg.connectAsync @connectionString
+        try
+            sql = squel.insert()
+                .into 'tokens'
+                .set 'id', token
+                .toString()
+            result = yield client.queryAsync sql
+            return token
+        finally
+            done()
+
+    getToken: Promise.coroutine ->
+        [client, done] = yield pg.connectAsync @connectionString
+        try
+            sql = squel.select()
+                .from 'tokens'
+                .field 'id'
+                .limit 1
+                .toString()
+            result = yield client.queryAsync sql
+            if result.rowCount is 0
+                return null
+            else
+                return result.rows[0].id
+        finally
+            done()
+
 module.exports = AccessService
+

@@ -17,7 +17,8 @@
     "express": "^4.12.2",
     "pg": "^4.3.0",
     "squel": "^3.10.0",
-    "superagent-as-promised": "^2.0.0"
+    "superagent-as-promised": "^2.0.0",
+    "uuid": "^2.0.1"
   },
   "devDependencies": {
     "chai": "^2.1.2"

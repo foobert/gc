@@ -8,6 +8,4 @@ CREATE TABLE geocaches
 
 CREATE TABLE tokens
 ( id uuid UNIQUE
-, comment varchar(256)
-, created timestamp with time zone
 );
