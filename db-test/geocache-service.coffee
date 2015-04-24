@@ -21,8 +21,10 @@ class QueryStream extends stream.Readable
     _read: ->
 
 class GeocacheService
+    constructor: (@connectionString) ->
+
     _queryGeocaches: Promise.coroutine (query, withData) ->
-        [client, done] = yield pg.connectAsync 'postgres://localhost/gc'
+        [client, done] = yield pg.connectAsync @connectionString
         sql = squel.select()
             .from 'geocaches'
             .field 'id'
@@ -82,7 +84,7 @@ class GeocacheService
             return row.id.trim().toUpperCase()
 
     get: Promise.coroutine (id) ->
-        [client, done] = yield pg.connectAsync 'postgres://localhost/gc'
+        [client, done] = yield pg.connectAsync @connectionString
         try
             row = yield client.query squel.select()
                 .from 'geocaches'
@@ -132,14 +134,14 @@ class GeocacheService
             throw err
 
     upsert: Promise.coroutine (data) ->
-        [client, done] = yield pg.connectAsync 'postgres://localhost/gc'
+        [client, done] = yield pg.connectAsync @connectionString
         try
             yield @_upsert client, data
         finally
             done()
 
     upsertBulk: Promise.coroutine (datas) ->
-        [client, done] = yield pg.connectAsync 'postgres://localhost/gc'
+        [client, done] = yield pg.connectAsync @connectionString
         try
             for data in datas
                 yield @_upsert client, data
@@ -147,7 +149,7 @@ class GeocacheService
             done()
 
     deleteAll: Promise.coroutine ->
-        [client, done] = yield pg.connectAsync 'postgres://localhost/gc'
+        [client, done] = yield pg.connectAsync @connectionString
         try
             sql = squel.delete()
                 .from 'geocaches'

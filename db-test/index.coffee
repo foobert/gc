@@ -5,9 +5,9 @@ main = Promise.coroutine ->
     GeocacheService = require './geocache-service'
     AccessService = require './access-service'
 
-    geocacheService = new GeocacheService
-
-    accessService = new AccessService 'postgres://127.0.0.1/gc'
+    connectionString = 'postgres://127.0.0.1/gc'
+    geocacheService = new GeocacheService connectionString
+    accessService = new AccessService connectionString
     token = yield accessService.init()
     console.log "Token: #{token}"
 
