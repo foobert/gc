@@ -25,9 +25,19 @@ parseTime = (time) ->
     timezone_minutes = parseInt(match[3]) * 60
     new Date((seconds_epoch - timezone_hours - timezone_minutes) * 1000).toISOString()
 
-fixTimestamps = (geocaches) ->
+formatCoordinates = (latitude, longitude) ->
+    convert = (deg) ->
+        fullDeg = parseInt deg
+        min = (deg - fullDeg) * 60
+        "#{fullDeg}' #{min.toFixed 3}"
+    latPrefix = if latitude < 0 then 'S' else 'N'
+    lonPrefix = if longitude < 0 then 'W' else 'E'
+    return "#{latPrefix} #{convert latitude} #{lonPrefix} #{convert longitude}"
+
+fixupGeocaches = (geocaches) ->
     geocaches.forEach (geocache) ->
         geocache.UTCPlaceDate = parseTime geocache.UTCPlaceDate
+        geocache.Coordinates = formatCoordinates geocache.Latitude, geocache.Longitude
 
 sort = (geocaches) ->
     geocaches.sort (a, b) ->
@@ -51,7 +61,7 @@ app.get '/*', Promise.coroutine (req, res, next) ->
                     maxAge: 14
 
             geocaches = apiRes.body
-            fixTimestamps geocaches
+            fixupGeocaches geocaches
             geocaches = sort geocaches
 
             lastFetch = new Date
