@@ -1,0 +1,13 @@
+{
+  "name": "gc-route",
+  "version": "0.0.1",
+  "description": "Search for Geocaches along a travel route",
+  "repository": "https://github.com/foobert/gc",
+  "readme": "README.md",
+  "dependencies": {
+    "bluebird": "^2.9.21",
+    "commander": "^2.7.1",
+    "debug": "^2.1.3",
+    "superagent": "^1.1.0"
+  }
+}
