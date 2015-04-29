@@ -39,6 +39,25 @@ fixupGeocaches = (geocaches) ->
         geocache.UTCPlaceDate = parseTime geocache.UTCPlaceDate
         geocache.Coordinates = formatCoordinates geocache.Latitude, geocache.Longitude
 
+_toRad = (x) ->
+    x * Math.PI / 180
+
+setDistance = (geocaches, center) ->
+    [lat1, lon1] = center
+    r = 6371000 # earth radius in meters
+    phi1 = _toRad lat1
+    geocaches.forEach (geocache) ->
+        phi2 = _toRad geocache.Latitude
+        deltaPhi = _toRad (geocache.Latitude - lat1)
+        deltaLambda = _toRad (geocache.Longitude - lon1)
+
+        a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+            Math.cos(phi1) * Math.cos(phi2) *
+            Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2)
+        c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+        geocache.Distance = r * c
+
 sort = (geocaches) ->
     geocaches.sort (a, b) ->
         if a.UTCPlaceDate < b.UTCPlaceDate
@@ -70,6 +89,9 @@ app.get '/*', Promise.coroutine (req, res, next) ->
             res.status 500
             res.send 'Failed to get upstream data'
             return
+
+    if req.query.homeLat? and req.query.homeLon?
+        setDistance geocaches, [parseFloat(req.query.homeLat), parseFloat(req.query.homeLon)]
 
     xml = template
         self: self

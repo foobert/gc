@@ -1,5 +1,7 @@
 mixin content(geocache)
     h4 #{geocache.CacheType.GeocacheTypeName} / #{geocache.ContainerType.ContainerTypeName} / D: #{geocache.Difficulty} / T: #{geocache.Terrain} / Coord: #{geocache.Coordinates}
+    if typeof geocache.Distance != 'undefined'
+        p Distance: #{Math.round(geocache.Distance / 1000)} km
 
 doctype xml
 feed(xmlns='http://www.w3.org/2005/Atom')
