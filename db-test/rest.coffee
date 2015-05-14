@@ -68,7 +68,7 @@ module.exports = (services) ->
 
     app.delete '/geocaches', async (req, res, next) ->
         yield geocacheService.deleteAll()
-        res.status 202
+        res.status 204
         res.send ''
 
     app.get '/gcs', async (req, res, next) ->
