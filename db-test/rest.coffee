@@ -38,8 +38,12 @@ module.exports = (services) ->
             .pipe res
 
     app.get '/geocache/:gc', async (req, res, next) ->
-        geocache = yield geocacheService.getSingle req.params.gc
-        res.json geocache
+        geocache = yield geocacheService.get req.params.gc
+        if not geocache?
+            res.status 404
+            res.send '404 - Geocache not found\n'
+        else
+            res.json geocache
 
     app.put '/geocaches', async (req, res, next) ->
         models = if typeof req.body is 'array'
@@ -64,7 +68,7 @@ module.exports = (services) ->
             .pipe res
 
     app.use (err, req, res, next) ->
-        console.error err
+        console.error err.stack
         res.status 500
         res.send ':-('
 

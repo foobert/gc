@@ -56,6 +56,7 @@ class GeocacheService
         @_queryGeocaches query, withData
 
     _mapRow: (row, withData = true) ->
+        return null unless row?
         if withData
             result = row.data
             result.meta =
@@ -67,12 +68,17 @@ class GeocacheService
     get: Promise.coroutine (id) ->
         [client, done] = yield @db.connect()
         try
-            row = yield client.query @db.select()
+            sql = @db.select()
                 .from 'geocaches'
                 .field 'updated'
                 .field 'data'
                 .where 'id = ?', id.trim().toLowerCase()
-            return @_mapRow row, true
+                .toString()
+            result = yield client.queryAsync sql
+            if result.rowCount is 0
+                return null
+            else
+                return @_mapRow result.rows[0], true
         finally
             done()
 
