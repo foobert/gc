@@ -55,6 +55,12 @@ module.exports = (services) ->
         res.status 201
         res.send ''
 
+    app.put '/geocache/:gc/seen', async (req, res, next) ->
+        now = Date.parse req.body
+        yield geocacheService.touch req.params.gc
+        res.status 200
+        res.send ''
+
     app.delete '/geocaches', async (req, res, next) ->
         yield geocacheService.deleteAll()
         res.status 202

@@ -81,6 +81,17 @@ class GeocacheService
                 return @_mapRow result.rows[0], true
         finally
             done()
+    touch: Promise.coroutine (id, date) ->
+        [client, done] = yield @db.connect()
+        try
+            sql = @db.update()
+                .table 'geocaches'
+                .set 'updated = ?', date
+                .where 'id = ?', id
+                .toString()
+            result = yield client.queryAsync sql
+        finally
+            done()
 
     _upsert: Promise.coroutine (client, data) ->
         console.log data
