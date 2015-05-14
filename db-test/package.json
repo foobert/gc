@@ -7,8 +7,9 @@
     "url": "http://github.com/foobert/gc.git"
   },
   "scripts": {
-    "start": "node_modules/.bin/coffee --nodejs --harmony index.coffee",
-    "test": "node_modules/.bin/mocha --harmony"
+    "start": "node_modules/.bin/coffee index.coffee",
+    "test": "node_modules/.bin/mocha",
+    "dev": "node_modules/.bin/nodemon --exec node_modules/.bin/coffee index.coffee"
   },
   "dependencies": {
     "bluebird": "^2.9.13",
@@ -21,6 +22,7 @@
     "uuid": "^2.0.1"
   },
   "devDependencies": {
-    "chai": "^2.1.2"
+    "chai": "^2.1.2",
+    "nodemon": "^1.3.7"
   }
 }
