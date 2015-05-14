@@ -12,11 +12,12 @@ module.exports = (services) ->
     app.set 'x-powered-by', false
     app.use bodyParser.json()
 
-    app.use (err, req, res, next) ->
-        console.error err
-        res
-            .status 500
-            .send ':-('
+    async = (f) ->
+        Promise.coroutine (req, res, next) ->
+            try
+                yield from f req, res, next
+            catch err
+                next err
 
     app.use Promise.coroutine (req, res, next) ->
         if req.method in ['GET', 'HEAD', 'OPTIONS']
@@ -29,32 +30,42 @@ module.exports = (services) ->
             .status 403
             .send 'Valid API token required'
 
-    app.get '/geocaches', Promise.coroutine (req, res, next) ->
+    app.get '/geocaches', async (req, res, next) ->
         res.set 'Content-Type', 'application/json'
         geocacheStream = yield geocacheService.getStream req.query, true
         geocacheStream
             .pipe JSONStream.stringify('[', ',', ']')
             .pipe res
 
-    app.get '/geocache/:gc', Promise.coroutine (req, res, next) ->
+    app.get '/geocache/:gc', async (req, res, next) ->
         geocache = yield geocacheService.getSingle req.params.gc
         res.json geocache
 
-    app.put '/geocaches', Promise.coroutine (req, res, next) ->
-        yield geocacheService.upsertBulk req.body
+    app.put '/geocaches', async (req, res, next) ->
+        models = if typeof req.body is 'array'
+            req.body
+        else
+            [req.body]
+
+        yield geocacheService.upsertBulk models
         res.status 201
         res.send ''
 
-    app.delete '/geocaches', Promise.coroutine (req, res, next) ->
+    app.delete '/geocaches', async (req, res, next) ->
         yield geocacheService.deleteAll()
         res.status 202
         res.send ''
 
-    app.get '/gcs', Promise.coroutine (req, res, next) ->
+    app.get '/gcs', async (req, res, next) ->
         res.set 'Content-Type', 'application/json'
         geocacheStream = yield geocacheService.getStream req.query, false
         geocacheStream
             .pipe JSONStream.stringify('[', ',', ']')
             .pipe res
+
+    app.use (err, req, res, next) ->
+        console.error err
+        res.status 500
+        res.send ':-('
 
     return app
