@@ -60,7 +60,7 @@ class CacheCache2
         count_total = 0
         count_updated = 0
         @logger.debug "Searching near #{lat} #{lon}"
-        @geo.search_geocaches(@config.accessToken, lat, lon, 1000) do |caches|
+        @geo.search_geocaches(@config.accessToken, lat, lon, 2000) do |caches|
             @logger.debug "Found #{caches.size} caches"
             count_total += caches.size
 
