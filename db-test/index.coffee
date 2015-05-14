@@ -1,13 +1,17 @@
 #!/usr/bin/env coffee
 Promise = require 'bluebird'
+Promise.longStackTraces()
+
 
 main = Promise.coroutine ->
     GeocacheService = require './geocache-service'
     AccessService = require './access-service'
 
-    connectionString = 'postgres://127.0.0.1/gc'
-    geocacheService = new GeocacheService connectionString
-    accessService = new AccessService connectionString
+    connectionString = "postgres://postgres@#{process.env.DB_PORT_5432_TCP_ADDR}/gc"
+    console.log connectionString
+    db = require('./db') connectionString
+    geocacheService = new GeocacheService db
+    accessService = new AccessService db
     token = yield accessService.init()
     console.log "Token: #{token}"
 

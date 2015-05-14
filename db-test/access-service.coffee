@@ -1,25 +1,18 @@
 uuid = require 'uuid'
-pg = require 'pg'
-squel = require 'squel'
 Promise = require 'bluebird'
-Promise.promisifyAll pg
 
 class AccessService
-    constructor: (@connectionString) ->
+    constructor: (@db) ->
 
     init: Promise.coroutine ->
-        token = yield @getToken()
-        if not token?
-            token = yield @addToken()
-        return token
-        #console.log "Token: #{token}"
+        return yield @getToken() or yield @addToken()
 
     check: Promise.coroutine (token) ->
         return false if not token?
 
-        [client, done] = yield pg.connectAsync @connectionString
+        [client, done] = yield @db.connect()
         try
-            sql = squel.select()
+            sql = @db.select()
                 .from 'tokens'
                 .field 'id'
                 .where 'id = ?', token
@@ -34,9 +27,9 @@ class AccessService
 
     addToken: Promise.coroutine ->
         token = uuid.v4()
-        [client, done] = yield pg.connectAsync @connectionString
+        [client, done] = yield @db.connect()
         try
-            sql = squel.insert()
+            sql = @db.insert()
                 .into 'tokens'
                 .set 'id', token
                 .toString()
@@ -46,9 +39,9 @@ class AccessService
             done()
 
     getToken: Promise.coroutine ->
-        [client, done] = yield pg.connectAsync @connectionString
+        [client, done] = yield @db.connect()
         try
-            sql = squel.select()
+            sql = @db.select()
                 .from 'tokens'
                 .field 'id'
                 .limit 1

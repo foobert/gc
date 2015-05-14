@@ -1,31 +1,12 @@
-pg = require 'pg'
-squel = require 'squel'
-highland = require 'highland'
-Promise = require 'bluebird'
-Promise.promisifyAll pg
 stream = require 'stream'
-
-class QueryStream extends stream.Readable
-    constructor: (query, map, done) ->
-        super objectMode: true
-
-        query.on 'row', (row) =>
-            @push map(row)
-        query.on 'end', (result) =>
-            @push null
-            done()
-        query.on 'error', (err) =>
-            @push null
-            done(err)
-
-    _read: ->
+Promise = require 'bluebird'
 
 class GeocacheService
-    constructor: (@connectionString) ->
+    constructor: (@db) ->
 
     _queryGeocaches: Promise.coroutine (query, withData) ->
-        [client, done] = yield pg.connectAsync @connectionString
-        sql = squel.select()
+        [client, done] = yield @db.connect()
+        sql = @db.select()
             .from 'geocaches'
             .field 'id'
             .field 'updated'
@@ -84,9 +65,9 @@ class GeocacheService
             return row.id.trim().toUpperCase()
 
     get: Promise.coroutine (id) ->
-        [client, done] = yield pg.connectAsync @connectionString
+        [client, done] = yield @db.connect()
         try
-            row = yield client.query squel.select()
+            row = yield client.query @db.select()
                 .from 'geocaches'
                 .field 'updated'
                 .field 'data'
@@ -96,6 +77,7 @@ class GeocacheService
             done()
 
     _upsert: Promise.coroutine (client, data) ->
+        console.log data
         id = data.Code?.toLowerCase()
         updated = data.meta?.updated
         delete data.meta
@@ -105,21 +87,21 @@ class GeocacheService
         try
             yield client.queryAsync 'BEGIN'
 
-            sql = squel.select()
+            sql = @db.select()
                 .field 'id'
                 .from 'geocaches'
                 .where 'id = ?', id
                 .toString()
             result = yield client.queryAsync sql
             sql = if result.rowCount is 0
-                squel.insert()
+                @db.insert()
                     .into 'geocaches'
                     .set 'id', id
                     .set 'updated', updated or 'CURRENT_TIMESTAMP', dontQuote: not updated?
                     .set 'data', JSON.stringify data
                     .toString()
             else
-                squel.update()
+                @db.update()
                     .table 'geocaches'
                     .set 'updated', updated or 'CURRENT_TIMESTAMP', dontQuote: not updated?
                     .set 'data', JSON.stringify data
@@ -134,14 +116,14 @@ class GeocacheService
             throw err
 
     upsert: Promise.coroutine (data) ->
-        [client, done] = yield pg.connectAsync @connectionString
+        [client, done] = yield @db.connect()
         try
             yield @_upsert client, data
         finally
             done()
 
     upsertBulk: Promise.coroutine (datas) ->
-        [client, done] = yield pg.connectAsync @connectionString
+        [client, done] = yield @db.connect()
         try
             for data in datas
                 yield @_upsert client, data
@@ -149,14 +131,29 @@ class GeocacheService
             done()
 
     deleteAll: Promise.coroutine ->
-        [client, done] = yield pg.connectAsync @connectionString
+        [client, done] = yield @db.connect()
         try
-            sql = squel.delete()
+            sql = @db.delete()
                 .from 'geocaches'
                 .toString()
             console.log sql
             yield client.queryAsync sql
         finally
             done()
+
+class QueryStream extends stream.Readable
+    constructor: (query, map, done) ->
+        super objectMode: true
+
+        query.on 'row', (row) =>
+            @push map(row)
+        query.on 'end', (result) =>
+            @push null
+            done()
+        query.on 'error', (err) =>
+            @push null
+            done(err)
+
+    _read: ->
 
 module.exports = GeocacheService
