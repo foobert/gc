@@ -4,8 +4,7 @@ Promise = require 'bluebird'
 JSONStream = require 'JSONStream'
 
 module.exports = (services) ->
-    accessService = services.access
-    geocacheService = services.geocache
+    {access, geocache} = services
 
     app = express()
 
@@ -24,7 +23,7 @@ module.exports = (services) ->
         if req.method in ['GET', 'HEAD', 'OPTIONS']
             return next()
 
-        if yield accessService.check req.get 'X-Token'
+        if yield access.check req.get 'X-Token'
             return next()
 
         res
@@ -37,27 +36,27 @@ module.exports = (services) ->
 
     app.get '/geocaches', async (req, res, next) ->
         res.set 'Content-Type', 'application/json'
-        geocacheStream = yield geocacheService.getStream req.query, true
+        geocacheStream = yield geocache.getStream req.query, true
         geocacheStream
             .pipe JSONStream.stringify('[', ',', ']')
             .pipe res
 
     app.get '/geocache/:gc', async (req, res, next) ->
-        geocache = yield geocacheService.get req.params.gc
-        if not geocache?
+        gc = yield geocache.get req.params.gc
+        if not gc?
             res.status 404
             res.send '404 - Geocache not found\n'
         else
-            res.header 'ETag', etag geocache
-            res.json geocache
+            res.header 'ETag', etag gc
+            res.json gc
 
     app.head '/geocache/:gc', async (req, res, next) ->
-        geocache = yield geocacheservice.get req.params.gc
-        if not geocache?
+        gc = yield geocacheservice.get req.params.gc
+        if not gc?
             res.status 404
             res.send '404 - Geocache not found\n'
         else
-            res.header 'ETag', etag geocache
+            res.header 'ETag', etag gc
             res.end
 
     app.put '/geocaches', async (req, res, next) ->
@@ -66,30 +65,30 @@ module.exports = (services) ->
         else
             [req.body]
 
-        yield geocacheService.upsertBulk models
+        yield geocache.upsertBulk models
         res.status 201
         res.send ''
 
     app.post '/geocache', async (req, res, next) ->
-        yield geocacheService.upsert req.body
+        yield geocache.upsert req.body
         res.status 201
         res.send ''
 
     app.put '/geocache/:gc/seen', async (req, res, next) ->
         now = Date.parse req.body
-        yield geocacheService.touch req.params.gc
+        yield geocache.touch req.params.gc
         res.status 200
         res.send ''
 
     app.delete '/geocaches', async (req, res, next) ->
-        yield geocacheService.deleteAll()
+        yield geocache.deleteAll()
         res.status 204
         res.send ''
 
     app.get '/gcs', async (req, res, next) ->
         res.set 'Content-Type', 'application/json'
-        geocacheStream = yield geocacheService.getStream req.query, false
-        geocacheStream
+        gcStream = yield geocache.getStream req.query, false
+        gcStream
             .pipe JSONStream.stringify('[', ',', ']')
             .pipe res
 
@@ -98,9 +97,9 @@ module.exports = (services) ->
         res.status 500
         res.send ':-('
 
-    etag = (geocache) ->
-        return null if not geocache?
-        time = geocache.DateLastUpdate
+    etag = (gc) ->
+        return null if not gc?
+        time = gc.DateLastUpdate
         match = time.match /^\/Date\((\d+)-(\d{2})(\d{2})\)\/$/
         return null if not match?
         seconds_epoch = parseInt(match[1]) / 1000
