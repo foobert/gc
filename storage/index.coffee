@@ -4,18 +4,18 @@ Promise.longStackTraces()
 
 
 main = Promise.coroutine ->
-    GeocacheService = require './geocache-service'
-    AccessService = require './access-service'
+    GeocacheService = require './lib/geocache'
+    AccessService = require './lib/access'
 
     connectionString = "postgres://postgres@#{process.env.DB_PORT_5432_TCP_ADDR}/gc"
     console.log connectionString
-    db = require('./db') connectionString
+    db = require('./lib/db') connectionString
     geocacheService = new GeocacheService db
     accessService = new AccessService db
     token = yield accessService.init()
     console.log "Token: #{token}"
 
-    app = require('./rest')
+    app = require('./lib/rest')
         geocache: geocacheService
         access: accessService
 
