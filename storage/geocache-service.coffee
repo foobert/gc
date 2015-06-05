@@ -111,20 +111,19 @@ class GeocacheService
                 .toString()
             result = yield client.queryAsync sql
             sql = if result.rowCount is 0
-                @db.insert()
+                @db.insert numberedParameters: true
                     .into 'geocaches'
                     .set 'id', id
                     .set 'updated', updated or 'CURRENT_TIMESTAMP', dontQuote: not updated?
                     .set 'data', JSON.stringify data
-                    .toString()
+                    .toParam()
             else
-                @db.update()
+                @db.update numberedParameters: true
                     .table 'geocaches'
                     .set 'updated', updated or 'CURRENT_TIMESTAMP', dontQuote: not updated?
                     .set 'data', JSON.stringify data
                     .where 'id = ?', id
-                    .toString()
-            console.log sql
+                    .toParam()
             result = yield client.queryAsync sql
             throw new Error "Insert/update had no effect: #{sql}" if result.rowCount is 0
             yield client.queryAsync 'COMMIT'
