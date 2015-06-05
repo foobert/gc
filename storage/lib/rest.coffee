@@ -31,6 +31,10 @@ module.exports = (services) ->
             .status 403
             .send 'Valid API token required'
 
+    app.get '/', (req, res, next) ->
+        res.status 200
+        res.send 'Okay'
+
     app.get '/geocaches', async (req, res, next) ->
         res.set 'Content-Type', 'application/json'
         geocacheStream = yield geocacheService.getStream req.query, true
