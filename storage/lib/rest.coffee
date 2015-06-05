@@ -1,7 +1,10 @@
-express = require 'express'
 bodyParser = require 'body-parser'
-Promise = require 'bluebird'
+csv = require 'csv'
+express = require 'express'
 JSONStream = require 'JSONStream'
+Promise = require 'bluebird'
+
+poi = require './poi'
 
 module.exports = (services) ->
     {access, geocache} = services
@@ -95,6 +98,20 @@ module.exports = (services) ->
         gcStream = yield geocache.getStream req.query, false
         gcStream
             .pipe JSONStream.stringify('[', ',', ']')
+            .pipe res
+
+    app.get '/poi.csv', async (req, res, next) ->
+        res.set 'Content-Type', 'text/csv'
+        gcStream = yield geocache.getStream req.query, true
+        gcStream
+            .pipe csv.transform (gc) ->
+                [
+                    gc.Longitude
+                    gc.Latitude
+                    poi.title gc
+                    poi.description gc
+                ]
+            .pipe csv.stringify()
             .pipe res
 
     app.use (err, req, res, next) ->
