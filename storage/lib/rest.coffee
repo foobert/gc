@@ -5,6 +5,8 @@ JSONStream = require 'JSONStream'
 Promise = require 'bluebird'
 
 poi = require './poi'
+GpxStream = require './gpx'
+XmlStream = require './xml'
 
 module.exports = (services) ->
     {access, geocache} = services
@@ -112,6 +114,14 @@ module.exports = (services) ->
                     poi.description gc
                 ]
             .pipe csv.stringify()
+            .pipe res
+
+    app.get '/poi.gpx', async (req, res, next) ->
+        res.set 'Content-Type', 'application/gpx+xml'
+        gcStream = yield geocache.getStream req.query, true
+        gcStream
+            .pipe new GpxStream()
+            .pipe new XmlStream()
             .pipe res
 
     app.use (err, req, res, next) ->
