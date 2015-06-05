@@ -85,6 +85,11 @@ module.exports = (services) ->
         res.status 204
         res.send ''
 
+    app.delete '/geocaches/:gc', async (req, res, next) ->
+        yield geocache.delete req.params.gc
+        res.status 204
+        res.send ''
+
     app.get '/gcs', async (req, res, next) ->
         res.set 'Content-Type', 'application/json'
         gcStream = yield geocache.getStream req.query, false

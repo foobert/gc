@@ -146,6 +146,18 @@ class GeocacheService
         finally
             done()
 
+    delete: Promise.coroutine (id) ->
+        [client, done] = yield @db.connect()
+        try
+            sql = @db.delete()
+                    .from 'geocaches'
+                    .where 'id = ?', id.trim().toLowerCase()
+                    .toString()
+            console.log sql
+            yield client.queryAsync sql
+        finally
+            done()
+
     deleteAll: Promise.coroutine ->
         [client, done] = yield @db.connect()
         try
