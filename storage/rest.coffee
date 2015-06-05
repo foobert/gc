@@ -10,6 +10,7 @@ module.exports = (services) ->
     app = express()
 
     app.set 'x-powered-by', false
+    app.set 'etag', false
     app.use bodyParser.json()
 
     async = (f) ->
@@ -43,7 +44,17 @@ module.exports = (services) ->
             res.status 404
             res.send '404 - Geocache not found\n'
         else
+            res.header 'ETag', etag geocache
             res.json geocache
+
+    app.head '/geocache/:gc', async (req, res, next) ->
+        geocache = yield geocacheservice.get req.params.gc
+        if not geocache?
+            res.status 404
+            res.send '404 - Geocache not found\n'
+        else
+            res.header 'ETag', etag geocache
+            res.end
 
     app.put '/geocaches', async (req, res, next) ->
         models = if typeof req.body is 'array'
@@ -82,5 +93,15 @@ module.exports = (services) ->
         console.error err.stack
         res.status 500
         res.send ':-('
+
+    etag = (geocache) ->
+        return null if not geocache?
+        time = geocache.DateLastUpdate
+        match = time.match /^\/Date\((\d+)-(\d{2})(\d{2})\)\/$/
+        return null if not match?
+        seconds_epoch = parseInt(match[1]) / 1000
+        timezone_hours = parseInt(match[2]) * 60 * 60
+        timezone_minutes = parseInt(match[3]) * 60
+        new Date((seconds_epoch - timezone_hours - timezone_minutes) * 1000).toISOString()
 
     return app
