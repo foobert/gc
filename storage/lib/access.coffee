@@ -5,7 +5,7 @@ class AccessService
     constructor: (@db) ->
 
     init: Promise.coroutine ->
-        return yield @getToken() or yield @addToken()
+        return (yield @getToken()) or (yield @addToken())
 
     check: Promise.coroutine (token) ->
         return false if not token?
