@@ -50,7 +50,7 @@ module.exports = (services) ->
             .pipe JSONStream.stringify('[', ',', ']')
             .pipe res
 
-    app.get '/geocache/:gc', async (req, res, next) ->
+    app.get '/geocaches?/:gc', async (req, res, next) ->
         gc = yield geocache.get req.params.gc
         if not gc?
             res.status 404
