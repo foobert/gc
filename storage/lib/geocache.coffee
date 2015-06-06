@@ -46,24 +46,41 @@ class GeocacheService
 
         console.log sql.toString()
 
-        query = client.query sql.toString()
-        map = (row) => @_mapRow row, withData
-        geocacheStream = new QueryStream query, map, done
+        rows = client.query sql.toString()
+        map = (row) => @_mapRow row, withData: withData, minimal: query.minimal is '1'
+        geocacheStream = new QueryStream rows, map, done
 
         return geocacheStream
 
     getStream: (query, withData) ->
         @_queryGeocaches query, withData
 
-    _mapRow: (row, withData = true) ->
+    _mapRow: (row, options = {}) ->
         return null unless row?
-        if withData
-            result = row.data
+        options.withData ?= true
+        options.minimal ?= true
+        if options.withData
+            result = if options.minimal then @_minimalData row.data else row.data
             result.meta =
                 updated: row.updated
             return result
         else
             return row.id.trim().toUpperCase()
+
+    _minimalData: (data) ->
+        result = {}
+        whitelist = [
+            'Code', 'Name', 'Available', 'Archived',
+            'Difficulty', 'Terrain', 'EncodedHints',
+            'Attributes', 'Latitude', 'Longitude'
+        ]
+        for x in whitelist
+            result[x] = data[x]
+        result.CacheType =
+            GeocacheTypeId: data.CacheType.GeocacheTypeId
+        result.ContainerType =
+            ContainerTypeName: data.ContainerType.ContainerTypeName
+        return result
 
     get: Promise.coroutine (id) ->
         [client, done] = yield @db.connect()
@@ -78,7 +95,7 @@ class GeocacheService
             if result.rowCount is 0
                 return null
             else
-                return @_mapRow result.rows[0], true
+                return @_mapRow result.rows[0]
         finally
             done()
     touch: Promise.coroutine (id, date) ->
