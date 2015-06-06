@@ -5,8 +5,7 @@ JSONStream = require 'JSONStream'
 Promise = require 'bluebird'
 
 poi = require './poi'
-GpxStream = require './gpx'
-XmlStream = require './xml'
+xml = require './xml'
 
 module.exports = (services) ->
     {access, geocache} = services
@@ -117,11 +116,25 @@ module.exports = (services) ->
             .pipe res
 
     app.get '/poi.gpx', async (req, res, next) ->
+        pre =  """
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd"
+version="1.1" creator="cachecache">
+"""
+        post = '</gpx>'
+
         res.set 'Content-Type', 'application/gpx+xml'
         gcStream = yield geocache.getStream req.query, true
         gcStream
-            .pipe new GpxStream()
-            .pipe new XmlStream()
+            .pipe xml.transform pre, post, (gc) ->
+                wpt:
+                    $:
+                        lat: gc.Latitude
+                        lon: gc.Longitude
+                    name: poi.title gc
+                    cmt: poi.description gc
+                    type: 'Geocache'
             .pipe res
 
     app.use (err, req, res, next) ->
