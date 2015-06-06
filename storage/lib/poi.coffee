@@ -9,7 +9,7 @@ clean = (s) ->
         .replace(/ {2,}/g, ' ')
         .replace(/[^a-zA-Z0-9;:?!,.-=_\/@$%*+()<> |\n]/g, '')
 
-getType = (gc) ->
+type = (gc) ->
     switch gc.CacheType.GeocacheTypeId
         when   2 then 'T'
         when   3 then 'M'
@@ -18,24 +18,28 @@ getType = (gc) ->
         when 137 then 'E'
         else '?'
 
-getCode = (gc) ->
+code = (gc) ->
     gc.Code[2..-1]
 
-getSkill = (gc) ->
+skill = (gc) ->
     "#{gc.Difficulty}/#{gc.Terrain}"
 
-getSize = (gc) ->
+size = (gc) ->
     gc.ContainerType.ContainerTypeName[0]
 
-getName = (gc) ->
+updated = (gc) ->
+    d = gc.meta.updated.toISOString()
+    d[5..6] + d[8..9]
+
+name = (gc) ->
     clean gc.Name
 
-getHint = (gc) ->
+hint = (gc) ->
     clean gc.EncodedHints ? ''
 
 module.exports =
     title: (gc) ->
-        "#{getCode gc} #{getSize gc} #{getType gc} #{getSkill gc}"
+        "#{size gc}#{type gc} #{skill gc} #{updated gc}"
 
     description: (gc) ->
-        "#{getName gc}\n#{getHint gc}"[0...100]
+        "#{code gc} #{name gc}\n#{hint gc}"[0...100]
