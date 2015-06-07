@@ -69,11 +69,7 @@ class GeocacheService
 
     _minimalData: (data) ->
         result = {}
-        whitelist = [
-            'Code', 'Name', 'Available', 'Archived',
-            'Difficulty', 'Terrain', 'EncodedHints',
-            'Attributes', 'Latitude', 'Longitude'
-        ]
+        whitelist = ['Code', 'Name', 'Available', 'Archived', 'Difficulty', 'Terrain', 'Latitude', 'Longitude']
         for x in whitelist
             result[x] = data[x]
         result.CacheType =
