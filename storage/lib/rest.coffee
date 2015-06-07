@@ -1,4 +1,5 @@
 bodyParser = require 'body-parser'
+compression = require 'compression'
 csv = require 'csv'
 express = require 'express'
 JSONStream = require 'JSONStream'
@@ -14,6 +15,7 @@ module.exports = (services) ->
 
     app.set 'x-powered-by', false
     app.set 'etag', false
+    app.use compression()
     app.use bodyParser.json()
 
     async = (f) ->
