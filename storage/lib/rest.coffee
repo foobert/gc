@@ -6,6 +6,7 @@ JSONStream = require 'JSONStream'
 Promise = require 'bluebird'
 
 poi = require './poi'
+streamTransform = require './transform'
 xml = require './xml'
 
 module.exports = (services) ->
@@ -142,6 +143,27 @@ version="1.1" creator="cachecache">
                     name: poi.title gc
                     cmt: poi.description gc
                     type: 'Geocache'
+            .pipe res
+
+    app.get '/poi.json', async (req, res, next) ->
+        gcStream = yield geocache.getStream req.query, true
+        gcStream
+            .pipe streamTransform (gc) ->
+                Code: gc.Code
+                Name: gc.Name
+                Available: gc.Available
+                Archived: gc.Archived
+                Difficulty: gc.Diffculty
+                Terrain: gc.Terrain
+                Latittude: gc.Latitude
+                Longitude: gc.Longitude
+                CacheType: GeocacheTypeId: gc.CacheType.GeocacheTypeId
+                ContainerType: ContainerTypeName: gc.ContainerType.ContainerTypeName
+                meta:
+                    poi:
+                        name: poi.title gc
+                        description: poi.description gc
+            .pipe JSONStream.stringify '[', ',', ']'
             .pipe res
 
     app.use (err, req, res, next) ->

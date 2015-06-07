@@ -47,7 +47,7 @@ class GeocacheService
         console.log sql.toString()
 
         rows = client.query sql.toString()
-        map = (row) => @_mapRow row, withData: withData, minimal: query.minimal is '1'
+        map = (row) => @_mapRow row, withData: withData
         geocacheStream = new QueryStream rows, map, done
 
         return geocacheStream
@@ -58,25 +58,13 @@ class GeocacheService
     _mapRow: (row, options = {}) ->
         return null unless row?
         options.withData ?= true
-        options.minimal ?= true
         if options.withData
-            result = if options.minimal then @_minimalData row.data else row.data
+            result = row.data
             result.meta =
                 updated: row.updated
             return result
         else
             return row.id.trim().toUpperCase()
-
-    _minimalData: (data) ->
-        result = {}
-        whitelist = ['Code', 'Name', 'Available', 'Archived', 'Difficulty', 'Terrain', 'Latitude', 'Longitude']
-        for x in whitelist
-            result[x] = data[x]
-        result.CacheType =
-            GeocacheTypeId: data.CacheType.GeocacheTypeId
-        result.ContainerType =
-            ContainerTypeName: data.ContainerType.ContainerTypeName
-        return result
 
     get: Promise.coroutine (id) ->
         [client, done] = yield @db.connect()
