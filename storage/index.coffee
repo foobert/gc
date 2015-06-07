@@ -2,7 +2,6 @@
 Promise = require 'bluebird'
 Promise.longStackTraces()
 
-
 main = Promise.coroutine ->
     GeocacheService = require './lib/geocache'
     AccessService = require './lib/access'
