@@ -7,9 +7,13 @@ main = Promise.coroutine ->
     GeocacheService = require './lib/geocache'
     AccessService = require './lib/access'
 
-    connectionString = "postgres://postgres@#{process.env.DB_PORT_5432_TCP_ADDR}/gc"
-    console.log connectionString
-    db = require('./lib/db') connectionString
+    db = require('./lib/db')
+        host: process.env.DB_PORT_5432_TCP_ADDR ? 'localhost'
+        user: process.env.DB_USER ? process.env.USER
+        password: process.env.DB_PASSWORD
+        database: process.env.DB ? 'gc'
+    yield db.up()
+
     geocacheService = new GeocacheService db
     accessService = new AccessService db
     token = yield accessService.init()
