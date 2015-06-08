@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>GC</title>
+
+  <link rel="stylesheet" type="text/css" href="css/semantic.min.css">
+
+  <script src="js/jquery-2.1.4.min.js"></script>
+  <script src="js/semantic.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <script src="js/index.js"></script>
+</head>
+
+<body>
+    <div class="ui page">
+        <div class="ui four item menu">
+            <a class="active item">POI Generator</a>
+            <a class="item">Geocache Map</a>
+            <a class="item">Track Analysis</a>
+            <a class="item">Statistics</a>
+        </div>
+
+        <h1 class="ui header dividing">POI Generator</h1>
+        <div class="ui form">
+            <div class="grouped fields">
+                <label>Geocache Types</label>
+                <div class="field">
+                    <div class="ui checkbox checked">
+                        <input type="checkbox" id="type-traditional" value="2" checked="checked"/>
+                        <label>Traditional Cache</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox checked">
+                        <input type="checkbox" id="type-multi" value="3" checked="checked"/>
+                        <label>Multi Cache</label>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>Exclude finds by</label>
+                <input type="text" id="username" placeholder="Username"/>
+            </div>
+            <div class="inline fields">
+                <label for="format">File Format:</label>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="format" checked="">
+                    <label>CSV</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="format">
+                    <label>GPX</label>
+                  </div>
+                </div>
+              </div>
+            <div class="ui submit button">Generate</div>
+        </div>
+    </div>
+</body>
+
+</html>
