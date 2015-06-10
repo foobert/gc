@@ -9,7 +9,6 @@ Menu = React.createClass
         <div className="ui page">
             <MainMenu/>
             <PoiGenerator {... @props} />
-            <div>mmh {@props.test}</div>
         </div>
 
 module.exports = React.createClass

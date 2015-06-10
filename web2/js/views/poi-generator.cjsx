@@ -46,7 +46,6 @@ module.exports = React.createClass
 
         <div>
             <h1 className="ui header dividing">POI Generator</h1>
-            <h2>foo {@props.test} bar {@props["type-traditional"]}</h2>
             <div className="ui form">
                 <div className="ui error message">
                     <div className="header">Download Failed</div>
