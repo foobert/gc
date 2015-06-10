@@ -1,6 +1,7 @@
 require '../css/index.css'
 
-{Actions, Store, Flummox} = require 'flummox'
+{Actions, Flummox} = require 'flummox'
+Store = require 'flummox-localstore'
 
 class PoiActions extends Actions
     setType: (typeId) ->
@@ -17,14 +18,19 @@ class PoiActions extends Actions
 
 class PoiStore extends Store
     constructor: (flux) ->
-        super()
+        super flux,
+            initialState:
+                "type-traditional": true
+                "type-multi": true
+                "type-earth": true
+                "type-letterbox": true
+                "type-webcam": true
+                format: 'csv'
 
         actions = flux.getActions 'poi'
         @register actions.setType, @handleType
         @register actions.setFormat, @handleFormat
         @register actions.setUsername, @handleUsername
-        @state =
-            format: 'gpx'
 
     handleType: (typeId) ->
         @setState
@@ -37,12 +43,6 @@ class PoiStore extends Store
     handleUsername: (username) ->
         @setState
             username: username
-
-    @serialize: (state) ->
-        JSON.stringify state
-
-    @deserialize: (json) ->
-        JSON.parse json
 
 class Flux extends Flummox
     constructor: ->
@@ -67,10 +67,6 @@ $ = window.$;#$ = require 'jquery'
 saveAs = require 'FileSaver'
 JSZip = require 'jszip'
 
-setTimeout ->
-    flux.getActions('poi').setType 'traditional'
-, 2000
-
 $('.submit.button').click ->
     $('.form').addClass 'loading'
     files = $.makeArray $('.form input[type=checkbox').map (i, input) ->
@@ -92,8 +88,3 @@ $('.submit.button').click ->
                 .fail ->
                     $('.form').removeClass('loading').addClass('error')
     h()
-
-
-setTimeout ->
-    console.log flux.serialize()
-, 5000
