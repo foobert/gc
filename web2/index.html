@@ -9,86 +9,10 @@
   <script src="js/jquery-2.1.4.min.js"></script>
   <script src="js/semantic.min.js"></script>
 
-  <script src="bundle.js"></script>
 </head>
 
 <body>
-    <div class="ui page">
-        <div class="ui left visible vertical inverted labeled icon sidebar menu">
-            <div class="header item"><i class="home icon"></i>Cache Cache</div>
-            <a class="active item"><i class="marker icon"></i>POI Generator</a>
-            <a class="item"><i class="map icon"></i>Geocache Map</a>
-            <a class="item">
-                <i class="sort content ascending icon"></i>
-                Track Analysis
-            </a>
-            <a class="item"><i class="line chart icon"></i>Statistics</a>
-        </div>
-
-        <h1 class="ui header dividing">POI Generator</h1>
-        <div class="ui form">
-            <div class="ui error message">
-                <div class="header">Download Failed</div>
-                <p>Error something something.</p>
-            </div>
-            <div class="grouped fields">
-                <label>Geocache Types</label>
-                <div class="field">
-                    <div class="ui checkbox checked">
-                        <input type="checkbox" id="type-traditional" value="2" checked="checked"/>
-                        <label>Traditional Cache</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox checked">
-                        <input type="checkbox" id="type-multicache" value="3" checked="checked"/>
-                        <label>Multi Cache</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox checked">
-                        <input type="checkbox" id="type-earthcache" value="137" checked="checked"/>
-                        <label>Earth Cache</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox checked">
-                        <input type="checkbox" id="type-letterbox" value="5" checked="checked"/>
-                        <label>Letterbox</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui checkbox checked">
-                        <input type="checkbox" id="type-webcam" value="11" checked="checked"/>
-                        <label>Webcam Cache</label>
-                    </div>
-                </div>
-            </div>
-            <div class="field">
-                <label>Exclude finds by</label>
-                <input type="text" id="username" placeholder="Username"/>
-            </div>
-            <div class="inline fields">
-                <label for="format">File Format:</label>
-                <div class="field">
-                    <div class="ui radio checkbox">
-                        <input type="radio" name="format" checked="">
-                        <label>CSV</label>
-                    </div>
-                </div>
-                <div class="field">
-                    <div class="ui radio checkbox">
-                        <input type="radio" name="format">
-                        <label>GPX</label>
-                    </div>
-                </div>
-            </div>
-            <div class="ui submit labeled icon button">
-                <i class="cloud download icon"></i>
-                Generate
-            </div>
-        </div>
-    </div>
+    <script src="bundle.js"></script>
 </body>
 
 </html>

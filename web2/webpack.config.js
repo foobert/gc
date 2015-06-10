@@ -8,7 +8,8 @@ module.exports = {
     module: {
         loaders: [
             { test: /\.css$/, loader: "style!css" },
-            { test: /\.coffee$/, loader: "coffee-loader" }
+            { test: /\.coffee$/, loader: "coffee-loader" },
+            { test: /\.cjsx$/, loaders: ['coffee', 'cjsx']}
         ]
     }
 };
