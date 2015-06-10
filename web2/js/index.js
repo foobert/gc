@@ -1,5 +1,4 @@
 require('../css/index.css');
-require('jquery');
 
 $(function() {
     $('.ui.checkbox').checkbox();
