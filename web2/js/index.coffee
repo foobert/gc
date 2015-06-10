@@ -11,13 +11,9 @@ $ ->
 
     $('.submit.button').click ->
         $('.form').addClass 'loading'
-        files = [
-            url: 'https://gc.funkenburg.net/api/poi.csv?type=3'
-            name: 'multi.csv'
-        ,
-            url: 'http://gc.funkenburg.net/api/poi.csv?type=2'
-            name: 'tradi.csv'
-        ]
+        files = $.makeArray $('.form input[type=checkbox').map (i, input) ->
+            url: "https://gc.funkenburg.net/api/poi.csv?type=#{input.value}"
+            name: "#{input.id.substr(5)}.csv"
         zip = new JSZip()
         zipFolder = zip.folder 'poi'
         h = (name, data) ->
