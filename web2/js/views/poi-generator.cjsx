@@ -1,4 +1,5 @@
 React = require 'react'
+classnames = require 'classnames'
 
 GeocacheTypeCheckbox = React.createClass
     render: ->
@@ -44,9 +45,15 @@ module.exports = React.createClass
             name: 'webcam', label: 'Webcam Geocache'
         ]
 
+        classes = classnames
+            ui: true
+            form: true
+            loading: @props.loading
+            error: @props.error
+
         <div>
             <h1 className="ui header dividing">POI Generator</h1>
-            <div className="ui form">
+            <div className={classes}>
                 <div className="ui error message">
                     <div className="header">Download Failed</div>
                     <p>Error something something.</p>
@@ -94,7 +101,7 @@ module.exports = React.createClass
                         </div>
                     </div>
                 </div>
-                <div className="ui submit labeled icon button">
+                <div className="ui submit labeled icon button" onClick={=> @props.submit @props.types}>
                     <i className="cloud download icon"></i>
                     Generate
                 </div>
