@@ -1,3 +1,6 @@
+require('../css/index.css');
+require('jquery');
+
 $(function() {
     $('.ui.checkbox').checkbox();
     $('.ui.radio.checkbox').checkbox();
@@ -8,6 +11,7 @@ $(function() {
             {url: 'https://gc.funkenburg.net/api/poi.csv?type=3', name: 'multi.csv'},
             {url: 'http://gc.funkenburg.net/api/poi.csv?type=2', name: 'tradi.csv'}
         ];
+        var JSZip = require('jszip');
         var zip = new JSZip();
         var zipFolder = zip.folder('poi');
         var h = function(name, data) {
@@ -16,6 +20,7 @@ $(function() {
             }
             if (files.length === 0) {
                 var zipBlob = zip.generate({type: 'blob'});
+                var saveAs = require('FileSaver');
                 saveAs(zipBlob, 'poi.zip');
                 $('.form').removeClass('loading');
             } else {
