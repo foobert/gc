@@ -8,6 +8,8 @@
 
   <script src="js/jquery-2.1.4.min.js"></script>
   <script src="js/semantic.min.js"></script>
+  <script src="js/FileSaver.js"></script>
+  <script src="js/jszip.min.js"></script>
 
   <link rel="stylesheet" type="text/css" href="css/index.css">
   <script src="js/index.js"></script>
@@ -28,6 +30,10 @@
 
         <h1 class="ui header dividing">POI Generator</h1>
         <div class="ui form">
+            <div class="ui error message">
+                <div class="header">Download Failed</div>
+                <p>Error something something.</p>
+            </div>
             <div class="grouped fields">
                 <label>Geocache Types</label>
                 <div class="field">
@@ -50,18 +56,18 @@
             <div class="inline fields">
                 <label for="format">File Format:</label>
                 <div class="field">
-                  <div class="ui radio checkbox">
-                    <input type="radio" name="format" checked="">
-                    <label>CSV</label>
-                  </div>
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="format" checked="">
+                        <label>CSV</label>
+                    </div>
                 </div>
                 <div class="field">
-                  <div class="ui radio checkbox">
-                    <input type="radio" name="format">
-                    <label>GPX</label>
-                  </div>
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="format">
+                        <label>GPX</label>
+                    </div>
                 </div>
-              </div>
+            </div>
             <div class="ui submit labeled icon button">
                 <i class="cloud download icon"></i>
                 Generate
