@@ -14,13 +14,15 @@ class PoiStore extends Store
                 types: ['traditional', 'multi', 'earth', 'letterbox', 'webcam']
                 loading: false
                 error: false
+                filename: null
             serializer: (state) ->
-                _.omit state, ['loading', 'error']
+                _.omit state, ['loading', 'error', 'filename']
 
         actions = flux.getActions 'poi'
         @register actions.setType, @handleType
         @register actions.setFormat, @handleFormat
         @register actions.setUsername, @handleUsername
+        @register actions.setFilename, @handleFilename
         @registerAsync actions.submit, @handleSubmitBegin, @handleSubmitSuccess, @handleSubmitFail
 
     handleType: (typeId) ->
@@ -42,6 +44,10 @@ class PoiStore extends Store
     handleUsername: (username) ->
         @setState
             username: username
+
+    handleFilename: (filename) ->
+        @setState
+            filename: filename
 
     handleSubmitBegin: ->
         @setState

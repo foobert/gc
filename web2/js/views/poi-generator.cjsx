@@ -48,12 +48,17 @@ module.exports = React.createClass
         classes = classnames
             ui: true
             form: true
-            loading: @props.loading
             error: @props.error
+            dimmable: true
+            dimmed: @props.loading
+            disabled: @props.loading
 
         <div>
             <h1 className="ui header dividing">POI Generator</h1>
             <div className={classes}>
+                <div className="ui simple inverted dimmer">
+                    <div className="ui text loader">Downloading {@props.filename}&hellip;</div>
+                </div>
                 <div className="ui error message">
                     <div className="header">Download Failed</div>
                     <p>Error something something.</p>
