@@ -13,7 +13,7 @@ module.exports = React.createClass
                 POI Generator
             </a>
             <a className="item">
-                <i className="map icon"></i>
+                <i className="world icon"></i>
                 Geocache Map
             </a>
             <a className="item">
