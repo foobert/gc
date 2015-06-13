@@ -10,7 +10,9 @@ class Flux extends Flummox
         super()
 
         @createActions 'poi', require './actions/poi.coffee'
+        @createActions 'navigation', require './actions/navigation.coffee'
         @createStore 'poi', require('./stores/poi.coffee'), this
+        @createStore 'navigation', require('./stores/navigation.coffee'), this
 
 flux = new Flux()
 React.render React.createElement(Page, {
@@ -19,4 +21,5 @@ React.render React.createElement(Page, {
     setFormat: flux.getActions('poi').setFormat
     setUsername: flux.getActions('poi').setUsername
     submit: flux.getActions('poi').submit
+    setPage: flux.getActions('navigation').setPage
 }), document.body

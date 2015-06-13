@@ -3,24 +3,30 @@ React = require 'react'
 module.exports = React.createClass
     displayName: 'MainMenu'
     render: ->
+        active = (id) =>
+            if @props.page is id
+                'active item'
+            else
+                'item'
+
         <div className="ui left visible vertical inverted labeled icon sidebar menu">
             <div className="header item">
                 <i className="home icon"></i>
                 Cache Cache
             </div>
-            <a className="active item">
+            <a className={active 'poi'} onClick={=> @props.setPage 'poi'}>
                 <i className="marker icon"></i>
                 POI Generator
             </a>
-            <a className="item">
+            <a className={active 'map'} onClick={=> @props.setPage 'map' }>
                 <i className="world icon"></i>
                 Geocache Map
             </a>
-            <a className="item">
+            <a className={active 'track'}>
                 <i className="sort content ascending icon"></i>
                 Track Analysis
             </a>
-            <a className="item">
+            <a className={active 'statistics'}>
                 <i className="line chart icon"></i>
                 Statistics
             </a>
