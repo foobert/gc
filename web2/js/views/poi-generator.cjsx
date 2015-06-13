@@ -56,9 +56,6 @@ module.exports = React.createClass
         <div className="poi-generator">
             <h1 className="ui header dividing">POI Generator</h1>
             <div className={classes}>
-                <div className="ui simple inverted dimmer">
-                    <div className="ui text loader">Downloading {@props.filename}&hellip;</div>
-                </div>
                 <div className="ui error message">
                     <div className="header">Download Failed</div>
                     <p>Error something something.</p>
