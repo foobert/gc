@@ -53,7 +53,7 @@ module.exports = React.createClass
             dimmed: @props.loading
             disabled: @props.loading
 
-        <div>
+        <div className="poi-generator">
             <h1 className="ui header dividing">POI Generator</h1>
             <div className={classes}>
                 <div className="ui simple inverted dimmer">

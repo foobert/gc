@@ -12,9 +12,11 @@ Page = React.createClass
             when 'map' then Map
             else PoiGenerator
 
-        <div className="ui page">
+        <div className="ui pushable">
             <MainMenu page={@props.page} setPage={@props.setPage}/>
-            {React.createElement(child, React.__spread({}, @props))}
+            <div className="pusher">
+                {React.createElement(child, React.__spread({}, @props))}
+            </div>
         </div>
 
 module.exports = React.createClass

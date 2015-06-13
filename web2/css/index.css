@@ -1,8 +1,15 @@
-body {
+html, body {
     background-color: #FFF;
+    height: 100%;
+    padding: 0;
+    margin: 0;
 }
 
-.page {
+.pusher {
+    height: 100%;
+}
+
+.poi-generator {
     width: 700px;
-    margin: 2em auto;
+    margin: 5em auto;
 }

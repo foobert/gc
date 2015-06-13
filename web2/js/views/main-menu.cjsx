@@ -9,7 +9,7 @@ module.exports = React.createClass
             else
                 'item'
 
-        <div className="ui left visible vertical inverted labeled icon sidebar menu">
+        <div className="ui left thin visible vertical inverted icon labeled sidebar menu">
             <div className="header item">
                 <i className="home icon"></i>
                 Cache Cache
