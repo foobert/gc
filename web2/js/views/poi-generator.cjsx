@@ -17,23 +17,8 @@ GeocacheTypeCheckbox = React.createClass
         </div>
 
 module.exports = React.createClass
-    displayName: 'PoiGenerator'
-
-
-    render: ->
-
-        typeCheckbox = (name, label) =>
-            setType = @props.setType.bind this, name
-            id = "type-#{name}"
-            <GeocacheTypeCheckbox
-                id={id}
-                key={id}
-                label={label}
-                selected={@props["type-#{name}"]}
-                toggle={setType}
-            />
-
-        types = [
+    getInitialState: ->
+        types: [
             name: 'traditional', label: 'Traditional Geocache'
         ,
             name: 'multi', label: 'Multi Geocache'
@@ -45,6 +30,7 @@ module.exports = React.createClass
             name: 'webcam', label: 'Webcam Geocache'
         ]
 
+    render: ->
         classes = classnames
             ui: true
             form: true
@@ -62,7 +48,7 @@ module.exports = React.createClass
                 </div>
                 <div className="grouped fields">
                     <label>Geocache Types</label>
-                    {typeCheckbox t.name, t.label for t in types}
+                    {@typeCheckbox t.name, t.label for t in @state.types}
                 </div>
                 <div className="field">
                     <label>Exclude finds by</label>
@@ -109,3 +95,14 @@ module.exports = React.createClass
                 </div>
             </div>
         </div>
+
+    typeCheckbox: (name, label) ->
+        setType = @props.setType.bind this, name
+        id = "type-#{name}"
+        <GeocacheTypeCheckbox
+            id={id}
+            key={id}
+            label={label}
+            selected={@props["type-#{name}"]}
+            toggle={setType}
+        />
