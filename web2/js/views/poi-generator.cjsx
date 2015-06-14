@@ -1,3 +1,4 @@
+FluxComponent = require 'flummox/component'
 React = require 'react'
 classnames = require 'classnames'
 
@@ -16,7 +17,10 @@ GeocacheTypeCheckbox = React.createClass
             </div>
         </div>
 
-module.exports = React.createClass
+PoiGenerator = React.createClass
+    componentWillMount: ->
+        @actions = @props.flux.getActions('poi')
+
     getInitialState: ->
         types: [
             name: 'traditional', label: 'Traditional Geocache'
@@ -57,7 +61,7 @@ module.exports = React.createClass
                         id="username"
                         placeholder="Username"
                         value={@props.username}
-                        onChange={ (ev) => @props.setUsername ev.target.value }
+                        onChange={ (ev) => @actions.setUsername ev.target.value }
                     />
                 </div>
                 <div className="inline fields">
@@ -70,7 +74,7 @@ module.exports = React.createClass
                                 id="format-csv"
                                 value="csv"
                                 checked={if @props.format is 'csv' then 'checked' else null}
-                                onChange={ (ev) => @props.setFormat ev.target.value }
+                                onChange={ (ev) => @actions.setFormat ev.target.value }
                             />
                             <label htmlFor="format-csv">CSV</label>
                         </div>
@@ -83,13 +87,13 @@ module.exports = React.createClass
                                 id="format-gpx"
                                 value="gpx"
                                 checked={if @props.format is 'gpx' then 'checked' else null}
-                                onChange={ (ev) => @props.setFormat ev.target.value }
+                                onChange={ (ev) => @actions.setFormat ev.target.value }
                             />
                             <label htmlFor="format-gpx">GPX</label>
                         </div>
                     </div>
                 </div>
-                <div className="ui submit labeled icon button" onClick={=> @props.submit @props.types}>
+                <div className="ui submit labeled icon button" onClick={=> @actions.submit @props.types}>
                     <i className="cloud download icon"></i>
                     Generate
                 </div>
@@ -97,7 +101,7 @@ module.exports = React.createClass
         </div>
 
     typeCheckbox: (name, label) ->
-        setType = @props.setType.bind this, name
+        setType = @actions.setType.bind this, name
         id = "type-#{name}"
         <GeocacheTypeCheckbox
             id={id}
@@ -106,3 +110,9 @@ module.exports = React.createClass
             selected={@props["type-#{name}"]}
             toggle={setType}
         />
+
+module.exports = React.createClass
+    render: ->
+        <FluxComponent connectToStores={['poi']}>
+            <PoiGenerator/>
+        </FluxComponent>

@@ -19,9 +19,4 @@ class Flux extends Flummox
 flux = new Flux()
 React.render React.createElement(Page, {
     flux: flux
-    setType: flux.getActions('poi').setType
-    setFormat: flux.getActions('poi').setFormat
-    setUsername: flux.getActions('poi').setUsername
-    submit: flux.getActions('poi').submit
-    setPage: flux.getActions('navigation').setPage
 }), document.body

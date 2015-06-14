@@ -1,10 +1,11 @@
+FluxComponent = require 'flummox/component'
 L = require 'leaflet'
 React = require 'react'
 
 #require 'leaflet/dist/leaflet.css'
 require '../../css/map.css'
 
-module.exports = React.createClass
+Map = React.createClass
     displayName: 'Geocache Map'
 
     getInitialState: ->
@@ -107,3 +108,9 @@ module.exports = React.createClass
             iconAnchor:   [16, 16] # point of the icon which will correspond to marker's location
             shadowAnchor: [0, 0]  # the same for the shadow
             popupAnchor:  [0, -16] # point from which the popup should open relative to the iconAnchor
+
+module.exports = React.createClass
+    render: ->
+        <FluxComponent connectToStores={['map']}>
+            <Map/>
+        </FluxComponent>
