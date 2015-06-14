@@ -11,8 +11,10 @@ class Flux extends Flummox
 
         @createActions 'poi', require './actions/poi.coffee'
         @createActions 'navigation', require './actions/navigation.coffee'
+        @createActions 'map', require './actions/map.coffee'
         @createStore 'poi', require('./stores/poi.coffee'), this
         @createStore 'navigation', require('./stores/navigation.coffee'), this
+        @createStore 'map', require('./stores/map.coffee'), this
 
 flux = new Flux()
 React.render React.createElement(Page, {

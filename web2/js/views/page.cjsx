@@ -21,6 +21,6 @@ Page = React.createClass
 
 module.exports = React.createClass
     render: ->
-        <FluxComponent flux=@props.flux connectToStores={['poi', 'navigation']}>
+        <FluxComponent flux=@props.flux connectToStores={['poi', 'navigation', 'map']}>
             <Page {... @props}/>
         </FluxComponent>
