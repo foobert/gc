@@ -1,6 +1,5 @@
 L = require 'leaflet'
 React = require 'react'
-jquery = require 'jquery'
 
 #require 'leaflet/dist/leaflet.css'
 require '../../css/map.css'
@@ -12,6 +11,8 @@ module.exports = React.createClass
         {}
 
     componentDidMount: ->
+        @actions = @props.flux.getActions 'map'
+
         @icons = {}
         for id in [2, 3, 4, 5, 6, 8, 11, 13, 137, 453, 1858]
             @icons[id] = @createIcon id
@@ -33,14 +34,22 @@ module.exports = React.createClass
         @refreshMarkers()
         @map.on 'moveend', (ev) =>
             @refreshMarkers ev
-
-        @actions = @props.flux.getActions 'map'
+            @actions.setZoom @map.getZoom()
+            @actions.setCenter @map.getCenter()
 
     componentDidUpdate: (prevProps, prevState) ->
-        if @prevProps.center isnt @props.center
+        if prevProps.center isnt @props.center
             @map.panTo @props.center
-        if @prevProps.zoom isnt @props.zoom
+
+        if prevProps.zoom isnt @props.zoom
             @map.setZoom @props.zoom
+
+        if prevProps.geocaches isnt @props.geocaches
+            @markerLayer.clearLayers()
+            for gc in @props.geocaches
+                icon = @icons[gc.CacheType.GeocacheTypeId]
+                marker = L.marker [gc.Latitude, gc.Longitude], {icon}
+                marker.addTo @markerLayer
 
     componentWillUnmount: ->
         @actions.setZoom @map.getZoom()
@@ -52,20 +61,7 @@ module.exports = React.createClass
         </div>
 
     refreshMarkers: ->
-        bounds = @map.getBounds()
-        minll = bounds.getSouthWest()
-        maxll = bounds.getNorthEast()
-
-        url = 'https://gc.funkenburg.net/api'
-        url += "/geocaches?excludeDisabled=1&bounds[]=#{minll.lat}&bounds[]=#{minll.lng}&bounds[]=#{maxll.lat}&bounds[]=#{maxll.lng}"
-
-        jquery.get url
-            .done (geocaches) =>
-                @markerLayer.clearLayers()
-                for gc in geocaches
-                    icon = @icons[gc.CacheType.GeocacheTypeId]
-                    marker = L.marker [gc.Latitude, gc.Longitude], {icon}
-                    marker.addTo @markerLayer
+        @actions.setBounds @map.getBounds()
 
     createIcon: (id) ->
         L.icon
