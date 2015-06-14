@@ -57,6 +57,41 @@ module.exports = React.createClass
 
     render: ->
         <div className="map-container">
+            <div className="ui wide right visible sidebar">
+                <div className="ui form">
+                    <div className="grouped fields">
+                        <label>Geocache Types</label>
+                        <div className="field">
+                            <div className="ui input checkbox">
+                                <input
+                                    type="checkbox"
+                                    name="type"
+                                    id="type-traditional"
+                                    />
+                                <label htmlFor="type-traditional">Traditiional</label>
+                            </div>
+                        </div>
+                        <div className="field">
+                            <div className="ui input checkbox">
+                                <input
+                                    type="checkbox"
+                                    name="type"
+                                    id="type-multi"
+                                    />
+                                <label htmlFor="type-multi">Multi</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="field">
+                        <label>Exclude finds by</label>
+                        <input
+                            type="text"
+                            id="username"
+                            placeholder="Username"
+                        />
+                    </div>
+                </div>
+            </div>
             <div id='map'></div>
         </div>
 
