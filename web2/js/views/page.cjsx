@@ -14,9 +14,9 @@ Page = React.createClass
             when 'map' then Map
             else PoiGenerator
 
-        <div className="ui pushable">
+        <div className="container">
             <MainMenu page={@props.page} setPage={@actions.setPage}/>
-            <div className="pusher">
+            <div className="content">
                 { React.createElement child }
             </div>
         </div>

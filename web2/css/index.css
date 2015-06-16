@@ -5,11 +5,31 @@ html, body {
     margin: 0;
 }
 
-.pusher {
+.container, .content {
     height: 100%;
 }
 
 .poi-generator {
     width: 700px;
     margin: 5em auto;
+}
+
+.container {
+  display: flex;
+  flex-grow: columns;
+}
+
+.container .menu {
+  position: relative;
+  width: 100px;
+  visibility: visible;
+}
+
+.ui.left.sidebar {
+  transform: initial;
+  -webkit-transform: initial;
+}
+
+.content {
+  flex-grow: 1;
 }
