@@ -16,6 +16,7 @@
     "flummox-localstore": "^2.0.1",
     "jquery": "^2.1.4",
     "jszip": "^2.5.0",
+    "leaflet": "^0.7.3",
     "lodash": "^3.9.3",
     "node-safe-filesaver": "^0.1.0",
     "react": "^0.13.3",
