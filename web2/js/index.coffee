@@ -1,5 +1,7 @@
 require '../css/index.css'
 
+#require 'imports?jQuery=jquery!./semantic.js'
+
 {Flummox} = require 'flummox'
 React = require 'react'
 
