@@ -5,6 +5,19 @@ React = require 'react'
 #require 'leaflet/dist/leaflet.css'
 require '../../css/map.css'
 
+TypeFilter = React.createClass
+    render: ->
+        <div className="field">
+            <div className="ui input checkbox">
+                <input
+                    type="checkbox"
+                    name="type"
+                    id="type-#{@props.id}"
+                    />
+                <label htmlFor="type-#{@props.id}">{@props.label}</label>
+            </div>
+        </div>
+
 Map = React.createClass
     displayName: 'Geocache Map'
 
@@ -62,34 +75,34 @@ Map = React.createClass
                 <div className="ui form">
                     <div className="grouped fields">
                         <label>Geocache Types</label>
-                        <div className="field">
-                            <div className="ui input checkbox">
-                                <input
-                                    type="checkbox"
-                                    name="type"
-                                    id="type-traditional"
-                                    />
-                                <label htmlFor="type-traditional">Traditiional</label>
-                            </div>
-                        </div>
-                        <div className="field">
-                            <div className="ui input checkbox">
-                                <input
-                                    type="checkbox"
-                                    name="type"
-                                    id="type-multi"
-                                    />
-                                <label htmlFor="type-multi">Multi</label>
-                            </div>
-                        </div>
+                        <TypeFilter id="traditional" label="Traditional"/>
+                        <TypeFilter id="multi" label="Multi-Cache"/>
+                        <TypeFilter id="letterbox" label="Letterbox"/>
+                        <TypeFilter id="event" label="Event-Cache"/>
+                        <TypeFilter id="mystery" label="Mystery"/>
+                        <TypeFilter id="webcam" label="Webcam"/>
+                        <TypeFilter id="cito" label="Cache In Trash Out"/>
+                        <TypeFilter id="earth" label="Earth-Cache"/>
+                        <TypeFilter id="mega" label="Mega-Event"/>
+                        <TypeFilter id="wherigo" label="Wherigo"/>
                     </div>
                     <div className="field">
-                        <label>Exclude finds by</label>
+                        <label>Exclude finds</label>
                         <input
                             type="text"
                             id="username"
                             placeholder="Username"
                         />
+                    </div>
+                </div>
+                <div className="ui list">
+                    <div className="item">
+                        <i className="right floated red close icon link icon"></i>
+                        <div className="content">foobert</div>
+                    </div>
+                    <div className="item">
+                        <i className="right floated red close icon link icon"></i>
+                        <div className="content">signux</div>
                     </div>
                 </div>
             </div>
