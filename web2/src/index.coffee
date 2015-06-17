@@ -1,3 +1,4 @@
+require '../css/semantic.css'
 require '../css/index.css'
 
 #require 'imports?jQuery=jquery!./semantic.js'
