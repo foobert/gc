@@ -1,6 +1,7 @@
 FluxComponent = require 'flummox/component'
 L = require 'leaflet'
 React = require 'react'
+request = require 'superagent'
 
 require 'leaflet/dist/leaflet.css'
 require '../../css/map.css'
@@ -13,6 +14,8 @@ TypeFilter = React.createClass
                     type="checkbox"
                     name="type"
                     id="type-#{@props.id}"
+                    checked={@props.selected?.has @props.id}
+                    onChange={@props.toggle}
                     />
                 <label htmlFor="type-#{@props.id}">{@props.label}</label>
             </div>
@@ -43,46 +46,105 @@ Map = React.createClass
         @markerLayer = L.featureGroup([])
         @markerLayer.addTo @map
 
-        @refreshMarkers()
+        # TODO load markers initially
         @map.on 'moveend', (ev) =>
-            @refreshMarkers ev
             @actions.setZoom @map.getZoom()
             @actions.setCenter @map.getCenter()
 
     componentDidUpdate: (prevProps, prevState) ->
+        needsRefresh = false
         if prevProps.center isnt @props.center
             @map.panTo @props.center
+            needsRefresh = true
 
         if prevProps.zoom isnt @props.zoom
             @map.setZoom @props.zoom
+            needsRefresh = true
 
-        if prevProps.geocaches isnt @props.geocaches
-            @markerLayer.clearLayers()
-            for gc in @props.geocaches
-                icon = @icons[gc.CacheType.GeocacheTypeId]
-                marker = L.marker [gc.Latitude, gc.Longitude], {icon}
-                marker.addTo @markerLayer
+        if prevProps.selectedTypes isnt @props.selectedTypes
+            needsRefresh = true
+
+        _qs = (key, values) ->
+            # superagent can't deal with arrays in query params :-(
+            values
+                .map (v) -> "#{key}[]=#{v}"
+                .join '&'
+
+        if needsRefresh
+            bounds = @map.getBounds()
+            minll = bounds.getSouthWest()
+            maxll = bounds.getNorthEast()
+            typeIds = @props.selectedTypes.toArray().map @typeToId
+            request
+                .get 'https://gc.funkenburg.net/api/geocaches'
+                .query excludeDisabled: 1
+                .query _qs 'bounds', [minll.lat, minll.lng, maxll.lat, maxll.lng]
+                .query _qs 'typeIds', typeIds
+                .end (err, res) =>
+                    if err or res.status isnt 200
+                        return console.log "Geocache download failed (#{res?.status}): #{err}"
+
+                    @markerLayer.clearLayers()
+                    for gc in res.body
+                        icon = @icons[gc.CacheType.GeocacheTypeId]
+                        marker = L.marker [gc.Latitude, gc.Longitude], {icon}
+                        marker.addTo @markerLayer
 
     componentWillUnmount: ->
         @actions.setZoom @map.getZoom()
         @actions.setCenter @map.getCenter()
 
+    typeToId: (type) ->
+        switch type
+            when 'traditional' then 2
+            when 'multi' then 3
+            when 'virtual' then 4
+            when 'letterbox' then 5
+            when 'event' then 6
+            when 'mystery' then 8
+            when 'webcam' then 11
+            when 'cito' then 13
+            when 'earth' then 137
+            when 'mega' then 453
+            when 'wherigo' then 1858
+
     render: ->
+        typeToggle = @props.flux.getActions('map').setType
         <div className="map-container">
             <div className="ui wide right visible sidebar">
                 <div className="ui form">
                     <div className="grouped fields">
                         <label>Geocache Types</label>
-                        <TypeFilter id="traditional" label="Traditional"/>
-                        <TypeFilter id="multi" label="Multi-Cache"/>
-                        <TypeFilter id="letterbox" label="Letterbox"/>
-                        <TypeFilter id="event" label="Event-Cache"/>
-                        <TypeFilter id="mystery" label="Mystery"/>
-                        <TypeFilter id="webcam" label="Webcam"/>
-                        <TypeFilter id="cito" label="Cache In Trash Out"/>
-                        <TypeFilter id="earth" label="Earth-Cache"/>
-                        <TypeFilter id="mega" label="Mega-Event"/>
-                        <TypeFilter id="wherigo" label="Wherigo"/>
+                        <TypeFilter
+                            id="traditional" label="Traditional"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
+                            id="multi" label="Multi-Cache"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
+                            id="letterbox" label="Letterbox"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
+                            id="event" label="Event-Cache"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
+                            id="mystery" label="Mystery"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
+                            id="webcam" label="Webcam"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
+                            id="cito" label="Cache In Trash Out"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
+                            id="earth" label="Earth-Cache"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
+                            id="mega" label="Mega-Event"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
+                            id="wherigo" label="Wherigo"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
                     </div>
                     <div className="field">
                         <label>Exclude finds</label>
@@ -106,9 +168,6 @@ Map = React.createClass
             </div>
             <div id='map'></div>
         </div>
-
-    refreshMarkers: ->
-        @actions.setBounds @map.getBounds()
 
     createIcon: (id) ->
         L.icon

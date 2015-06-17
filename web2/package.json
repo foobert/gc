@@ -14,13 +14,14 @@
     "classnames": "^2.1.2",
     "flummox": "^3.5.2",
     "flummox-localstore": "^2.0.1",
+    "immutable": "^3.7.3",
     "jquery": "^2.1.4",
     "jszip": "^2.5.0",
     "leaflet": "^0.7.3",
     "lodash": "^3.9.3",
     "node-safe-filesaver": "^0.1.0",
     "react": "^0.13.3",
-    "request-promise": "^0.4.2"
+    "superagent": "^1.2.0"
   },
   "devDependencies": {
     "cjsx-loader": "^2.0.1",
