@@ -1,7 +1,8 @@
 module.exports = {
     entry: "./src/index.coffee",
     output: {
-        path: __dirname,
+        path: './assets',
+        publicPath: "assets/",
         filename: "bundle.js"
     },
     devtool: "source-map",
