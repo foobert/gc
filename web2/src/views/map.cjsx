@@ -2,7 +2,7 @@ FluxComponent = require 'flummox/component'
 L = require 'leaflet'
 React = require 'react'
 
-#require 'leaflet/dist/leaflet.css'
+require 'leaflet/dist/leaflet.css'
 require '../../css/map.css'
 
 TypeFilter = React.createClass
@@ -30,8 +30,6 @@ Map = React.createClass
         @icons = {}
         for id in [2, 3, 4, 5, 6, 8, 11, 13, 137, 453, 1858]
             @icons[id] = @createIcon id
-
-        L.Icon.Default.imagePath = 'img/leaflet/'
 
         @map = L.map 'map',
             center: @props.center,

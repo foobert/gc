@@ -9,7 +9,8 @@ module.exports = {
         loaders: [
             { test: /\.css$/, loader: "style!css" },
             { test: /\.coffee$/, loader: "coffee-loader" },
-            { test: /\.cjsx$/, loaders: ['coffee', 'cjsx']}
+            { test: /\.cjsx$/, loaders: ['coffee', 'cjsx']},
+            { test: /\.(jpe?g|png|gif|svg)$/i, loaders: [ 'file?hash=sha512&digest=hex&name=[hash].[ext]' ] }
         ]
     }
 };
