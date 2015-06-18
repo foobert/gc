@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "$(npm bin)/webpack",
+    "dev": "$(npm bin)/webpack-dev-server --progress --colors --port 9090"
   },
   "author": "foobert",
   "license": "all rights reserved",
