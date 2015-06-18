@@ -1,3 +1,4 @@
+Promise = require 'bluebird'
 {Actions} = require 'flummox'
 
 class MapActions extends Actions
@@ -16,5 +17,10 @@ class MapActions extends Actions
 
     removeUser: (username) ->
         username
+
+    geolocate: ->
+        return unless navigator.geolocation?
+        new Promise (resolve, reject) ->
+            navigator.geolocation.getCurrentPosition resolve, reject
 
 module.exports = MapActions

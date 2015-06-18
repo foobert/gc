@@ -26,3 +26,7 @@
 .user:hover a {
     visibility: visible;
 }
+
+.locate .error {
+    color: #8b1820;
+}

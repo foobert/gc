@@ -10,6 +10,10 @@ class MapStore extends Store
                 zoom: 13
                 selectedTypes: Immutable.Set()
                 filterUsers: Immutable.Set()
+                locating: false
+                locatingError: null
+            serializer: (state) ->
+                _.omit state, ['locating', 'locatingError']
 
         # HACK
         @state.selectedTypes = Immutable.Set @state.selectedTypes
@@ -21,6 +25,7 @@ class MapStore extends Store
         @register actions.setType, @handleTypeFilter
         @register actions.addUser, @handleAddUser
         @register actions.removeUser, @handleRemoveUser
+        @registerAsync actions.geolocate, @handleGeolocateBegin, @handleGeolocateSuccess, @handleGeolocateFail
 
     handleCenter: (center) ->
         @setState
@@ -42,5 +47,20 @@ class MapStore extends Store
     handleRemoveUser: (username) ->
         @setState filterUsers: @state.filterUsers.remove username
 
+    handleGeolocateBegin: ->
+        @setState
+            locating: true
+            locatingError: null
+
+    handleGeolocateSuccess: (position) ->
+        @setState
+            center: [position.coords.latitude, position.coords.longitude]
+            locating: false
+            locatingError: null
+
+    handleGeolocateFail: (err) ->
+        @setState
+            locating: false
+            locatingError: err.message
 
 module.exports = MapStore

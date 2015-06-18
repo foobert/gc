@@ -1,6 +1,7 @@
 FluxComponent = require 'flummox/component'
 L = require 'leaflet'
 React = require 'react'
+classnames = require 'classnames'
 request = require 'superagent'
 
 require 'leaflet/dist/leaflet.css'
@@ -121,6 +122,22 @@ Map = React.createClass
 
     render: ->
         typeToggle = @props.flux.getActions('map').setType
+        if navigator.geolocation?
+            locateClasses = classnames
+                ui: true
+                button: true
+                labeled: true
+                icon: true
+                loading: @props.locating
+            locateButton = 
+                <div className="locate">
+                    <div className={locateClasses} onClick={@props.flux.getActions('map').geolocate}>
+                        <i className="map icon"></i>
+                        Center on me
+                    </div>
+                    <div className="error">{@props.locatingError}</div>
+                </div>
+
         <div className="map-container">
             <div className="ui wide right visible sidebar">
                 <div className="ui form">
@@ -171,6 +188,7 @@ Map = React.createClass
                             </ul>
                         </div>
                     </form>
+                    {locateButton}
                 </div>
             </div>
             <div id='map'></div>
