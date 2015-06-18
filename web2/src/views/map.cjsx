@@ -71,6 +71,9 @@ Map = React.createClass
         if prevProps.selectedTypes isnt @props.selectedTypes
             needsRefresh = true
 
+        if prevProps.filterUsers isnt @props.filterUsers
+            needsRefresh = true
+
         _qs = (key, values) ->
             # superagent can't deal with arrays in query params :-(
             values
@@ -87,6 +90,7 @@ Map = React.createClass
                 .query excludeDisabled: 1
                 .query _qs 'bounds', [minll.lat, minll.lng, maxll.lat, maxll.lng]
                 .query _qs 'typeIds', typeIds
+                .query _qs 'excludeFinds', @props.filterUsers.toArray()
                 .end (err, res) =>
                     if err or res.status isnt 200
                         return console.log "Geocache download failed (#{res?.status}): #{err}"
