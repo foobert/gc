@@ -28,6 +28,7 @@ html, body {
 .ui.left.sidebar {
   transform: initial;
   -webkit-transform: initial;
+  box-shadow: 20px 0px 20px 0px rgba(0,0,0,0.15);
 }
 
 .content {
