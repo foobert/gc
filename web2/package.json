@@ -12,6 +12,7 @@
   "license": "all rights reserved",
   "readme": "README.md",
   "dependencies": {
+    "autoprefixer-core": "^5.2.0",
     "bluebird": "^2.9.27",
     "classnames": "^2.1.2",
     "flummox": "^3.5.2",
@@ -22,6 +23,7 @@
     "leaflet": "^0.7.3",
     "lodash": "^3.9.3",
     "node-safe-filesaver": "^0.1.0",
+    "postcss-loader": "^0.5.0",
     "react": "^0.13.3",
     "superagent": "^1.2.0"
   },
