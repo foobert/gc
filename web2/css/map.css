@@ -15,4 +15,14 @@
     padding: 0.5em;
 }
 
+.user .content {
+    display: inline;
+}
+.user a {
+    visibility: hidden;
+    float: right;
+}
 
+.user:hover a {
+    visibility: visible;
+}

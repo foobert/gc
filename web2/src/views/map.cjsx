@@ -23,10 +23,10 @@ TypeFilter = React.createClass
 
 UserFilter = React.createClass
     render: ->
-        <div className="item">
-            <i className="right floated red close icon link icon"></i>
+        <li className="item user">
             <div className="content">{@props.username}</div>
-        </div>
+            <a data-username={@props.username} onClick={@props.remove}>Remove</a>
+        </li>
 
 Map = React.createClass
     displayName: 'Geocache Map'
@@ -162,11 +162,11 @@ Map = React.createClass
                                 placeholder="Username"
                                 ref="username"
                             />
+                            <ul className="ui list">
+                                { React.createElement(UserFilter, key: username, username: username, remove: @handleRemoveUser) for username in @props.filterUsers.toArray() }
+                            </ul>
                         </div>
                     </form>
-                </div>
-                <div className="ui list">
-                    { React.createElement(UserFilter, username: username) for username in @props.filterUsers.toArray() }
                 </div>
             </div>
             <div id='map'></div>
@@ -177,6 +177,11 @@ Map = React.createClass
         textInput = React.findDOMNode @refs.username
         @props.flux.getActions('map').addUser textInput.value
         textInput.value = ''
+
+    handleRemoveUser: (ev) ->
+        ev.preventDefault()
+        username = ev.target.getAttribute 'data-username'
+        @props.flux.getActions('map').removeUser username
 
     createIcon: (id) ->
         L.icon
