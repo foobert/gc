@@ -11,4 +11,10 @@ class MapActions extends Actions
         type: ev.target.id.substring 5
         action: if ev.target.checked then 'add' else 'remove'
 
+    addUser: (username) ->
+        username
+
+    removeUser: (username) ->
+        username
+
 module.exports = MapActions

@@ -21,6 +21,13 @@ TypeFilter = React.createClass
             </div>
         </div>
 
+UserFilter = React.createClass
+    render: ->
+        <div className="item">
+            <i className="right floated red close icon link icon"></i>
+            <div className="content">{@props.username}</div>
+        </div>
+
 Map = React.createClass
     displayName: 'Geocache Map'
 
@@ -146,28 +153,30 @@ Map = React.createClass
                             id="wherigo" label="Wherigo"
                             selected={@props.selectedTypes} toggle={typeToggle}/>
                     </div>
-                    <div className="field">
-                        <label>Exclude finds</label>
-                        <input
-                            type="text"
-                            id="username"
-                            placeholder="Username"
-                        />
-                    </div>
+                    <form onSubmit={@handleSubmit}>
+                        <div className="field">
+                            <label>Exclude finds</label>
+                            <input
+                                type="text"
+                                id="username"
+                                placeholder="Username"
+                                ref="username"
+                            />
+                        </div>
+                    </form>
                 </div>
                 <div className="ui list">
-                    <div className="item">
-                        <i className="right floated red close icon link icon"></i>
-                        <div className="content">foobert</div>
-                    </div>
-                    <div className="item">
-                        <i className="right floated red close icon link icon"></i>
-                        <div className="content">signux</div>
-                    </div>
+                    { React.createElement(UserFilter, username: username) for username in @props.filterUsers.toArray() }
                 </div>
             </div>
             <div id='map'></div>
         </div>
+
+    handleSubmit: (ev) ->
+        ev.preventDefault()
+        textInput = React.findDOMNode @refs.username
+        @props.flux.getActions('map').addUser textInput.value
+        textInput.value = ''
 
     createIcon: (id) ->
         L.icon
