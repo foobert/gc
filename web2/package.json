@@ -2,10 +2,11 @@
   "name": "gc-web",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "$(npm bin)/webpack",
+    "build": "NODE_ENV=production $(npm bin)/webpack -p",
     "dev": "$(npm bin)/webpack-dev-server --progress --colors --port 9090"
   },
   "author": "foobert",
@@ -15,6 +16,7 @@
     "autoprefixer-core": "^5.2.0",
     "bluebird": "^2.9.27",
     "classnames": "^2.1.2",
+    "express": "^4.12.4",
     "flummox": "^3.5.2",
     "flummox-localstore": "^2.0.1",
     "immutable": "^3.7.3",
