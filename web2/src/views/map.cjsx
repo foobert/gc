@@ -56,10 +56,11 @@ Map = React.createClass
         @markerLayer = L.featureGroup([])
         @markerLayer.addTo @map
 
-        # TODO load markers initially
         @map.on 'moveend', (ev) =>
             @actions.setZoom @map.getZoom()
             @actions.setCenter @map.getCenter()
+
+        @refreshMap()
 
     componentDidUpdate: (prevProps, prevState) ->
         needsRefresh = false
@@ -77,36 +78,38 @@ Map = React.createClass
         if prevProps.filterUsers isnt @props.filterUsers
             needsRefresh = true
 
+        @refreshMap() if needsRefresh
+
+    componentWillUnmount: ->
+        @actions.setZoom @map.getZoom()
+        @actions.setCenter @map.getCenter()
+
+    refreshMap: ->
         _qs = (key, values) ->
             # superagent can't deal with arrays in query params :-(
             values
                 .map (v) -> "#{key}[]=#{v}"
                 .join '&'
 
-        if needsRefresh
-            bounds = @map.getBounds()
-            minll = bounds.getSouthWest()
-            maxll = bounds.getNorthEast()
-            typeIds = @props.selectedTypes.toArray().map @typeToId
-            request
-                .get 'https://gc.funkenburg.net/api/geocaches'
-                .query excludeDisabled: 1
-                .query _qs 'bounds', [minll.lat, minll.lng, maxll.lat, maxll.lng]
-                .query _qs 'typeIds', typeIds
-                .query _qs 'excludeFinds', @props.filterUsers.toArray()
-                .end (err, res) =>
-                    if err or res.status isnt 200
-                        return console.log "Geocache download failed (#{res?.status}): #{err}"
+        bounds = @map.getBounds()
+        minll = bounds.getSouthWest()
+        maxll = bounds.getNorthEast()
+        typeIds = @props.selectedTypes.toArray().map @typeToId
+        request
+            .get 'https://gc.funkenburg.net/api/geocaches'
+            .query excludeDisabled: 1
+            .query _qs 'bounds', [minll.lat, minll.lng, maxll.lat, maxll.lng]
+            .query _qs 'typeIds', typeIds
+            .query _qs 'excludeFinds', @props.filterUsers.toArray()
+            .end (err, res) =>
+                if err or res.status isnt 200
+                    return console.log "Geocache download failed (#{res?.status}): #{err}"
 
-                    @markerLayer.clearLayers()
-                    for gc in res.body
-                        icon = @icons[gc.CacheType.GeocacheTypeId]
-                        marker = L.marker [gc.Latitude, gc.Longitude], {icon}
-                        marker.addTo @markerLayer
-
-    componentWillUnmount: ->
-        @actions.setZoom @map.getZoom()
-        @actions.setCenter @map.getCenter()
+                @markerLayer.clearLayers()
+                for gc in res.body
+                    icon = @icons[gc.CacheType.GeocacheTypeId]
+                    marker = L.marker [gc.Latitude, gc.Longitude], {icon}
+                    marker.addTo @markerLayer
 
     typeToId: (type) ->
         geocaches.types[type]
