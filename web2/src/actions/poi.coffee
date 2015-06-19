@@ -2,7 +2,7 @@
 {saveAs} = require 'node-safe-filesaver'
 Promise = require 'bluebird'
 JSZip = require 'jszip'
-jquery = require 'jquery'
+request = require 'superagent'
 
 class PoiActions extends Actions
     setType: (typeId) ->
@@ -34,10 +34,11 @@ class PoiActions extends Actions
                 else
                     next = files.shift()
                     @setFilename next.name
-                    jquery.get next.url
-                        .done (data) -> h next.name, data
-                        .fail ->
-                            reject(new Error('download failed'))
+                    request
+                        .get next.url
+                        .end (err, res) ->
+                            return reject err if err?
+                            h next.name, data
             h()
 
         ###
