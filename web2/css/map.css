@@ -40,3 +40,7 @@
 .locate .error {
     color: #8b1820;
 }
+
+.leaflet-control-attribution {
+    display: none;
+}

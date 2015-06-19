@@ -49,7 +49,6 @@ Map = React.createClass
             zoom: @props.zoom
 
         L.tileLayer 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            attribution: 'openstreetmap',
             maxZoom: 18
         .addTo @map
 
