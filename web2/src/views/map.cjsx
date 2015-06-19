@@ -133,7 +133,7 @@ Map = React.createClass
 
         <div className="map-container">
             <div id='map'></div>
-            <div className="ui wide right sidebar">
+            <div className="ui right sidebar">
                 <div className="ui form">
                     <div className="grouped fields">
                         <label>Geocache Types</label>
