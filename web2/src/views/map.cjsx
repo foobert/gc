@@ -4,6 +4,8 @@ React = require 'react'
 classnames = require 'classnames'
 request = require 'superagent'
 
+geocaches = require '../geocache.coffee'
+
 require 'leaflet/dist/leaflet.css'
 require '../../css/map.css'
 
@@ -107,18 +109,7 @@ Map = React.createClass
         @actions.setCenter @map.getCenter()
 
     typeToId: (type) ->
-        switch type
-            when 'traditional' then 2
-            when 'multi' then 3
-            when 'virtual' then 4
-            when 'letterbox' then 5
-            when 'event' then 6
-            when 'mystery' then 8
-            when 'webcam' then 11
-            when 'cito' then 13
-            when 'earth' then 137
-            when 'mega' then 453
-            when 'wherigo' then 1858
+        geocaches.types[type]
 
     render: ->
         typeToggle = @props.flux.getActions('map').setType

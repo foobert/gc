@@ -2,13 +2,15 @@ _ = require 'lodash'
 Immutable = require 'Immutable'
 Store = require 'flummox-localstore'
 
+geocaches = require '../geocache.coffee'
+
 class MapStore extends Store
     constructor: (flux) ->
         super flux,
             initialState:
                 center: [0, 0]
                 zoom: 13
-                selectedTypes: Immutable.Set()
+                selectedTypes: Immutable.Set.fromKeys geocaches.types
                 filterUsers: Immutable.Set()
                 locating: false
                 locatingError: null
