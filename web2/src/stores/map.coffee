@@ -1,5 +1,5 @@
 _ = require 'lodash'
-Immutable = require 'Immutable'
+Immutable = require 'immutable'
 Store = require 'flummox-localstore'
 
 geocaches = require '../geocache.coffee'
