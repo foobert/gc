@@ -7,7 +7,7 @@ module.exports = {
         publicPath: "assets/",
         filename: "bundle.js"
     },
-    devtool: "source-map",
+    devtool: "cheap-module-eval-source-map",
     module: {
         loaders: [
             { test: /\.css$/, loader: "style!css!postcss" },
