@@ -6,6 +6,41 @@
 </head>
 
 <body>
+    <!-- yes, styles are not allowed in bodies,
+         but this way they are removed when the script loads -->
+    <style>
+        html, body, .container {
+          height: 100%;
+          margin: 0;
+          width: 100%;
+        }
+        .container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .loader {
+          font-family: sans-serif;
+          font-size: 4em;
+          color: #444;
+          animation-duration: 2s;
+          animation-name: pulse;
+          animation-iteration-count: infinite;
+          animation-direction: alternate;
+        }
+        @keyframes pulse {
+          from {
+            font-size: 2em;
+            opacity: 0.2;
+          }
+
+          to {
+            font-size: 6em;
+            opactiy: 1;
+          }
+        }
+    </style>
+    <div class="container"><div class="loader">Loading</div></div>
     <script src="assets/bundle.js"></script>
 </body>
 
