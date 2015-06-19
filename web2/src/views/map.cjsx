@@ -133,7 +133,8 @@ Map = React.createClass
                 </div>
 
         <div className="map-container">
-            <div className="ui wide right visible sidebar">
+            <div id='map'></div>
+            <div className="ui wide right sidebar">
                 <div className="ui form">
                     <div className="grouped fields">
                         <label>Geocache Types</label>
@@ -185,7 +186,6 @@ Map = React.createClass
                     {locateButton}
                 </div>
             </div>
-            <div id='map'></div>
         </div>
 
     handleSubmit: (ev) ->
