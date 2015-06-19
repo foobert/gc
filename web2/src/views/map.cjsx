@@ -65,7 +65,7 @@ Popup = React.createClass
             <div className="item">
                 <div className="content">
                     <i className="signal icon"></i>
-                    Difficulty {@props.Difficulty}, Terrain {@props.Terrain}
+                    Difficulty {@props.Difficulty.toFixed 1}, Terrain {@props.Terrain.toFixed 1}
                 </div>
             </div>
         </div>
