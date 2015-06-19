@@ -31,6 +31,45 @@ UserFilter = React.createClass
             <a data-username={@props.username} onClick={@props.remove}>Remove</a>
         </li>
 
+Coordinates = React.createClass
+    _format: (coord, pos, neg) ->
+        deg = Math.floor coord
+        min = (coord - deg) * 60
+        prefix = if coord < 0 then neg else pos
+        "#{prefix} #{deg}\u00b0 #{min.toFixed 3}"
+
+    render: ->
+        <span>{@_format @props.lat, 'N', 'S'} {@_format @props.lon, 'E', 'W'}</span>
+
+Popup = React.createClass
+    render: ->
+        <div className="ui list">
+            <div className="item">
+                <div className="content">
+                    <a className="header" href="http://coord.info/#{@props.Code}" target="_blank">{@props.Code}</a>
+                    <div className="description">{@props.Name}</div>
+                </div>
+            </div>
+            <div className="item">
+                <div className="content">
+                    <i className="location arrow icon"></i>
+                    <Coordinates lat={@props.Latitude} lon={@props.Longitude}/>
+                </div>
+            </div>
+            <div className="item">
+                <div className="content">
+                    <i className="suitcase icon"></i>
+                    {@props.ContainerType.ContainerTypeName} {geocaches.names[@props.CacheType.GeocacheTypeId]}
+                </div>
+            </div>
+            <div className="item">
+                <div className="content">
+                    <i className="signal icon"></i>
+                    Difficulty {@props.Difficulty}, Terrain {@props.Terrain}
+                </div>
+            </div>
+        </div>
+
 Map = React.createClass
     displayName: 'Geocache Map'
 
@@ -105,9 +144,16 @@ Map = React.createClass
                     return console.log "Geocache download failed (#{res?.status}): #{err}"
 
                 @markerLayer.clearLayers()
-                for gc in res.body
+                res.body.forEach (gc) =>
                     icon = @icons[gc.CacheType.GeocacheTypeId]
-                    marker = L.marker [gc.Latitude, gc.Longitude], {icon}
+                    marker = L.marker [gc.Latitude, gc.Longitude],
+                        icon: icon
+                        title: gc.Code
+                    marker.on 'click', (e) =>
+                        popup = L.popup closeButton: false, offset: L.point(0, -5)
+                            .setLatLng e.latlng
+                            .setContent React.renderToStaticMarkup <Popup {... gc}/>
+                            .openOn @map
                     marker.addTo @markerLayer
 
     typeToId: (type) ->
