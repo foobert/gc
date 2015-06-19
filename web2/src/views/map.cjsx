@@ -200,7 +200,7 @@ Map = React.createClass
 
     createIcon: (id) ->
         L.icon
-            iconUrl: "img/map/#{id}.gif"
+            iconUrl: require "../../img/map/#{id}.gif"
             shadowUrl: null
             iconSize:     [32, 32] # size of the icon
             shadowSize:   [0, 0] # size of the shadow
