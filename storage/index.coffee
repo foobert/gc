@@ -2,7 +2,7 @@
 Promise = require 'bluebird'
 Promise.longStackTraces()
 
-main = Promise.coroutine ->
+do Promise.coroutine ->
     GeocacheService = require './lib/geocache'
     AccessService = require './lib/access'
 
@@ -24,5 +24,3 @@ main = Promise.coroutine ->
 
     console.log 'Listening on port 8081'
     app.listen 8081
-
-main()

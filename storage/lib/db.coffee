@@ -3,7 +3,9 @@ squel = require 'squel'
 Promise = require 'bluebird'
 Promise.promisifyAll pg
 
-process.on 'SIGINT', -> pg.end()
+process.on 'SIGINT', ->
+    pg.end()
+    process.exit()
 
 module.exports = (options) ->
     migrate = require('./migrate') options
