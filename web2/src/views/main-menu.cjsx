@@ -22,12 +22,4 @@ module.exports = React.createClass
                 <i className="world icon"></i>
                 Geocache Map
             </a>
-            <a className={active 'track'}>
-                <i className="sort content ascending icon"></i>
-                Track Analysis
-            </a>
-            <a className={active 'statistics'}>
-                <i className="line chart icon"></i>
-                Statistics
-            </a>
         </div>
