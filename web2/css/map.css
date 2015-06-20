@@ -36,6 +36,10 @@
     visibility: visible;
 }
 
+.locate {
+    margin-top: 2em;
+}
+
 .locate .error {
     color: #8b1820;
 }

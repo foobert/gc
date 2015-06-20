@@ -171,7 +171,7 @@ Map = React.createClass
             locateButton = 
                 <div className="locate">
                     <div className={locateClasses} onClick={@props.flux.getActions('map').geolocate}>
-                        <i className="map icon"></i>
+                        <i className="crosshairs icon"></i>
                         Center on me
                     </div>
                     <div className="error">{@props.locatingError}</div>
