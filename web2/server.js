@@ -6,7 +6,7 @@ app.set('x-powered-by', false);
 app.use(compression());
 app.use(logger(process.env.NODE_ENV === 'production' ? 'tiny' : 'dev'));
 app.use('/assets', express.static('assets'));
-app.get('/favicon.png', function(req, res, next) { res.sendFile('img/favicon.png', {root: __dirname}); });
+app.get('/favicon.png', function(req, res, next) { res.sendFile('favicon.png', {root: __dirname}); });
 app.get('/*', function(req, res, next) { res.sendFile('index.html', {root: __dirname}); });
 console.log('Listening on 8080');
 app.listen(8080);
