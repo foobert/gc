@@ -5,6 +5,7 @@ classnames = require 'classnames'
 request = require 'superagent'
 
 geocaches = require '../geocache.coffee'
+server = require '../backend.coffee'
 
 require 'leaflet/dist/leaflet.css'
 require '../../css/map.css'
@@ -134,7 +135,7 @@ Map = React.createClass
         maxll = bounds.getNorthEast()
         typeIds = @props.selectedTypes.toArray().map @typeToId
         request
-            .get 'https://gc.funkenburg.net/api/geocaches'
+            .get server.url '/geocaches'
             .query excludeDisabled: 1
             .query _qs 'bounds', [minll.lat, minll.lng, maxll.lat, maxll.lng]
             .query _qs 'typeIds', typeIds

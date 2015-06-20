@@ -4,6 +4,8 @@ Promise = require 'bluebird'
 JSZip = require 'jszip'
 request = require 'superagent'
 
+server = require '../backend.coffee'
+
 class PoiActions extends Actions
     setType: (typeId) ->
         typeId
@@ -20,7 +22,7 @@ class PoiActions extends Actions
     submit: (types) ->
         new Promise (resolve, reject) =>
             files = types.map (type) ->
-                url: "https://gc.funkenburg.net/api/poi.csv?type=#{type}"
+                url: server.url "/poi.csv?type=#{type}"
                 name: "#{type}.csv"
             zip = new JSZip()
             zipFolder = zip.folder 'poi'
