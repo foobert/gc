@@ -12,6 +12,7 @@
     "dev": "docker run --rm -it -v $PWD:/usr/src/app -w /usr/src/app --link db:db -p 8081:8081 iojs node_modules/.bin/nodemon --exec node_modules/.bin/coffee index.coffee"
   },
   "dependencies": {
+    "JSONStream": "^1.0.4",
     "bluebird": "^2.9.13",
     "body-parser": "^1.12.2",
     "coffee-script": "^1.9.1",
