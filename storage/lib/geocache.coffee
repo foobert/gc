@@ -115,13 +115,13 @@ class GeocacheService
                 @db.insert numberedParameters: true
                     .into 'geocaches'
                     .set 'id', id
-                    .set 'updated', updated or 'CURRENT_TIMESTAMP', dontQuote: not updated?
+                    .set 'updated', updated or 'now', dontQuote: not updated?
                     .set 'data', JSON.stringify data
                     .toParam()
             else
                 @db.update numberedParameters: true
                     .table 'geocaches'
-                    .set 'updated', updated or 'CURRENT_TIMESTAMP', dontQuote: not updated?
+                    .set 'updated', updated or 'now', dontQuote: not updated?
                     .set 'data', JSON.stringify data
                     .where 'id = ?', id
                     .toParam()
