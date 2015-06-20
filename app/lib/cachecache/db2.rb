@@ -33,7 +33,7 @@ module CacheCache
         def touch_geocaches(ids)
             ids.each do |id|
                 @logger.debug "PUT #{id}"
-                RestClient.put _url("/geocache/#{id}/seen"), 'X-Token' => @token
+                RestClient.put _url("/geocache/#{id}/seen"), '', 'X-Token' => @token
             end
         end
 
