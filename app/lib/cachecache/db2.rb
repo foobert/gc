@@ -11,7 +11,7 @@ module CacheCache
 
             @db_uri = ENV['DB_URI']
             @token = ENV['DB_TOKEN']
-            @logger.debug "Using db #{@db_uri}"
+            @logger.debug "Using db #{@db_uri} with token #{@token}"
         end
 
         def need_update?(gc)
