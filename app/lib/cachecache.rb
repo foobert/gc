@@ -4,7 +4,6 @@ require 'logging'
 
 require 'cachecache/geocaching'
 require 'cachecache/db2'
-require 'cachecache/poi'
 
 class CacheCache2
     def initialize(config)
