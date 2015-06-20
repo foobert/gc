@@ -80,25 +80,9 @@ class CacheCache2
         puts "Found #{count_total} and updated #{count_updated} (#{(count_updated.to_f / count_total * 100).to_i}%) geocaches."
     end
 
-    def csv(username)
-        geocaches = @db.get_geocaches exclude_finds_by: username
-        poi = CacheCache::POI.new
-        print poi.csv(geocaches).join
-    end
-
     def get(ids)
         @logger.debug "Updating #{ids.size} caches"
         full = @geo.get_geocaches(@config.accessToken, ids)
         @db.save_geocaches full
-    end
-
-    def clean
-        old = @couch.byAge(5)
-        if old.empty?
-            puts "No old geocaches found."
-        else
-            puts "Found #{old.size} old geocaches. Deleting.."
-            @couch.delete_bulk old.map {|o| {"_id" => o["id"], "_rev" => o["value"]["rev"]} }
-        end
     end
 end

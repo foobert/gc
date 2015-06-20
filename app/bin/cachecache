@@ -7,8 +7,6 @@ require 'cachecache'
 require 'yaml'
 require 'ostruct'
 
-require 'cachecache/server'
-
 # TODO clean up config parsing once I figure out how I want to manage it
 config_defaults = File.exist?('config.yml') ? YAML.load_file('config.yml') : {}
 config = OpenStruct.new(config_defaults)
@@ -28,21 +26,15 @@ when "logs"
     ARGV.each {|username| cacheCache.update_logs username }
 when "search"
     cacheCache.search_caches *ARGV.map {|x| x.to_f }
-when "clean"
-    cacheCache.clean
-when "serve"
-    app = CacheCache::Server
-    app.run!
-when "poi"
-    cacheCache.csv ARGV.shift
 when "get"
     cacheCache.get ARGV
 else
     puts "Usage: #{$0} CMD"
     puts "Where CMD is one of"
     puts
+    puts "login"
     puts "search"
+    puts "get"
     puts "logs"
-    puts "clean"
 end
 # vi: ft=ruby

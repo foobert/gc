@@ -1,13 +1,4 @@
 source 'https://rubygems.org'
 gem 'logging'
 gem 'rest_client'
-gem 'sinatra'
-gem 'sinatra-contrib'
-gem 'rethinkdb'
-gem 'thin'
-gem 'connection_pool'
 gem 'builder'
-
-group :test do
-    gem 'webmock'
-end
