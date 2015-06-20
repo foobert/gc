@@ -1,27 +1,12 @@
-FROM ubuntu:trusty
-MAINTAINER 0x002a@gmail.com
+FROM ruby:slim
+RUN bundle config --global frozen 1
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
 
-# Update package sources.
-RUN apt-get update
+COPY Gemfile /usr/src/app/
+COPY Gemfile.lock /usr/src/app/
+RUN bundle install
 
-# Install build tools.
-RUN apt-get install -y build-essential git-core curl
-
-# Install ruby.
-RUN curl -L -o ruby-install-0.5.0.tar.gz https://github.com/postmodern/ruby-install/archive/v0.5.0.tar.gz
-RUN tar xzf ruby-install-0.5.0.tar.gz && cd ruby-install-0.5.0 && make install
-RUN ruby-install --system ruby 2.1.4
-RUN gem install bundler
-
-# Install app.
-ADD bin /app/bin/
-ADD lib /app/lib/
-ADD Gemfile /app/Gemfile
-ADD Gemfile.lock /app/Gemfile.lock
-RUN cd /app && bundle install --deployment
-
-EXPOSE 4567
-
-WORKDIR /app
-ENTRYPOINT ["/app/bin/cachecache"]
-CMD ["serve"]
+COPY . /usr/src/app
+ENTRYPOINT ["/usr/src/app/bin/cachecache"]
+CMD ["help"]
