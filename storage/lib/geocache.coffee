@@ -85,11 +85,11 @@ class GeocacheService
     touch: Promise.coroutine (id, date) ->
         [client, done] = yield @db.connect()
         try
-            sql = @db.update()
+            sql = @db.update numberedParameters: true
                 .table 'geocaches'
-                .set 'updated = ?', date
+                .set 'updated', date or 'now', dontQuote: not date?
                 .where 'id = ?', id
-                .toString()
+                .toParam()
             result = yield client.queryAsync sql
         finally
             done()
