@@ -178,6 +178,11 @@ version="1.1" creator="cachecache">
         else
             res.status 404
 
+    app.post '/sillyRefresh', async (req, res, next) ->
+        yield geolog.refresh()
+        res.status 200
+        res.send 'Refreshed'
+
     app.use (err, req, res, next) ->
         console.error err.stack
         res.status 500

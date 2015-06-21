@@ -6,47 +6,48 @@ class GeocacheService
 
     _queryGeocaches: Promise.coroutine (query, withData) ->
         [client, done] = yield @db.connect()
-        sql = @db.select()
-            .from 'geocaches'
-            .field 'id'
-            .field 'updated'
+        sql = @db.select tableAliasQuoteCharacter: '"'
+            .from 'geocaches', 'c'
+            .field 'c.id', 'id'
+            .field 'c.updated', 'updated'
 
         if withData
             sql = sql
-                .field 'data'
+                .field 'c.data', 'data'
 
         if query.stale isnt '1'
             sql = sql
-                .where "age(updated) < interval '3 days'"
+                .where "age(c.updated) < interval '3 days'"
 
         if query.maxAge?
             sql = sql
-                .where "age(date 'epoch' + (substring(data->>'UTCPlaceDate' from 7 for 10)::numeric - substring(data->>'UTCPlaceDate' from 21 for 2)::numeric * 3600) * interval '1 second') < interval ?", "#{query.maxAge} days"
+                .where "age(date 'epoch' + (substring(c.data->>'UTCPlaceDate' from 7 for 10)::numeric - substring(c.data->>'UTCPlaceDate' from 21 for 2)::numeric * 3600) * interval '1 second') < interval ?", "#{query.maxAge} days"
 
         if query.bounds?
             [lat0, lng0, lat1, lng1] = query.bounds
             sql = sql
-                .where "(data->>'Latitude')::numeric >= ?", lat0
-                .where "(data->>'Latitude')::numeric <= ?", lat1
-                .where "(data->>'Longitude')::numeric >= ?", lng0
-                .where "(data->>'Longitude')::numeric <= ?", lng1
+                .where "(c.data->>'Latitude')::numeric >= ?", lat0
+                .where "(c.data->>'Latitude')::numeric <= ?", lat1
+                .where "(c.data->>'Longitude')::numeric >= ?", lng0
+                .where "(c.data->>'Longitude')::numeric <= ?", lng1
 
         if query.typeIds?
             typeIds = query.typeIds
                 .map (typeId) -> "'#{parseInt(typeId)}'"
                 .join ','
             sql = sql
-                .where "data->'CacheType'->>'GeocacheTypeId' = ANY(ARRAY[#{typeIds}])"
+                .where "c.data->'CacheType'->>'GeocacheTypeId' = ANY(ARRAY[#{typeIds}])"
 
         # query.attributeIds is currently not supported
 
         if query.excludeFinds?
             sql = sql
-                .where 'not exists (select 1 from logsRel l where l.cachecode = geocaches.data->>\'Code\' and l.username in ?)', query.excludeFinds
+                .right_join 'founds', 'f', 'c.id = f.id'
+                .where 'not ? = any(f.usernames)', query.excludeFinds[0]
 
         if query.excludeDisabled is '1'
             sql = sql
-                .where "data @> '{\"Archived\": false, \"Available\": true}'"
+                .where "c.data @> '{\"Archived\": false, \"Available\": true}'"
 
         console.log sql.toString()
 

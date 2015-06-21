@@ -1,5 +1,5 @@
 pg = require 'pg'
-squel = require 'squel'
+squel = require('squel').useFlavour 'postgres'
 Promise = require 'bluebird'
 Promise.promisifyAll pg
 
@@ -31,5 +31,14 @@ module.exports = (options) ->
                      , data->\'LogType\'->>\'WptLogTypeId\' as logtype
                      , (date \'epoch\' + (substring(data->>\'UTCCreateDate\' from 7 for 10)::numeric * interval \'1 second\')) as createdate
                 FROM logs
+            """
+        ]
+        yield migrate.up [
+            """
+            CREATE MATERIALIZED VIEW founds AS
+                SELECT
+                    c.id,
+                    array(SELECT DISTINCT l.username FROM logsRel l WHERE lower(l.cachecode) = c.id AND l.logtype = '2') AS usernames
+                FROM geocaches c
             """
         ]

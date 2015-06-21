@@ -24,3 +24,10 @@ module.exports = (db) ->
         finally
             done()
 
+    refresh: Promise.coroutine ->
+        [client, done] = yield db.connect()
+        try
+            console.log 'refresh founds'
+            yield client.queryAsync 'REFRESH MATERIALIZED VIEW founds'
+        finally
+            done()
