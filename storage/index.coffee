@@ -5,6 +5,7 @@ Promise.longStackTraces()
 do Promise.coroutine ->
     GeocacheService = require './lib/geocache'
     AccessService = require './lib/access'
+    geolog = require './lib/geolog'
 
     db = require('./lib/db')
         host: process.env.DB_PORT_5432_TCP_ADDR ? 'localhost'
@@ -21,6 +22,7 @@ do Promise.coroutine ->
     app = require('./lib/rest')
         geocache: geocacheService
         access: accessService
+        geolog: geolog db
 
     console.log 'Listening on port 8081'
     app.listen 8081

@@ -10,7 +10,7 @@ streamTransform = require './transform'
 xml = require './xml'
 
 module.exports = (services) ->
-    {access, geocache} = services
+    {access, geocache, geolog} = services
 
     app = express()
 
@@ -165,6 +165,18 @@ version="1.1" creator="cachecache">
                         description: poi.description gc
             .pipe JSONStream.stringify '[', ',', ']'
             .pipe res
+
+    app.post '/log', async (req, res, next) ->
+        yield geolog.upsert req.body
+        res.status 201
+        res.send ''
+
+    app.get '/logs/latest', async (req, res, next) ->
+        id = yield geolog.latest req.query.username
+        if id?
+            res.status(200).send id
+        else
+            res.status 404
 
     app.use (err, req, res, next) ->
         console.error err.stack

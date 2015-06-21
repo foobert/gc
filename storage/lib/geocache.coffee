@@ -40,6 +40,10 @@ class GeocacheService
 
         # query.attributeIds is currently not supported
 
+        if query.excludeFinds?
+            sql = sql
+                .where 'not exists (select 1 from logsRel l where l.cachecode = geocaches.data->>\'Code\' and l.username in ?)', query.excludeFinds
+
         if query.excludeDisabled is '1'
             sql = sql
                 .where "data @> '{\"Archived\": false, \"Available\": true}'"
