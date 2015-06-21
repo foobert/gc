@@ -26,10 +26,10 @@ module.exports = (options) ->
             CREATE VIEW logsRel AS
                 SELECT id
                      , updated
-                     , data->>\'CacheCode\' as cachecode
-                     , data->\'Finder\'->>\'UserName\' as username
-                     , data->\'LogType\'->>\'WptLogTypeId\' as logtype
-                     , (date \'epoch\' + (substring(data->>\'UTCCreateDate\' from 7 for 10)::numeric * interval \'1 second\')) as createdate
+                     , data->>'CacheCode' as cachecode
+                     , data->'Finder'->>'UserName' as username
+                     , data->'LogType'->>'WptLogTypeId' as logtype
+                     , (date 'epoch' + (substring(data->>'UTCCreateDate' from 7 for 10)::numeric * interval '1 second')) as createdate
                 FROM logs
             """
         ]
@@ -42,3 +42,24 @@ module.exports = (options) ->
                 FROM geocaches c
             """
         ]
+        yield migrate.up [
+            """
+            CREATE MATERIALIZED VIEW geocachesRel AS
+                SELECT
+                    c.id,
+                    c.updated as updated,
+                    (c.data->>'Name') as Name,
+                    (c.data->>'Latitude')::numeric as Latitude,
+                    (c.data->>'Longitude')::numeric as Longitude,
+                    (c.data->'CacheType'->>'GeocacheTypeId')::numeric as GeocacheTypeId,
+                    c.data->'ContainerType'->>'ContainerTypeName' as ContainerTypeName,
+                    (c.data->>'Difficulty')::numeric as Difficulty,
+                    (c.data->>'Terrain')::numeric as Terrain,
+                    c.data->>'EncodedHints' as EncodedHints,
+                    (c.data->>'Archived')::bool as Archived,
+                    (c.data->>'Available')::bool as Available,
+                    (date 'epoch' + (substring(c.data->>'UTCPlaceDate' from 7 for 10)::numeric - substring(c.data->>'UTCPlaceDate' from 21 for 2)::numeric * 3600) * interval '1 second') as UTCPlaceDate
+                FROM geocaches c
+            """
+        ]
+
