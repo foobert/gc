@@ -37,8 +37,8 @@ class CacheCache2
 
         puts "Latest logs for #{username}:"
         logs.each do |log|
-            name = @db.get_geocache_name(log["CacheCode"])
-            puts " - #{log["CacheCode"]} #{name}"
+            #name = @db.get_geocache_name(log["CacheCode"])
+            puts " - #{log["CacheCode"]}"# #{name}"
         end
     end
 

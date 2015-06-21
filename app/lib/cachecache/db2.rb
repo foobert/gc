@@ -38,12 +38,20 @@ module CacheCache
         end
 
         def get_latest_log(username)
-            # TODO
+            begin
+                res = RestClient.get _url("/logs/latest?username=#{username}"), 'X-Token' => @token
+                res.body
+            rescue
+                nil
+            end
         end
 
         def save_logs(data_array)
             @logger.debug "Updating #{data_array.size} Logs"
-            # TODO
+            data_array.each do |data|
+                @logger.debug "POST #{data['Code']}"
+                RestClient.post _url('/log'), data.to_json, 'X-Token' => @token, :accept => :json, :content_type => :json
+            end
         end
 
         def get_geocache_name(id)
