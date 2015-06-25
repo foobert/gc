@@ -191,7 +191,7 @@ version="1.1" creator="cachecache">
     etag = (gc) ->
         return null if not gc?
         time = gc.DateLastUpdate
-        match = time.match /^\/Date\((\d+)-(\d{2})(\d{2})\)\/$/
+        match = time?.match /^\/Date\((\d+)-(\d{2})(\d{2})\)\/$/
         return null if not match?
         seconds_epoch = parseInt(match[1]) / 1000
         timezone_hours = parseInt(match[2]) * 60 * 60
