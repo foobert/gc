@@ -43,7 +43,7 @@ class GeocacheService
 
         if query.typeIds?
             sql = sql
-                .where 'GeocacheTypeId = ANY(?)', query.typeIds
+                .where 'GeocacheTypeId IN ?', query.typeIds.map (x) -> parseInt x
 
         # query.attributeIds is currently not supported
 
