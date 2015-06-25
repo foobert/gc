@@ -34,7 +34,7 @@ class GeocacheService
                 .where "age(UTCPlaceDate) < interval ?", "#{query.maxAge} days"
 
         if query.bounds?
-            [lat0, lng0, lat1, lng1] = query.bounds
+            [lat0, lng0, lat1, lng1] = query.bounds.map (x) -> parseFloat x
             sql = sql
                 .where "Latitude >= ?", lat0
                 .where "Latitude <= ?", lat1
@@ -73,6 +73,8 @@ class GeocacheService
         if options.withData
             Code: row.id
             Name: row.name
+            Latitude: parseFloat row.latitude
+            Longitude: parseFloat row.longitude
             Terrain: parseFloat row.terrain
             Difficulty: parseFloat row.difficulty
             Archived: row.archived
