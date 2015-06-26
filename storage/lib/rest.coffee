@@ -71,16 +71,6 @@ module.exports = (services) ->
             res.header 'ETag', etag gc
             res.end
 
-    app.put '/geocaches', async (req, res, next) ->
-        models = if typeof req.body is 'array'
-            req.body
-        else
-            [req.body]
-
-        yield geocache.upsertBulk models
-        res.status 201
-        res.send ''
-
     app.post '/geocache', async (req, res, next) ->
         yield geocache.upsert req.body
         res.status 201

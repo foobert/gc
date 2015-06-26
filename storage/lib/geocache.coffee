@@ -166,14 +166,6 @@ class GeocacheService
         finally
             done()
 
-    upsertBulk: Promise.coroutine (datas) ->
-        [client, done] = yield @db.connect()
-        try
-            for data in datas
-                yield @_upsert client, data
-            @_refreshView()
-        finally
-            done()
 
     delete: Promise.coroutine (id) ->
         debug "delete #{id}"
