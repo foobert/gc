@@ -121,9 +121,10 @@ class GeocacheService
         finally
             done()
 
-    upsert: (data) ->
+    upsert: Promise.coroutine (data) ->
         debug "upsert #{data.Code?.toLowerCase()}"
-        upsert @db, 'geocaches', data
+        yield upsert @db, 'geocaches', data
+        @_refreshView()
 
     delete: Promise.coroutine (id) ->
         debug "delete #{id}"

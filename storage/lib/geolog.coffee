@@ -7,6 +7,7 @@ module.exports = (db) ->
     upsert: (data) ->
         debug "upsert #{data.Code?.toLowerCase()}"
         upsert db, 'logs', data
+        @_refresh()
 
     latest: Promise.coroutine (username) ->
         debug "latest #{username}"
