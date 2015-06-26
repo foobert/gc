@@ -33,8 +33,10 @@ TypeFilter = React.createClass
 UserFilter = React.createClass
     render: ->
         <li className="item user">
-            <div className="content">{@props.username}</div>
-            <a data-username={@props.username} onClick={@props.remove}>Remove</a>
+            <i className="middle aligned red remove circle icon" data-username={@props.username} onClick={@props.remove}></i>
+            <div className="content">
+                {@props.username}
+            </div>
         </li>
 
 Coordinates = React.createClass

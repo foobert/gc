@@ -27,12 +27,11 @@
 .user .content {
     display: inline;
 }
-.user a {
+.user i {
     visibility: hidden;
-    float: right;
 }
 
-.user:hover a {
+.user:hover i {
     visibility: visible;
 }
 
@@ -46,4 +45,12 @@
 
 .leaflet-control-attribution {
     display: none;
+}
+
+ul {
+    padding: 0;
+}
+
+li.user {
+    list-style-type: none;
 }
