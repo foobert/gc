@@ -1,3 +1,7 @@
+#require 'semantic-ui-css/components/reset.css'
+require 'semantic-ui-css/components/site.css'
+require '../../css/index.css'
+
 React = require 'react'
 FluxComponent = require 'flummox/component'
 MainMenu = require './main-menu.cjsx'

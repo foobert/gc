@@ -9,25 +9,9 @@ html, body {
     height: 100%;
 }
 
-.poi-generator {
-    width: 700px;
-    margin: 5em auto;
-}
-
 .container {
   display: flex;
-  flex-grow: columns;
-}
-
-.container .menu {
-  position: relative;
-  width: 100px;
-  visibility: visible;
-}
-
-.ui.left.sidebar {
-  transform: initial;
-  box-shadow: 20px 0px 20px 0px rgba(0,0,0,0.15);
+  flex-direction: row;
 }
 
 .content {

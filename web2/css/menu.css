@@ -1,0 +1,10 @@
+.container .menu {
+  position: relative;
+  width: 100px;
+  visibility: visible;
+}
+
+.ui.left.sidebar {
+  transform: initial;
+  box-shadow: 20px 0px 20px 0px rgba(0,0,0,0.15);
+}

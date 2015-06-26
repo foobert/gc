@@ -10,7 +10,8 @@ module.exports = {
     devtool: "cheap-module-eval-source-map",
     module: {
         loaders: [
-            { test: /\.css$/, loader: "style!css!postcss" },
+            { test: /^css\/\.css$/, loader: "style!css!postcss" },
+            { test: /\.css$/, loader: "style!css" },
             { test: /\.coffee$/, loader: "coffee-loader" },
             { test: /\.cjsx$/, loaders: ['coffee', 'cjsx']},
             { test: /\.(jpe?g|png|gif|svg)$/i, loaders: [ 'file?hash=sha512&digest=hex&name=[hash].[ext]' ] },

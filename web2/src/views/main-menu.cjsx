@@ -1,3 +1,8 @@
+require 'semantic-ui-css/components/icon.css'
+require 'semantic-ui-css/components/menu.css'
+require 'semantic-ui-css/components/sidebar.css'
+require '../../css/menu.css'
+
 React = require 'react'
 
 module.exports = React.createClass

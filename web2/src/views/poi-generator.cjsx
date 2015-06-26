@@ -1,3 +1,11 @@
+require 'semantic-ui-css/components/button.css'
+require 'semantic-ui-css/components/checkbox.css'
+require 'semantic-ui-css/components/form.css'
+require 'semantic-ui-css/components/header.css'
+require 'semantic-ui-css/components/icon.css'
+require 'semantic-ui-css/components/message.css'
+require '../../css/poi.css'
+
 FluxComponent = require 'flummox/component'
 React = require 'react'
 classnames = require 'classnames'

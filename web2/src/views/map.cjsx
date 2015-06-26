@@ -1,3 +1,11 @@
+require 'semantic-ui-css/components/button.css'
+require 'semantic-ui-css/components/checkbox.css'
+require 'semantic-ui-css/components/form.css'
+require 'semantic-ui-css/components/icon.css'
+require 'semantic-ui-css/components/sidebar.css'
+require 'leaflet/dist/leaflet.css'
+require '../../css/map.css'
+
 FluxComponent = require 'flummox/component'
 L = require 'leaflet'
 React = require 'react'
@@ -6,9 +14,6 @@ request = require 'superagent'
 
 geocaches = require '../geocache.coffee'
 server = require '../backend.coffee'
-
-require 'leaflet/dist/leaflet.css'
-require '../../css/map.css'
 
 TypeFilter = React.createClass
     render: ->
