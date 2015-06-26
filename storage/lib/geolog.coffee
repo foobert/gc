@@ -1,10 +1,13 @@
-Promise = require 'bluebird'
+debug = require('debug') 'gc:geologs'
 upsert = require './upsert'
+refreshView = require './refreshView'
+Promise = require 'bluebird'
 
 module.exports = (db) ->
     upsert: upsert.bind this, db, 'logs'
 
     latest: Promise.coroutine (username) ->
+        debug "latest #{username}"
         [client, done] = yield db.connect()
         try
             sql = db.select()
@@ -15,7 +18,6 @@ module.exports = (db) ->
             sql = sql.where 'lower(username) = ?', username.trim().toLowerCase() if username?
             sql = sql.toString()
 
-            console.log sql
             result = yield client.queryAsync sql
             if result.rowCount is 0
                 return null
@@ -24,10 +26,4 @@ module.exports = (db) ->
         finally
             done()
 
-    refresh: Promise.coroutine ->
-        [client, done] = yield db.connect()
-        try
-            console.log 'refresh founds'
-            yield client.queryAsync 'REFRESH MATERIALIZED VIEW founds'
-        finally
-            done()
+    _refresh: refreshView db, 'logRel', 5000, debug

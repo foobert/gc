@@ -1,9 +1,11 @@
 debug = require('debug') 'gc:geocaches'
+refreshView = require './refreshView'
 stream = require 'stream'
 Promise = require 'bluebird'
 
 class GeocacheService
     constructor: (@db) ->
+        @_refreshView = refreshView @db, 'geocachesRel', 5000, debug
 
     _queryGeocaches: Promise.coroutine (query, withData) ->
         debug "query #{JSON.stringify query}, #{withData}"
@@ -114,6 +116,7 @@ class GeocacheService
                 .where 'id = ?', id
                 .toParam()
             result = yield client.queryAsync sql
+            @_refreshView()
         finally
             done()
 
@@ -159,6 +162,7 @@ class GeocacheService
         [client, done] = yield @db.connect()
         try
             yield @_upsert client, data
+            @_refreshView()
         finally
             done()
 
@@ -167,6 +171,7 @@ class GeocacheService
         try
             for data in datas
                 yield @_upsert client, data
+            @_refreshView()
         finally
             done()
 
@@ -180,6 +185,7 @@ class GeocacheService
                     .toString()
             console.log sql
             yield client.queryAsync sql
+            @_refreshView()
         finally
             done()
 
@@ -192,6 +198,7 @@ class GeocacheService
                 .toString()
             console.log sql
             yield client.queryAsync sql
+            @_refreshView()
         finally
             done()
 
