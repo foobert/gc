@@ -76,6 +76,11 @@ module.exports = (services) ->
         res.status 201
         res.send ''
 
+    app.get '/geocache/:gc/seen', async (req, res, next) ->
+        gc = yield geocache.get req.params.gc
+        res.status 200
+        res.send gc.meta.updated
+
     app.put '/geocache/:gc/seen', async (req, res, next) ->
         now = Date.parse req.body
         yield geocache.touch req.params.gc
