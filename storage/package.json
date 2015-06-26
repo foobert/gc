@@ -1,5 +1,5 @@
 {
-  "name": "gc-rest",
+  "name": "gc-storage",
   "version": "0.0.1",
   "description": "manages the geocache database abstraction",
   "repository": {
