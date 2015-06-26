@@ -4,6 +4,7 @@ Promise = require 'bluebird'
 JSZip = require 'jszip'
 request = require 'superagent'
 
+geocaches = require '../geocache.coffee'
 server = require '../backend.coffee'
 
 class PoiActions extends Actions
@@ -22,7 +23,7 @@ class PoiActions extends Actions
     submit: (types) ->
         new Promise (resolve, reject) =>
             files = types.map (type) ->
-                url: server.url "/poi.csv?type=#{type}"
+                url: server.url "/poi.csv?typeIds[]=#{geocaches.types[type]}"
                 name: "#{type}.csv"
             zip = new JSZip()
             zipFolder = zip.folder 'poi'
@@ -38,9 +39,10 @@ class PoiActions extends Actions
                     @setFilename next.name
                     request
                         .get next.url
+                        .accept 'text/csv'
                         .end (err, res) ->
                             return reject err if err?
-                            h next.name, data
+                            h next.name, res.text
             h()
 
         ###
