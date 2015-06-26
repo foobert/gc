@@ -83,7 +83,7 @@ class GeocacheService
             Difficulty: parseFloat row.difficulty
             Archived: row.archived
             Available: row.available
-            CacheType: GeocacheTypeId: row.geocachetypeid
+            CacheType: GeocacheTypeId: parseInt row.geocachetypeid
             ContainerType: ContainerTypeName: row.containertypename
             EncodedHints: row.encodedhints
             meta: updated: row.updated
