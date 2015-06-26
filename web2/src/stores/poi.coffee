@@ -52,6 +52,7 @@ class PoiStore extends Store
     handleSubmitBegin: ->
         @setState
             loading: true
+            error: false
 
     handleSubmitSuccess: ->
         @setState

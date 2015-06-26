@@ -39,8 +39,7 @@ PoiGenerator = React.createClass
             ui: true
             form: true
             error: @props.error
-            dimmable: true
-            dimmed: @props.loading
+            loading: @props.loading
             disabled: @props.loading
 
         <div className="poi-generator">
