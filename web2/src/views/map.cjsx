@@ -17,68 +17,10 @@ request = require 'superagent'
 geocaches = require '../geocache.coffee'
 server = require '../backend.coffee'
 
-TypeFilter = React.createClass
-    render: ->
-        <div className="field">
-            <div className="ui input checkbox">
-                <input
-                    type="checkbox"
-                    name="type"
-                    id="type-#{@props.id}"
-                    checked={@props.selected?.has @props.id}
-                    onChange={@props.toggle}
-                    />
-                <label htmlFor="type-#{@props.id}">{@props.label}</label>
-            </div>
-        </div>
-
-UserFilter = React.createClass
-    render: ->
-        <li className="item user">
-            <i className="middle aligned red remove circle icon" data-username={@props.username} onClick={@props.remove}></i>
-            <div className="content">
-                {@props.username}
-            </div>
-        </li>
-
-Coordinates = React.createClass
-    _format: (coord, pos, neg) ->
-        deg = Math.floor coord
-        min = (coord - deg) * 60
-        prefix = if coord < 0 then neg else pos
-        "#{prefix} #{deg}\u00b0 #{min.toFixed 3}"
-
-    render: ->
-        <span>{@_format @props.lat, 'N', 'S'} {@_format @props.lon, 'E', 'W'}</span>
-
-Popup = React.createClass
-    render: ->
-        <div className="ui list">
-            <div className="item">
-                <div className="content">
-                    <a className="header" href="http://coord.info/#{@props.Code}" target="_blank">{@props.Code}</a>
-                    <div className="description">{@props.Name}</div>
-                </div>
-            </div>
-            <div className="item">
-                <div className="content">
-                    <i className="location arrow icon"></i>
-                    <Coordinates lat={@props.Latitude} lon={@props.Longitude}/>
-                </div>
-            </div>
-            <div className="item">
-                <div className="content">
-                    <i className="suitcase icon"></i>
-                    {@props.ContainerType.ContainerTypeName} {geocaches.names[@props.CacheType.GeocacheTypeId]}
-                </div>
-            </div>
-            <div className="item">
-                <div className="content">
-                    <i className="signal icon"></i>
-                    Difficulty {@props.Difficulty.toFixed 1}, Terrain {@props.Terrain.toFixed 1}
-                </div>
-            </div>
-        </div>
+TypeFilter = require './map/type-filter.cjsx'
+UserFilter = require './map/user-filter.cjsx'
+Coordinates = require './map/coordinates.cjsx'
+Popup = require './map/popup.cjsx'
 
 Map = React.createClass
     displayName: 'Geocache Map'
