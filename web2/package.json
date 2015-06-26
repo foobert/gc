@@ -6,8 +6,9 @@
   "scripts": {
     "start": "NODE_ENV=production node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "NODE_ENV=production $(npm bin)/webpack -p",
-    "dev": "$(npm bin)/webpack-dev-server --progress --colors --port 9090"
+    "build": "NODE_ENV=production $(npm bin)/webpack -p --optimize-minimize",
+    "dev": "$(npm bin)/webpack-dev-server --progress --colors --port 9090",
+    "size": "$(npm bin)/webpack -p --optimize-minimize --json > stats.json && $(npm bin)/analyze-bundle-size stats.json; rm -f stats.json"
   },
   "author": "foobert",
   "license": "all rights reserved",
