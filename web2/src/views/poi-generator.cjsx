@@ -100,7 +100,7 @@ PoiGenerator = React.createClass
                         </div>
                     </div>
                 </div>
-                <div className="ui submit labeled icon button" onClick={=> @actions.submit @props.types}>
+                <div className="ui submit labeled icon button" onClick={=> @actions.submit @props.format, @props.types}>
                     <i className="cloud download icon"></i>
                     Generate
                 </div>

@@ -20,11 +20,14 @@ class PoiActions extends Actions
     setFilename: (filename) ->
         filename
 
-    submit: (types) ->
+    submit: (format, types) ->
         new Promise (resolve, reject) =>
             files = types.map (type) ->
-                url: server.url "/poi.csv?typeIds[]=#{geocaches.types[type]}"
-                name: "#{type}.csv"
+                url: server.url "/poi.#{format}?typeIds[]=#{geocaches.types[type]}"
+                name: "#{type}.#{format}"
+            accept = switch format
+                when 'gpx' then 'application/gpx+xml'
+                else 'text/csv'
             zip = new JSZip()
             zipFolder = zip.folder 'poi'
             h = (name, data) =>
@@ -39,7 +42,7 @@ class PoiActions extends Actions
                     @setFilename next.name
                     request
                         .get next.url
-                        .accept 'text/csv'
+                        .accept accept
                         .end (err, res) ->
                             return reject err if err?
                             h next.name, res.text
