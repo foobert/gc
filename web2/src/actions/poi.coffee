@@ -30,6 +30,10 @@ class PoiActions extends Actions
                 else 'text/csv'
             zip = new JSZip()
             zipFolder = zip.folder 'poi'
+            types.forEach (type) ->
+                dataUrl = require "url!../../img/poi/#{type}.bmp"
+                data = dataUrl.split(',')[1]
+                zipFolder.file "#{type}.bmp", data, base64: true
             h = (name, data) =>
                 if data?
                     zipFolder.file name, data
