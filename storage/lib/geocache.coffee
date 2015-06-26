@@ -16,6 +16,7 @@ class GeocacheService
 
         sql = sql
             .field 'upper(trim(id))', 'id'
+            .field 'updated'
 
         if withData
             sql = sql
@@ -85,6 +86,7 @@ class GeocacheService
             CacheType: GeocacheTypeId: row.geocachetypeid
             ContainerType: ContainerTypeName: row.containertypename
             EncodedHints: row.encodedhints
+            meta: updated: row.updated
         else
             row.id
 
