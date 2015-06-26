@@ -3,6 +3,8 @@ require 'semantic-ui-css/components/checkbox.css'
 require 'semantic-ui-css/components/form.css'
 require 'semantic-ui-css/components/header.css'
 require 'semantic-ui-css/components/icon.css'
+require 'semantic-ui-css/components/input.css'
+require 'semantic-ui-css/components/label.css'
 require 'semantic-ui-css/components/message.css'
 require '../../css/poi.css'
 
