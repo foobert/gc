@@ -4,7 +4,9 @@ refreshView = require './refreshView'
 Promise = require 'bluebird'
 
 module.exports = (db) ->
-    upsert: upsert.bind this, db, 'logs'
+    upsert: (data) ->
+        debug "upsert #{data.Code?.toLowerCase()}"
+        upsert db, 'logs', data
 
     latest: Promise.coroutine (username) ->
         debug "latest #{username}"

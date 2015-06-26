@@ -1,7 +1,6 @@
 Promise = require 'bluebird'
 
 upsert = Promise.coroutine (db, client, table, data) ->
-    console.log data
     id = data.Code?.toLowerCase()
     updated = data.meta?.updated
     delete data.meta

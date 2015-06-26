@@ -1,6 +1,7 @@
 debug = require('debug') 'gc:geocaches'
 refreshView = require './refreshView'
 stream = require 'stream'
+upsert = require './upsert'
 Promise = require 'bluebird'
 
 class GeocacheService
@@ -120,52 +121,9 @@ class GeocacheService
         finally
             done()
 
-    _upsert: Promise.coroutine (client, data) ->
-        id = data.Code?.toLowerCase()
-        updated = data.meta?.updated
-        delete data.meta
-
-        throw new Error "Missing geocache attribute 'Code'" if not id?
-
-        debug "upsert #{id}"
-        try
-            yield client.queryAsync 'BEGIN'
-
-            sql = @db.select()
-                .field 'id'
-                .from 'geocaches'
-                .where 'id = ?', id
-                .toString()
-            result = yield client.queryAsync sql
-            sql = if result.rowCount is 0
-                @db.insert numberedParameters: true
-                    .into 'geocaches'
-                    .set 'id', id
-                    .set 'updated', updated or 'now', dontQuote: not updated?
-                    .set 'data', JSON.stringify data
-                    .toParam()
-            else
-                @db.update numberedParameters: true
-                    .table 'geocaches'
-                    .set 'updated', updated or 'now', dontQuote: not updated?
-                    .set 'data', JSON.stringify data
-                    .where 'id = ?', id
-                    .toParam()
-            result = yield client.queryAsync sql
-            throw new Error "Insert/update had no effect: #{sql}" if result.rowCount is 0
-            yield client.queryAsync 'COMMIT'
-        catch err
-            yield client.queryAsync 'ROLLBACK'
-            throw err
-
-    upsert: Promise.coroutine (data) ->
-        [client, done] = yield @db.connect()
-        try
-            yield @_upsert client, data
-            @_refreshView()
-        finally
-            done()
-
+    upsert: (data) ->
+        debug "upsert #{data.Code?.toLowerCase()}"
+        upsert @db, 'geocaches', data
 
     delete: Promise.coroutine (id) ->
         debug "delete #{id}"
