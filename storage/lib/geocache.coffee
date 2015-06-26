@@ -1,3 +1,4 @@
+debug = require('debug') 'gc:geocaches'
 stream = require 'stream'
 Promise = require 'bluebird'
 
@@ -5,6 +6,7 @@ class GeocacheService
     constructor: (@db) ->
 
     _queryGeocaches: Promise.coroutine (query, withData) ->
+        debug "query #{JSON.stringify query}, #{withData}"
         [client, done] = yield @db.connect()
         sql = @db.select tableAliasQuoteCharacter: '"'
             .from 'geocachesRel'
@@ -56,8 +58,6 @@ class GeocacheService
                 .where 'Archived = false'
                 .where 'Available = true'
 
-        console.log sql.toString()
-
         rows = client.query sql.toString()
         map = (row) => @_mapRow row, withData: withData
         geocacheStream = new QueryStream rows, map, done
@@ -86,6 +86,7 @@ class GeocacheService
             row.id
 
     get: Promise.coroutine (id) ->
+        debug "get #{id}"
         [client, done] = yield @db.connect()
         try
             sql = @db.select()
@@ -104,6 +105,7 @@ class GeocacheService
         finally
             done()
     touch: Promise.coroutine (id, date) ->
+        debug "touch #{id}"
         [client, done] = yield @db.connect()
         try
             sql = @db.update numberedParameters: true
@@ -116,13 +118,13 @@ class GeocacheService
             done()
 
     _upsert: Promise.coroutine (client, data) ->
-        console.log data
         id = data.Code?.toLowerCase()
         updated = data.meta?.updated
         delete data.meta
 
         throw new Error "Missing geocache attribute 'Code'" if not id?
 
+        debug "upsert #{id}"
         try
             yield client.queryAsync 'BEGIN'
 
@@ -169,6 +171,7 @@ class GeocacheService
             done()
 
     delete: Promise.coroutine (id) ->
+        debug "delete #{id}"
         [client, done] = yield @db.connect()
         try
             sql = @db.delete()
@@ -181,6 +184,7 @@ class GeocacheService
             done()
 
     deleteAll: Promise.coroutine ->
+        debug "delete all"
         [client, done] = yield @db.connect()
         try
             sql = @db.delete()
