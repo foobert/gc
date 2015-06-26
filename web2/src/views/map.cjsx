@@ -210,6 +210,9 @@ Map = React.createClass
                             id="webcam" label="Webcam"
                             selected={@props.selectedTypes} toggle={typeToggle}/>
                         <TypeFilter
+                            id="virtual" label="Virtual"
+                            selected={@props.selectedTypes} toggle={typeToggle}/>
+                        <TypeFilter
                             id="cito" label="Cache In Trash Out"
                             selected={@props.selectedTypes} toggle={typeToggle}/>
                         <TypeFilter
