@@ -8,7 +8,7 @@ class MapStore extends Store
     constructor: (flux) ->
         super flux,
             initialState:
-                center: [0, 0]
+                center: [52.518769, 13.404027] # somewhere in Berlin
                 zoom: 13
                 selectedTypes: Immutable.Set.fromKeys geocaches.types
                 filterUsers: Immutable.Set()
