@@ -1,17 +1,35 @@
 debug = require('debug') 'gc:geocaches'
 refreshView = require './refreshView'
-stream = require 'stream'
 upsert = require './upsert'
 Promise = require 'bluebird'
+QuerySream = require './query-stream'
 
-class GeocacheService
-    constructor: (@db) ->
-        @_refreshView = refreshView @db, 'geocachesRel', 5000, debug
+module.exports = (db) ->
+    _refreshView = refreshView db, 'geocachesRel', 5000, debug
 
-    _queryGeocaches: Promise.coroutine (query, withData) ->
+    _mapRow = (row, options = {}) ->
+        return null unless row?
+        options.withData ?= true
+        if options.withData
+            Code: row.id
+            Name: row.name
+            Latitude: parseFloat row.latitude
+            Longitude: parseFloat row.longitude
+            Terrain: parseFloat row.terrain
+            Difficulty: parseFloat row.difficulty
+            Archived: row.archived
+            Available: row.available
+            CacheType: GeocacheTypeId: parseInt row.geocachetypeid
+            ContainerType: ContainerTypeName: row.containertypename
+            EncodedHints: row.encodedhints
+            meta: updated: row.updated
+        else
+            row.id
+
+    _queryGeocaches = Promise.coroutine (query, withData) ->
         debug "query #{JSON.stringify query}, #{withData}"
-        [client, done] = yield @db.connect()
-        sql = @db.select tableAliasQuoteCharacter: '"'
+        [client, done] = yield db.connect()
+        sql = db.select tableAliasQuoteCharacter: '"'
             .from 'geocachesRel'
 
         sql = sql
@@ -63,38 +81,19 @@ class GeocacheService
                 .where 'Available = true'
 
         rows = client.query sql.toString()
-        map = (row) => @_mapRow row, withData: withData
+        map = (row) => _mapRow row, withData: withData
         geocacheStream = new QueryStream rows, map, done
 
         return geocacheStream
 
     getStream: (query, withData) ->
-        @_queryGeocaches query, withData
-
-    _mapRow: (row, options = {}) ->
-        return null unless row?
-        options.withData ?= true
-        if options.withData
-            Code: row.id
-            Name: row.name
-            Latitude: parseFloat row.latitude
-            Longitude: parseFloat row.longitude
-            Terrain: parseFloat row.terrain
-            Difficulty: parseFloat row.difficulty
-            Archived: row.archived
-            Available: row.available
-            CacheType: GeocacheTypeId: parseInt row.geocachetypeid
-            ContainerType: ContainerTypeName: row.containertypename
-            EncodedHints: row.encodedhints
-            meta: updated: row.updated
-        else
-            row.id
+        _queryGeocaches query, withData
 
     get: Promise.coroutine (id) ->
         debug "get #{id}"
-        [client, done] = yield @db.connect()
+        [client, done] = yield db.connect()
         try
-            sql = @db.select()
+            sql = db.select()
                 .from 'geocaches'
                 .field 'updated'
                 .field 'data'
@@ -109,65 +108,49 @@ class GeocacheService
                 return row.data
         finally
             done()
+
     touch: Promise.coroutine (id, date) ->
         debug "touch #{id}"
-        [client, done] = yield @db.connect()
+        [client, done] = yield db.connect()
         try
-            sql = @db.update numberedParameters: true
+            sql = db.update numberedParameters: true
                 .table 'geocaches'
                 .set 'updated', date or 'now', dontQuote: not date?
                 .where 'id = ?', id
                 .toParam()
             result = yield client.queryAsync sql
-            @_refreshView()
+            _refreshView()
         finally
             done()
 
     upsert: Promise.coroutine (data) ->
         debug "upsert #{data.Code?.toLowerCase()}"
-        yield upsert @db, 'geocaches', data
-        @_refreshView()
+        yield upsert db, 'geocaches', data
+        _refreshView()
 
     delete: Promise.coroutine (id) ->
         debug "delete #{id}"
-        [client, done] = yield @db.connect()
+        [client, done] = yield db.connect()
         try
-            sql = @db.delete()
+            sql = db.delete()
                     .from 'geocaches'
                     .where 'id = ?', id.trim().toLowerCase()
                     .toString()
             console.log sql
             yield client.queryAsync sql
-            @_refreshView()
+            _refreshView()
         finally
             done()
 
     deleteAll: Promise.coroutine ->
         debug "delete all"
-        [client, done] = yield @db.connect()
+        [client, done] = yield db.connect()
         try
-            sql = @db.delete()
+            sql = db.delete()
                 .from 'geocaches'
                 .toString()
             console.log sql
             yield client.queryAsync sql
-            @_refreshView()
+            _refreshView()
         finally
             done()
-
-class QueryStream extends stream.Readable
-    constructor: (query, map, done) ->
-        super objectMode: true
-
-        query.on 'row', (row) =>
-            @push map(row)
-        query.on 'end', (result) =>
-            @push null
-            done()
-        query.on 'error', (err) =>
-            @push null
-            done(err)
-
-    _read: ->
-
-module.exports = GeocacheService

@@ -3,10 +3,6 @@ Promise = require 'bluebird'
 Promise.longStackTraces()
 
 do Promise.coroutine ->
-    GeocacheService = require './lib/geocache'
-    AccessService = require './lib/access'
-    geolog = require './lib/geolog'
-
     db = require('./lib/db')
         host: process.env.DB_PORT_5432_TCP_ADDR ? 'localhost'
         user: process.env.DB_USER ? process.env.USER
@@ -14,15 +10,14 @@ do Promise.coroutine ->
         database: process.env.DB ? 'gc'
     yield db.up()
 
-    geocacheService = new GeocacheService db
-    accessService = new AccessService db
-    token = yield accessService.init()
+    access = require('./lib/access') db
+    token = yield access.init()
     console.log "Token: #{token}"
 
     app = require('./lib/rest')
-        geocache: geocacheService
-        access: accessService
-        geolog: geolog db
+        access: access
+        geocache: require('./lib/geocache') db
+        geolog: require('./lib/geolog') db
 
     console.log 'Listening on port 8081'
     app.listen 8081

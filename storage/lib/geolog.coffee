@@ -4,10 +4,12 @@ refreshView = require './refreshView'
 Promise = require 'bluebird'
 
 module.exports = (db) ->
+    _refresh = refreshView db, 'logRel', 5000, debug
+
     upsert: (data) ->
         debug "upsert #{data.Code?.toLowerCase()}"
         upsert db, 'logs', data
-        @_refresh()
+        _refresh()
 
     latest: Promise.coroutine (username) ->
         debug "latest #{username}"
@@ -28,5 +30,3 @@ module.exports = (db) ->
                 return result.rows[0].id.toUpperCase()
         finally
             done()
-
-    _refresh: refreshView db, 'logRel', 5000, debug

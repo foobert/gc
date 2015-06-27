@@ -1,18 +1,16 @@
 uuid = require 'uuid'
 Promise = require 'bluebird'
 
-class AccessService
-    constructor: (@db) ->
-
+module.exports = (db) ->
     init: Promise.coroutine ->
         return (yield @getToken()) or (yield @addToken())
 
     check: Promise.coroutine (token) ->
         return false if not token?
 
-        [client, done] = yield @db.connect()
+        [client, done] = yield db.connect()
         try
-            sql = @db.select()
+            sql = db.select()
                 .from 'tokens'
                 .field 'id'
                 .where 'id = ?', token
@@ -27,9 +25,9 @@ class AccessService
 
     addToken: Promise.coroutine ->
         token = uuid.v4()
-        [client, done] = yield @db.connect()
+        [client, done] = yield db.connect()
         try
-            sql = @db.insert()
+            sql = db.insert()
                 .into 'tokens'
                 .set 'id', token
                 .toString()
@@ -39,9 +37,9 @@ class AccessService
             done()
 
     getToken: Promise.coroutine ->
-        [client, done] = yield @db.connect()
+        [client, done] = yield db.connect()
         try
-            sql = @db.select()
+            sql = db.select()
                 .from 'tokens'
                 .field 'id'
                 .limit 1
@@ -53,6 +51,3 @@ class AccessService
                 return result.rows[0].id
         finally
             done()
-
-module.exports = AccessService
-
