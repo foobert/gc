@@ -16,6 +16,6 @@ class XmlStream extends stream.Transform
         @push @post
         cb()
 
-module.exports = 
+module.exports =
     transform: (pre, post, mapper) ->
         new XmlStream pre, post, mapper
