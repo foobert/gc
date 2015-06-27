@@ -1,5 +1,5 @@
 debug = require('debug') 'gc:geocaches'
-refreshView = require './refreshView'
+refreshView = require './refresh-view'
 upsert = require './upsert'
 Promise = require 'bluebird'
 QuerySream = require './query-stream'

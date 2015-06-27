@@ -1,6 +1,6 @@
 debug = require('debug') 'gc:geologs'
 upsert = require './upsert'
-refreshView = require './refreshView'
+refreshView = require './refresh-view'
 Promise = require 'bluebird'
 
 module.exports = (db) ->
