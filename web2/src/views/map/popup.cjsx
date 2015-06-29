@@ -1,3 +1,5 @@
+geocaches = require '../../geocache.coffee'
+Coordinates = require './coordinates.cjsx'
 React = require 'react'
 
 module.exports = React.createClass
