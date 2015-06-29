@@ -1,15 +1,11 @@
 debug = require('debug') 'gc:geologs'
 upsert = require './upsert'
-refreshView = require './refresh-view'
 Promise = require 'bluebird'
 
 module.exports = (db) ->
-    _refresh = refreshView db, 'logsRel', 5000, debug
-
     upsert: (data) ->
         debug "upsert #{data.Code?.toLowerCase()}"
         upsert db, 'logs', data
-        _refresh()
 
     latest: Promise.coroutine (username) ->
         debug "latest #{username}"
