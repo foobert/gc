@@ -14,7 +14,7 @@ module.exports = (db) ->
             sql = db.select()
                 .from 'logsRel'
                 .field 'id'
-                .order 'createdate', false
+                .order 'visitdate', false
                 .limit 1
             sql = sql.where 'lower(username) = ?', username.trim().toLowerCase() if username?
             sql = sql.toString()

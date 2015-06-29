@@ -30,6 +30,7 @@ module.exports = (options) ->
                      , data->'Finder'->>'UserName' as username
                      , data->'LogType'->>'WptLogTypeId' as logtype
                      , (date 'epoch' + (substring(data->>'UTCCreateDate' from 7 for 10)::numeric * interval '1 second')) as createdate
+                     , (date 'epoch' + (substring(data->>'VisitDate' from 7 for 10)::numeric - substring(data->>'VisitDate' from 21 for 2)::numeric * 3600) * interval '1 second') as VisitDate
                 FROM logs
             """
         ]
