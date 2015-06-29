@@ -2,7 +2,7 @@ debug = require('debug') 'gc:geocaches'
 refreshView = require './refresh-view'
 upsert = require './upsert'
 Promise = require 'bluebird'
-QuerySream = require './query-stream'
+QueryStream = require './query-stream'
 
 module.exports = (db) ->
     _refreshView = refreshView db, 'geocachesRel', 5000, debug
