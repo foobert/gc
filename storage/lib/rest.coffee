@@ -171,7 +171,7 @@ version="1.1" creator="cachecache">
         if id?
             res.status(200).send id
         else
-            res.status 404
+            res.status(404).send 'No logs'
 
     app.post '/sillyRefresh', async (req, res, next) ->
         yield geolog.refresh()
