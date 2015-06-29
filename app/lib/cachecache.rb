@@ -33,7 +33,7 @@ class CacheCache2
             return
         end
 
-        @db.save_logs(logs)
+        #@db.save_logs(logs)
 
         puts "Latest logs for #{username}:"
         logs.each do |log|
@@ -48,6 +48,7 @@ class CacheCache2
             chunk.each do |log|
                 return logs.reverse if log['Code'] == lastlog
                 logs << log
+                @db.save_log(log)
             end
             @logger.debug "Found #{logs.size} logs so far"
         end
