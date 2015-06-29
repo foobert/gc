@@ -4,7 +4,7 @@ refreshView = require './refresh-view'
 Promise = require 'bluebird'
 
 module.exports = (db) ->
-    _refresh = refreshView db, 'logRel', 5000, debug
+    _refresh = refreshView db, 'logsRel', 5000, debug
 
     upsert: (data) ->
         debug "upsert #{data.Code?.toLowerCase()}"
