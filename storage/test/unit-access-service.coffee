@@ -1,4 +1,5 @@
 {expect} = require 'chai'
+uuid = require 'uuid'
 Promise = require 'bluebird'
 Promise.longStackTraces()
 
@@ -40,7 +41,7 @@ describe 'access service', ->
                 expect(result).to.be.true
 
             it 'should return false for an invalid token', Promise.coroutine ->
-                result = yield access.check 'foo'
+                result = yield access.check uuid()
                 expect(result).to.be.false
 
             it 'should return false for a null token', Promise.coroutine ->
