@@ -8,6 +8,7 @@ clean = (s) ->
         .replace /ß/g, 'ss'
         .replace(/ {2,}/g, ' ')
         .replace(/[^a-zA-Z0-9;:?!,.-=_\/@$%*+()<> |\n]/g, '')
+        .trim()
 
 type = (gc) ->
     switch gc.CacheType.GeocacheTypeId
@@ -22,7 +23,7 @@ code = (gc) ->
     gc.Code[2..-1]
 
 skill = (gc) ->
-    "#{gc.Difficulty}/#{gc.Terrain}"
+    "#{gc.Difficulty.toFixed 1}/#{gc.Terrain.toFixed 1}"
 
 size = (gc) ->
     gc.ContainerType.ContainerTypeName[0]
