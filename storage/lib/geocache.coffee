@@ -142,7 +142,7 @@ module.exports = (db) ->
             done()
 
     deleteAll: Promise.coroutine ->
-        debug "delete all"
+        debug 'delete all'
         [client, done] = yield db.connect()
         try
             sql = db.delete()
