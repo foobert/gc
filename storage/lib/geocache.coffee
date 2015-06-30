@@ -115,8 +115,8 @@ module.exports = (db) ->
         try
             sql = db.update numberedParameters: true
                 .table 'geocaches'
-                .set 'updated', date or 'now', dontQuote: not date?
-                .where 'id = ?', id
+                .set 'updated', date?.toISOString() or 'now', dontQuote: not date?
+                .where 'id = ?', id.trim().toLowerCase()
                 .toParam()
             result = yield client.queryAsync sql
             _refreshView()
@@ -136,7 +136,6 @@ module.exports = (db) ->
                     .from 'geocaches'
                     .where 'id = ?', id.trim().toLowerCase()
                     .toString()
-            console.log sql
             yield client.queryAsync sql
             _refreshView()
         finally
@@ -149,7 +148,6 @@ module.exports = (db) ->
             sql = db.delete()
                 .from 'geocaches'
                 .toString()
-            console.log sql
             yield client.queryAsync sql
             _refreshView()
         finally
