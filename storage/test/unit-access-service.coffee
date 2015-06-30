@@ -2,7 +2,7 @@
 Promise = require 'bluebird'
 Promise.longStackTraces()
 
-describe.only 'access service', ->
+describe 'access service', ->
     access = null
 
     before Promise.coroutine ->

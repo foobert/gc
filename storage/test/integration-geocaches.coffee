@@ -40,7 +40,7 @@ gc = (id, options) ->
 
     merge defaults, options
 
-describe 'REST routes for geocaches', ->
+describe.skip 'REST routes for geocaches', ->
     before Promise.coroutine ->
         yield setupDatabase []
 
