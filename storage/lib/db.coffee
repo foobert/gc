@@ -21,6 +21,8 @@ module.exports = (options) ->
             'CREATE TABLE tokens (id uuid UNIQUE)'
         ]
         yield migrate.up [
+            # TODO need to work with dates that don't use 10 numbers, see
+            # UTCCreateDate, VisitDate et al.
             'CREATE TABLE logs (id char(8) PRIMARY KEY, updated timestamp with time zone NOT NULL, data jsonb)'
             """
             CREATE VIEW logsRel AS
@@ -44,6 +46,8 @@ module.exports = (options) ->
             """
         ]
         yield migrate.up [
+            # TODO need to work with dates that don't use 10 numbers, see
+            # UTCCreateDate, VisitDate et al.
             """
             CREATE MATERIALIZED VIEW geocachesRel AS
                 SELECT
