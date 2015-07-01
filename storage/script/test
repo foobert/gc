@@ -1,0 +1,8 @@
+#!/bin/bash
+DB=$(docker run -d postgres)
+sleep 2
+docker run --rm -t --link ${DB}:DB foobert/gc-storage node_modules/.bin/mocha test/unit\*
+APP=$(docker run -d --link ${DB}:DB foobert/gc-storage)
+sleep 2
+docker run --rm -t --link ${DB}:DB --link ${APP}:APP foobert/gc-storage node_modules/.bin/mocha test/integration\*
+docker rm -f ${DB}

@@ -1,8 +1,8 @@
 _ = require 'lodash'
 Promise = require 'bluebird'
 
-module.exports = (db, view, timeout, debug = null) ->
-    refresh = Promise.coroutine ->
+module.exports =
+    refresh: Promise.coroutine (db, view, debug) ->
         debug 'refresh view' if debug?
         [client, done] = yield db.connect()
         try
@@ -12,4 +12,5 @@ module.exports = (db, view, timeout, debug = null) ->
         finally
             done()
 
-    _.debounce refresh, timeout
+    debounce: (db, view, timeout, debug) ->
+        _.debounce (=> @refresh db, view, debug), timeout

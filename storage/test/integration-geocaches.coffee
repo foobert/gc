@@ -2,51 +2,59 @@
 Promise = require 'bluebird'
 request = require 'superagent-as-promised'
 
-url = 'http://localhost:8081'
-token = 'b4e124aa-96d9-4774-9565-b7e728561e4c'
+access = require '../lib/access'
+geocache = require '../lib/geocache'
 
-setupDatabase = Promise.coroutine (geocaches) ->
-    response = yield request
-        .del  "#{url}/geocaches"
-        .set 'X-Token', token
-    expect(response.status).to.equal 202
+describe 'REST routes for geocaches', ->
+    db = null
+    token = null
+    url = null
 
-    response = yield request
-        .put "#{url}/geocaches"
-        .set 'Content-Type', 'application/json'
-        .set 'X-Token', token
-        .send geocaches
-    expect(response.status).to.equal 201
+    setupTestData = Promise.coroutine (geocaches) ->
+        g = geocache db
+        yield g.deleteAll()
+        for geocache in geocaches
+            yield g.upsert geocache
+        yield g.forceRefresh()
 
-gc = (id, options) ->
-    defaults =
-        Code: "GC#{id}"
-        Latitude: 10
-        Longitude: 20
-        Archived: false
-        Available: true
-        CacheType:
-            GeocacheTypeId: 1
-        UTCPlaceDate: "/Date(#{new Date().getTime()}-0000)/"
-    merge = (a, b) ->
-        return a unless b?
-        for k, v of b
-            if typeof v is 'object'
-                a[k] = {} unless a[k]?
-                merge a[k], v
-            else
-                a[k] = v
-        a
+    gc = (id, options) ->
+        defaults =
+            Code: "GC#{id}"
+            Latitude: 10
+            Longitude: 20
+            Archived: false
+            Available: true
+            CacheType:
+                GeocacheTypeId: 1
+            UTCPlaceDate: "/Date(#{new Date().getTime()}-0000)/"
+        merge = (a, b) ->
+            return a unless b?
+            for k, v of b
+                if typeof v is 'object'
+                    a[k] = {} unless a[k]?
+                    merge a[k], v
+                else
+                    a[k] = v
+            a
 
-    merge defaults, options
+        merge defaults, options
 
-describe.skip 'REST routes for geocaches', ->
     before Promise.coroutine ->
-        yield setupDatabase []
+        url = "http://#{process.env.APP_PORT_8081_TCP_ADDR}:#{process.env.APP_PORT_8081_TCP_PORT}"
+        db = require('../lib/db')
+            host: process.env.DB_PORT_5432_TCP_ADDR ? 'localhost'
+            user: process.env.DB_USER ? 'postgres'
+            password: process.env.DB_PASSWORD
+            database: process.env.DB ? 'gc'
+
+        a = access db
+        token = yield a.getToken()
+
+        setupTestData []
 
     describe '/gcs', ->
-        it 'should return a list of GC numbers on GET', Promise.coroutine ->
-            yield setupDatabase [
+        it.only 'should return a list of GC numbers on GET', Promise.coroutine ->
+            yield setupTestData [
                 gc '100'
                 gc '101'
             ]

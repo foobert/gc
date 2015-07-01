@@ -5,7 +5,7 @@ Promise.longStackTraces()
 do Promise.coroutine ->
     db = require('./lib/db')
         host: process.env.DB_PORT_5432_TCP_ADDR ? 'localhost'
-        user: process.env.DB_USER ? process.env.USER
+        user: process.env.DB_USER ? 'postgres'
         password: process.env.DB_PASSWORD
         database: process.env.DB ? 'gc'
     yield db.up()

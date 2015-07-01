@@ -5,8 +5,6 @@ Promise = require 'bluebird'
 QueryStream = require './query-stream'
 
 module.exports = (db) ->
-    _refreshView = refreshView db, 'geocachesRel', 5000, debug
-
     _mapRow = (row, options = {}) ->
         return null unless row?
         options.withData ?= true
@@ -119,14 +117,14 @@ module.exports = (db) ->
                 .where 'id = ?', id.trim().toLowerCase()
                 .toParam()
             result = yield client.queryAsync sql
-            _refreshView()
+            @refresh()
         finally
             done()
 
     upsert: Promise.coroutine (data) ->
         debug "upsert #{data.Code?.toLowerCase()}"
         yield upsert db, 'geocaches', data
-        _refreshView()
+        @refresh()
 
     delete: Promise.coroutine (id) ->
         debug "delete #{id}"
@@ -137,7 +135,7 @@ module.exports = (db) ->
                     .where 'id = ?', id.trim().toLowerCase()
                     .toString()
             yield client.queryAsync sql
-            _refreshView()
+            @refresh()
         finally
             done()
 
@@ -149,6 +147,10 @@ module.exports = (db) ->
                 .from 'geocaches'
                 .toString()
             yield client.queryAsync sql
-            _refreshView()
+            @refresh()
         finally
             done()
+
+    refresh: refreshView.debounce db, 'geocachesRel', 5000, debug
+    forceRefresh: ->
+        refreshView.refresh db, 'geocachesRel', debug
