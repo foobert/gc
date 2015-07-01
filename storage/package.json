@@ -8,8 +8,8 @@
   },
   "scripts": {
     "start": "node_modules/.bin/coffee index.coffee",
-    "test": "node_modules/.bin/mocha",
-    "dev": "docker run --rm -it -v $PWD:/usr/src/app -w /usr/src/app --link db:db -p 8081:8081 iojs node_modules/.bin/nodemon --exec node_modules/.bin/coffee index.coffee"
+    "test": "./script/test",
+    "dev": "./script/dev"
   },
   "dependencies": {
     "JSONStream": "^1.0.4",

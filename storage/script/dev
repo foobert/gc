@@ -1,0 +1,5 @@
+#!/bin/sh
+DB=$(docker run -d postgres)
+echo App will be reachable at http://$(boot2docker ip):8081
+docker run --rm -it -v $PWD:/usr/src/app -w /usr/src/app --link ${DB}:db -p 8081:8081 iojs node_modules/.bin/nodemon --exec node_modules/.bin/coffee index.coffee
+docker rm -f ${DB}

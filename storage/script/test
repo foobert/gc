@@ -4,5 +4,5 @@ sleep 2
 docker run --rm -t --link ${DB}:DB foobert/gc-storage node_modules/.bin/mocha test/unit\*
 APP=$(docker run -d --link ${DB}:DB foobert/gc-storage)
 sleep 2
-docker run --rm -t --link ${DB}:DB --link ${APP}:APP foobert/gc-storage node_modules/.bin/mocha test/integration\*
+docker run --rm -t --link ${DB}:DB --link ${APP}:APP -v $PWD:/usr/src/app foobert/gc-storage node_modules/.bin/mocha --watch test/integration\*
 docker rm -f ${DB}
