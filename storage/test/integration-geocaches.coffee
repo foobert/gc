@@ -3,7 +3,7 @@ Promise = require 'bluebird'
 request = require 'superagent-as-promised'
 
 access = require '../lib/access'
-geocache = require '../lib/geocache'
+geocacheService = require '../lib/geocache'
 
 describe 'REST routes for geocaches', ->
     db = null
@@ -11,7 +11,8 @@ describe 'REST routes for geocaches', ->
     url = null
 
     setupTestData = Promise.coroutine (geocaches) ->
-        g = geocache db
+        geocaches = JSON.parse JSON.stringify geocaches
+        g = geocacheService db
         yield g.deleteAll()
         for geocache in geocaches
             yield g.upsert geocache
@@ -20,13 +21,17 @@ describe 'REST routes for geocaches', ->
     gc = (id, options) ->
         defaults =
             Code: "GC#{id}"
+            Name: 'geocache name'
             Latitude: 10
             Longitude: 20
+            Terrain: 1
+            Difficulty: 1
             Archived: false
             Available: true
-            CacheType:
-                GeocacheTypeId: 1
+            CacheType: GeocacheTypeId: 2
+            ContainerType: ContainerTypeName: 'Micro'
             UTCPlaceDate: "/Date(#{new Date().getTime()}-0000)/"
+            EncodedHints: 'some hints'
         merge = (a, b) ->
             return a unless b?
             for k, v of b
@@ -50,10 +55,11 @@ describe 'REST routes for geocaches', ->
         a = access db
         token = yield a.getToken()
 
-        setupTestData []
+    beforeEach Promise.coroutine ->
+        yield setupTestData []
 
     describe '/gcs', ->
-        it.only 'should return a list of GC numbers on GET', Promise.coroutine ->
+        it 'should return a list of GC numbers on GET', Promise.coroutine ->
             yield setupTestData [
                 gc '100'
                 gc '101'
@@ -66,11 +72,9 @@ describe 'REST routes for geocaches', ->
             expect(response.body).to.include.members ['GC100', 'GC101']
 
         it 'should filter by age using "maxAge"', Promise.coroutine ->
-            yield setupDatabase [
-                gc '100',
-                    UTCPlaceDate: "/Date(#{new Date().getTime()}-0000)/"
-                gc '101',
-                    UTCPlaceDate: '/Date(946684800-0000)/'
+            yield setupTestData [
+                gc '100', UTCPlaceDate: "/Date(#{new Date().getTime()}-0000)/"
+                gc '101', UTCPlaceDate: '/Date(00946684800-0000)/'
             ]
             response = yield request
                 .get "#{url}/gcs"
@@ -81,7 +85,7 @@ describe 'REST routes for geocaches', ->
             expect(response.body).to.include.members ['GC100']
 
         it 'should filter by coordinates using "bounds"', Promise.coroutine ->
-            yield setupDatabase [
+            yield setupTestData [
                 gc '100',
                     Latitude: 10
                     Longitude: 10
@@ -104,16 +108,10 @@ describe 'REST routes for geocaches', ->
             expect(response.body).to.include.members ['GC100']
 
         it 'should filter by type id using "typeIds"', Promise.coroutine ->
-            yield setupDatabase [
-                gc '100',
-                    CacheType:
-                        GeocacheTypeId: 5
-                gc '101',
-                    CacheType:
-                        GeocacheTypeId: 6
-                gc '102',
-                    CacheType:
-                        GeocacheTypeId: 7
+            yield setupTestData [
+                gc '100', CacheType: GeocacheTypeId: 5
+                gc '101', CacheType: GeocacheTypeId: 6
+                gc '102', CacheType: GeocacheTypeId: 7
             ]
             response = yield request
                 .get "#{url}/gcs"
@@ -124,7 +122,7 @@ describe 'REST routes for geocaches', ->
             expect(response.body).to.include.members ['GC100', 'GC102']
 
         it 'should filter disabled/archived geocaches using "excludeDisabled"', Promise.coroutine ->
-            yield setupDatabase [
+            yield setupTestData [
                 gc '100',
                     Archived: false
                     Available: false
@@ -147,7 +145,7 @@ describe 'REST routes for geocaches', ->
             expect(response.body).to.include.members ['GC101']
 
         it 'should return disabled/archived geocaches by default', Promise.coroutine ->
-            yield setupDatabase [
+            yield setupTestData [
                 gc '100',
                     Archived: false
                     Available: false
@@ -170,13 +168,9 @@ describe 'REST routes for geocaches', ->
 
 
         it 'should filter stale geocaches by default', Promise.coroutine ->
-            yield setupDatabase [
-                gc '100',
-                    meta:
-                        updated: new Date().toISOString()
-                gc '101',
-                    meta:
-                        updated: '2000-01-01 00:00:00Z'
+            yield setupTestData [
+                gc '100', meta: updated: new Date().toISOString()
+                gc '101', meta: updated: '2000-01-01 00:00:00Z'
             ]
             response = yield request
                 .get "#{url}/gcs"
@@ -186,11 +180,9 @@ describe 'REST routes for geocaches', ->
             expect(response.body).to.include.members ['GC100']
 
         it 'should return stale geocaches when "stale" is 1', Promise.coroutine ->
-            yield setupDatabase [
-                gc '100',
-                    updated: new Date().toISOString()
-                gc '101',
-                    updated: '2000-01-01 00:00:00Z'
+            yield setupTestData [
+                gc '100', meta: updated: new Date().toISOString()
+                gc '101', meta: updated: '2000-01-01 00:00:00Z'
             ]
             response = yield request
                 .get "#{url}/gcs"
@@ -202,55 +194,81 @@ describe 'REST routes for geocaches', ->
 
     describe '/geocaches', ->
         it 'should return a list of geocaches on GET', Promise.coroutine ->
-            a = gc '100', meta: updated: new Date().toISOString()
-            b = gc '101', meta: updated: new Date().toISOString()
-            yield setupDatabase [a, b]
+            a = gc '100'
+            b = gc '101'
+            yield setupTestData [a, b]
             response = yield request
                 .get "#{url}/geocaches"
                 .set 'Accept', 'application/json'
 
             expect(response.type).to.equal 'application/json'
             expect(response.body.length).to.equal 2
-            expect(response.body).to.deep.include.members [a, b]
+            expect(response.body.map (gc) -> gc.Code).to.deep.equal ['GC100', 'GC101']
+
+        [
+            name: 'Code'
+            type: 'String'
+        ,
+            name: 'Name'
+            type: 'String'
+        ,
+            name: 'Terrain'
+            type: 'Number'
+        ,
+            name: 'Difficulty'
+            type: 'Number'
+        ,
+            name: 'Archived'
+            type: 'Boolean'
+        ].forEach ({name, type}) ->
+            it "should include field #{name} of type #{type}", Promise.coroutine ->
+                a = gc '100'
+                yield setupTestData [a]
+                response = yield request
+                    .get "#{url}/geocaches"
+                    .set 'Accept', 'application/json'
+
+                [result] = response.body
+                expect(result[name]).to.exist
+                expect(result[name]).to.be.a type
 
         it 'should include the update timestamp', Promise.coroutine ->
             a = gc '100', meta: updated: new Date().toISOString()
-            yield setupDatabase [a]
+            yield setupTestData [a]
             response = yield request
                 .get "#{url}/geocaches"
                 .set 'Accept', 'application/json'
 
-            expect(response.body[0].meta.updated).to.equal a.meta.updated
+            [result] = response.body
+            expect(result.meta.updated).to.equal a.meta.updated
 
         it 'should create new geocaches on POST', Promise.coroutine ->
-            yield setupDatabase []
-
             a = gc '100', meta: updated: new Date().toISOString()
 
             putResponse = yield request
-                .put "#{url}/geocaches"
+                .post "#{url}/geocache"
                 .set 'Content-Type', 'application/json'
                 .set 'X-Token', token
-                .send [a]
+                .send a
 
             getResponse = yield request
-                .get "#{url}/geocaches"
+                .get "#{url}/geocache/GC100"
                 .set 'Accept', 'application/json'
 
-            expect(getResponse.body).to.deep.equal [a]
+            expect(putResponse.status).to.equal 201
+            expect(getResponse.status).to.equal 200
 
         it 'should should reject POSTs without a valid API key', Promise.coroutine ->
-            yield setupDatabase []
-
             a = gc '100', meta: updated: new Date().toISOString()
 
             try
                 putResponse = yield request
-                    .put "#{url}/geocaches"
+                    .post "#{url}/geocache"
                     .set 'Content-Type', 'application/json'
                     .set 'X-Token', 'invalid'
-                    .send [a]
+                    .send a
             catch err
+                # expected
 
             expect(err.status).to.equal 403
 
@@ -261,16 +279,15 @@ describe 'REST routes for geocaches', ->
             expect(getResponse.body).to.deep.equal []
 
         it 'should should reject POSTs with a missing API key', Promise.coroutine ->
-            yield setupDatabase []
-
             a = gc '100', meta: updated: new Date().toISOString()
 
             try
                 putResponse = yield request
-                    .put "#{url}/geocaches"
+                    .post "#{url}/geocache"
                     .set 'Content-Type', 'application/json'
-                    .send [a]
+                    .send a
             catch err
+                # expected
 
             expect(err.status).to.equal 403
 
