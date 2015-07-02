@@ -1,2 +1,10 @@
 #!/bin/bash
-docker build -t foobert/gc-storage .
+if [ $1 ]
+then
+    TAG=$1
+else
+    TAG=foobert/gc-storage
+fi
+
+docker build -t $TAG .
+echo Build image $TAG

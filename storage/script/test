@@ -1,8 +1,37 @@
 #!/bin/bash
+set -e
+
+function rm_db {
+    docker rm -f ${DB}
+}
+
+function rm_app {
+    docker rm -f ${APP}
+}
+if [ $1 ]
+then
+    TAG=$1
+else
+    TAG=foobert/gc-storage
+fi
+
+echo Running tests against image ${TAG}
+
 DB=$(docker run -d postgres)
+trap rm_db EXIT
+
+# wait until the database is there. needs to be fixed in the unit test
 sleep 2
-docker run --rm -t --link ${DB}:DB foobert/gc-storage node_modules/.bin/mocha test/unit\*
-APP=$(docker run -d --link ${DB}:DB foobert/gc-storage)
+
+# unit est
+docker run --rm -t --link ${DB}:DB ${TAG} node_modules/.bin/mocha test/unit\*
+
+# start app for integration testing
+APP=$(docker run -d --link ${DB}:DB ${TAG})
+trap rm_app EXIT
+
+# wait again..
 sleep 2
-docker run --rm -t --link ${DB}:DB --link ${APP}:APP -v $PWD:/usr/src/app foobert/gc-storage node_modules/.bin/mocha --watch test/integration\*
-docker rm -f ${DB}
+
+# run integration tests against the app
+docker run --rm -t --link ${DB}:DB --link ${APP}:APP -v $PWD:/usr/src/app ${TAG} node_modules/.bin/mocha test/integration\*
