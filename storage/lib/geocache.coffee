@@ -47,6 +47,7 @@ module.exports = (db) ->
                 .field 'Terrain'
                 .field 'GeocacheTypeId'
                 .field 'ContainerTypeName'
+                .field 'UTCPlaceDate'
 
         if query.stale isnt '1'
             sql = sql
