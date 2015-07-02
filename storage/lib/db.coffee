@@ -64,7 +64,8 @@ module.exports = (options) ->
                     (c.data->>'Archived')::bool as Archived,
                     (c.data->>'Available')::bool as Available,
                     (date 'epoch' + (substring(c.data->>'UTCPlaceDate' from 7 for 10)::numeric - substring(c.data->>'UTCPlaceDate' from 21 for 2)::numeric * 3600) * interval '1 second') as UTCPlaceDate,
-                    ARRAY(SELECT DISTINCT data->'Finder'->>'UserName' FROM logs l WHERE lower(l.data->>'CacheCode') = c.id AND l.data->'LogType'->>'WptLogTypeId' = '2') as found
+                    ARRAY(SELECT DISTINCT data->'Finder'->>'UserName' FROM logs l WHERE lower(l.data->>'CacheCode') = c.id AND l.data->'LogType'->>'WptLogTypeId' = '2') as found,
+                    (c.data->'Owner'->>'UserName') as UserName
                 FROM geocaches c
             """
         ]

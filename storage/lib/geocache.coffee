@@ -21,6 +21,7 @@ module.exports = (db) ->
             ContainerType: ContainerTypeName: row.containertypename
             EncodedHints: row.encodedhints
             UTCPlaceDate: row.utcplacedate.toISOString()
+            Owner: UserName: row.username
             meta: updated: row.updated
         else
             row.id
@@ -48,6 +49,7 @@ module.exports = (db) ->
                 .field 'GeocacheTypeId'
                 .field 'ContainerTypeName'
                 .field 'UTCPlaceDate'
+                .field 'UserName'
 
         if query.stale isnt '1'
             sql = sql
