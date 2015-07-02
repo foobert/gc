@@ -151,6 +151,6 @@ module.exports = (db) ->
         finally
             done()
 
-    refresh: refreshView.debounce db, 'geocachesRel', 5000, debug
+    refresh: refreshView.debounce db, 'geocachesRel', 30000, debug
     forceRefresh: ->
         refreshView.refresh db, 'geocachesRel', debug
