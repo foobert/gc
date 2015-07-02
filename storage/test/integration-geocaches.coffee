@@ -220,6 +220,9 @@ describe 'REST routes for geocaches', ->
         ,
             name: 'Archived'
             type: 'Boolean'
+        ,
+            name: 'UTCPlaceDate'
+            type: 'String'
         ].forEach ({name, type}) ->
             it "should include field #{name} of type #{type}", Promise.coroutine ->
                 a = gc '100'

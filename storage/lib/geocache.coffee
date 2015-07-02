@@ -20,6 +20,7 @@ module.exports = (db) ->
             CacheType: GeocacheTypeId: parseInt row.geocachetypeid
             ContainerType: ContainerTypeName: row.containertypename
             EncodedHints: row.encodedhints
+            UTCPlaceDate: row.utcplacedate.toISOString()
             meta: updated: row.updated
         else
             row.id
