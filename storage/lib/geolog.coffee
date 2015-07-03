@@ -1,5 +1,5 @@
 debug = require('debug') 'gc:geologs'
-upsert = require './upsert'
+upsert = require './db/upsert'
 Promise = require 'bluebird'
 
 module.exports = (db) ->
