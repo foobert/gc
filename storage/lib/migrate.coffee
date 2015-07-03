@@ -3,21 +3,17 @@ pg = require 'pg'
 Promise = require 'bluebird'
 Promise.promisifyAll pg
 
-module.exports = (options) ->
+module.exports = ->
     expectedVersion = 0
 
-    ensureDb = Promise.coroutine ->
-        [client, done] = yield pg.connectAsync
-            host: options.host
-            port: options.port
-            user: options.user
-            password: options.password
-            database: 'postgres'
+    ensureDb = Promise.coroutine (db) ->
+        [client, done] = yield db.connect 'postgres'
         try
-            result = yield client.queryAsync 'SELECT 0 FROM pg_database WHERE datname = $1', [options.database]
+            result = yield client.queryAsync 'SELECT 0 FROM pg_database WHERE datname = $1', [db.database]
             if result.rowCount isnt 1
-                debug "creating database #{options.database}"
-                yield client.queryAsync "CREATE DATABASE #{options.database}"
+                debug "creating database #{db.database}"
+                # TODO possible sql injection?
+                yield client.queryAsync "CREATE DATABASE #{db.database}"
         finally
             done()
 
@@ -33,10 +29,10 @@ module.exports = (options) ->
             yield client.queryAsync 'INSERT INTO _schema VALUES(0)'
             return 0
 
-    up: Promise.coroutine (statements) ->
-        yield ensureDb()
+    up: Promise.coroutine (db, statements) ->
+        yield ensureDb db
         expectedVersion += 1
-        [client, done] = yield pg.connectAsync options
+        [client, done] = yield db.connect()
         try
             currentVersion = yield getCurrentVersion client
             if currentVersion < expectedVersion

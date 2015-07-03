@@ -3,6 +3,8 @@ Promise = require 'bluebird'
 {expect} = require 'chai'
 
 describe 'geocache service', ->
+    @timeout 5000
+
     db = null
     geocaches = null
 

@@ -4,6 +4,8 @@ Promise = require 'bluebird'
 Promise.longStackTraces()
 
 describe 'access service', ->
+    @timeout 5000
+
     access = null
 
     before Promise.coroutine ->

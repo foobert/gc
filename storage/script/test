@@ -20,9 +20,6 @@ echo Running tests against image ${TAG}
 DB=$(docker run -d postgres)
 trap rm_db EXIT
 
-# wait until the database is there. needs to be fixed in the unit test
-sleep 2
-
 # unit est
 docker run --rm -t --link ${DB}:DB ${TAG} node_modules/.bin/mocha test/unit\*
 

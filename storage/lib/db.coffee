@@ -1,3 +1,4 @@
+debug = require('debug') 'gc:db'
 pg = require 'pg'
 squel = require('squel').useFlavour 'postgres'
 Promise = require 'bluebird'
@@ -8,19 +9,31 @@ process.on 'SIGINT', ->
     process.exit()
 
 module.exports = (options) ->
-    migrate = require('./migrate') options
+    migrate = require('./migrate')()
+    database: options.database
 
     select: squel.select
     insert: squel.insert
     update: squel.update
     delete: squel.delete
-    connect: pg.connectAsync.bind pg, options
+    connect: Promise.coroutine (database) ->
+        tries = 5
+        while tries-- > 0
+            try
+                o = JSON.parse JSON.stringify options
+                o.database = database if database?
+                return yield pg.connectAsync o
+            catch err
+                yield Promise.delay 500
+        debug "connection to database failed: #{err}"
+        throw err
+
     up: Promise.coroutine ->
-        yield migrate.up [
+        yield migrate.up this, [
             'CREATE TABLE geocaches (id char(8) PRIMARY KEY, updated timestamp with time zone NOT NULL, data jsonb)'
             'CREATE TABLE tokens (id uuid UNIQUE)'
         ]
-        yield migrate.up [
+        yield migrate.up this, [
             # TODO need to work with dates that don't use 10 numbers, see
             # UTCCreateDate, VisitDate et al.
             'CREATE TABLE logs (id char(8) PRIMARY KEY, updated timestamp with time zone NOT NULL, data jsonb)'
@@ -36,7 +49,7 @@ module.exports = (options) ->
                 FROM logs
             """
         ]
-        yield migrate.up [
+        yield migrate.up this, [
             """
             CREATE MATERIALIZED VIEW founds AS
                 SELECT
@@ -45,7 +58,7 @@ module.exports = (options) ->
                 FROM geocaches c
             """
         ]
-        yield migrate.up [
+        yield migrate.up this, [
             # TODO need to work with dates that don't use 10 numbers, see
             # UTCCreateDate, VisitDate et al.
             """
