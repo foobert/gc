@@ -6,6 +6,8 @@ access = require '../lib/access'
 geocacheService = require '../lib/geocache'
 
 describe 'REST routes for geocaches', ->
+    @timeout 5000
+
     db = null
     token = null
     url = null
@@ -54,6 +56,12 @@ describe 'REST routes for geocaches', ->
 
         a = access db
         token = yield a.getToken()
+
+        tries = 5
+        while tries-- > 5
+            response = yield request.get url
+            break if response.status is 200
+            yield Promise.delay 500
 
     beforeEach Promise.coroutine ->
         yield setupTestData []
