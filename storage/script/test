@@ -31,7 +31,7 @@ APP=$(docker run -d --link ${DB}:DB ${TAG})
 trap rm_app EXIT
 
 # wait again..
-sleep 2
+sleep 5
 
 # run integration tests against the app
 docker run --rm -t --link ${DB}:DB --link ${APP}:APP -v $PWD:/usr/src/app ${TAG} node_modules/.bin/mocha test/integration\*
