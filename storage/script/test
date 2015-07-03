@@ -6,6 +6,7 @@ function rm_db {
 }
 
 function rm_app {
+    rm_db
     docker rm -f ${APP}
 }
 if [ $1 ]
@@ -18,14 +19,20 @@ fi
 echo Running tests against image ${TAG}
 
 DB=$(docker run -d postgres)
+echo Using temporary DB ${DB}
 trap rm_db EXIT
 
-# unit est
+# unit test
+echo Running unit tests
 docker run --rm -t --link ${DB}:DB ${TAG} node_modules/.bin/mocha test/unit\*
 
 # start app for integration testing
 APP=$(docker run -d --link ${DB}:DB ${TAG})
+echo Using temporary APP ${APP}
 trap rm_app EXIT
 
 # run integration tests against the app
+echo Running integration tests
 docker run --rm -t --link ${DB}:DB --link ${APP}:APP ${TAG} node_modules/.bin/mocha test/integration\*
+
+echo All passed!
