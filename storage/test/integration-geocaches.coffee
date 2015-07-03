@@ -58,10 +58,13 @@ describe 'REST routes for geocaches', ->
         token = yield a.getToken()
 
         tries = 5
-        while tries-- > 5
-            response = yield request.get url
-            break if response.status is 200
-            yield Promise.delay 500
+        while tries-- > 0
+            try
+                response = yield request.get url
+                break if response.status is 200
+                yield Promise.delay 500
+            catch err
+                yield Promise.delay 500
 
     beforeEach Promise.coroutine ->
         yield setupTestData []
