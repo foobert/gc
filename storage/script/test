@@ -7,6 +7,7 @@ function rm_db {
 
 function rm_app {
     rm_db
+    docker logs ${APP}
     docker rm -f ${APP}
 }
 if [ "x$1" != x ]
