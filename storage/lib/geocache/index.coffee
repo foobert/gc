@@ -51,7 +51,7 @@ module.exports = (db) ->
                 .field 'UTCPlaceDate'
                 .field 'UserName'
 
-        if query.stale isnt '1'
+        if query.stale not in ['1', 1, true]
             sql = sql
                 .where "age(updated) < interval '3 days'"
 
