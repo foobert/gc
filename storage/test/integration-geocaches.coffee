@@ -61,7 +61,9 @@ describe 'REST routes for geocaches', ->
         while tries-- > 0
             try
                 response = yield request.get url
-                break if response.status is 200
+                if response.status is 200
+                    console.log "found app at #{url}"
+                    break
                 yield Promise.delay 500
             catch err
                 yield Promise.delay 500
