@@ -1,5 +1,5 @@
 {expect} = require 'chai'
-poi = require '../lib/poi'
+poi = require '../lib/poi/format'
 
 describe 'poi', ->
     gc = null

@@ -1,13 +1,10 @@
 bodyParser = require 'body-parser'
 compression = require 'compression'
-csv = require 'csv'
 express = require 'express'
 JSONStream = require 'JSONStream'
 Promise = require 'bluebird'
 
-poi = require './poi'
-streamTransform = require './transform'
-xml = require './xml'
+async = require './rest-async'
 
 module.exports = (services) ->
     {access, geocache, geolog} = services
@@ -18,13 +15,6 @@ module.exports = (services) ->
     app.set 'etag', false
     app.use compression()
     app.use bodyParser.json()
-
-    async = (f) ->
-        Promise.coroutine (req, res, next) ->
-            try
-                yield from f req, res, next
-            catch err
-                next err
 
     app.use Promise.coroutine (req, res, next) ->
         if req.method in ['GET', 'HEAD', 'OPTIONS']
@@ -104,63 +94,6 @@ module.exports = (services) ->
             .pipe JSONStream.stringify('[', ',', ']')
             .pipe res
 
-    app.get '/poi.csv', async (req, res, next) ->
-        res.set 'Content-Type', 'text/csv'
-        gcStream = yield geocache.getStream req.query, true
-        gcStream
-            .pipe csv.transform (gc) ->
-                [
-                    gc.Longitude
-                    gc.Latitude
-                    poi.title gc
-                    poi.description gc
-                ]
-            .pipe csv.stringify()
-            .pipe res
-
-    app.get '/poi.gpx', async (req, res, next) ->
-        pre =  """
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd"
-version="1.1" creator="cachecache">
-"""
-        post = '</gpx>'
-
-        res.set 'Content-Type', 'application/gpx+xml'
-        gcStream = yield geocache.getStream req.query, true
-        gcStream
-            .pipe xml.transform pre, post, (gc) ->
-                wpt:
-                    $:
-                        lat: gc.Latitude
-                        lon: gc.Longitude
-                    name: poi.title gc
-                    cmt: poi.description gc
-                    type: 'Geocache'
-            .pipe res
-
-    app.get '/poi.json', async (req, res, next) ->
-        gcStream = yield geocache.getStream req.query, true
-        gcStream
-            .pipe streamTransform (gc) ->
-                Code: gc.Code
-                Name: gc.Name
-                Available: gc.Available
-                Archived: gc.Archived
-                Difficulty: gc.Diffculty
-                Terrain: gc.Terrain
-                Latittude: gc.Latitude
-                Longitude: gc.Longitude
-                CacheType: GeocacheTypeId: gc.CacheType.GeocacheTypeId
-                ContainerType: ContainerTypeName: gc.ContainerType.ContainerTypeName
-                meta:
-                    poi:
-                        name: poi.title gc
-                        description: poi.description gc
-            .pipe JSONStream.stringify '[', ',', ']'
-            .pipe res
-
     app.post '/log', async (req, res, next) ->
         yield geolog.upsert req.body
         res.status 201
@@ -177,6 +110,8 @@ version="1.1" creator="cachecache">
         yield geolog.refresh()
         res.status 200
         res.send 'Refreshed'
+
+    require('./poi/rest') app, geocache
 
     app.use (err, req, res, next) ->
         console.error err.stack
