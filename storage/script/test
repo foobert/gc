@@ -9,7 +9,7 @@ function rm_app {
     rm_db
     docker rm -f ${APP}
 }
-if [ $1 ]
+if [ "x$1" != x ]
 then
     TAG=$1
 else
@@ -27,7 +27,7 @@ echo Running unit tests
 docker run --rm -t --link ${DB}:DB ${TAG} node_modules/.bin/mocha test/unit\*
 
 # start app for integration testing
-APP=$(docker run -d --link ${DB}:DB ${TAG})
+APP=$(docker run -d --link ${DB}:DB --publish 8081:8081 ${TAG} npm start)
 echo Using temporary APP ${APP}
 trap rm_app EXIT
 
