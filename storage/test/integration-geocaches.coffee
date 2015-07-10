@@ -58,15 +58,20 @@ describe 'REST routes for geocaches', ->
         token = yield a.getToken()
 
         tries = 5
+        appRunning = false
         while tries-- > 0
             try
                 response = yield request.get url
                 if response.status is 200
                     console.log "found app at #{url}"
+                    appRunning = true
                     break
-                yield Promise.delay 500
+                yield Promise.delay 1000
             catch err
-                yield Promise.delay 500
+                yield Promise.delay 1000
+
+        if not appRunning
+            throw new Error "App is not running at #{url}"
 
     beforeEach Promise.coroutine ->
         yield setupTestData []
