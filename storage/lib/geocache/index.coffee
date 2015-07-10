@@ -82,6 +82,10 @@ module.exports = (db) ->
                 .where 'Archived = false'
                 .where 'Available = true'
 
+        if query.orderBy?
+            sql = sql
+                .order query.orderBy, query.order isnt 'desc'
+
         rows = client.query sql.toString()
         map = (row) => _mapRow row, withData: withData
         geocacheStream = new QueryStream rows, map, done

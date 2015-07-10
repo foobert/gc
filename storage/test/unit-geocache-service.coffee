@@ -123,3 +123,51 @@ describe 'geocache service', ->
         it 'should do nothing if no geocaches exist', Promise.coroutine ->
             yield geocaches.deleteAll()
 
+    describe 'getStream', ->
+        it 'should sort by default ascending', Promise.coroutine ->
+            yield geocaches.upsert GC1BAZ8
+            yield geocaches.upsert GC38XPR
+            yield geocaches.forceRefresh()
+            stream = yield geocaches.getStream
+                orderBy: 'UTCPlaceDate'
+                stale: '1'
+            , true
+
+            arr = yield streamToArray stream
+            codes = arr.map (gc) -> gc.Code
+            expect(codes).to.deep.equal ['GC1BAZ8', 'GC38XPR']
+
+        it 'should sort by orderBy ascending', Promise.coroutine ->
+            yield geocaches.upsert GC1BAZ8
+            yield geocaches.upsert GC38XPR
+            yield geocaches.forceRefresh()
+            stream = yield geocaches.getStream
+                orderBy: 'UTCPlaceDate'
+                order: 'asc'
+                stale: '1'
+            , true
+
+            arr = yield streamToArray stream
+            codes = arr.map (gc) -> gc.Code
+            expect(codes).to.deep.equal ['GC1BAZ8', 'GC38XPR']
+
+        it 'should sort by orderBy descending', Promise.coroutine ->
+            yield geocaches.upsert GC1BAZ8
+            yield geocaches.upsert GC38XPR
+            yield geocaches.forceRefresh()
+            stream = yield geocaches.getStream
+                orderBy: 'UTCPlaceDate'
+                order: 'desc'
+                stale: '1'
+            , true
+
+            arr = yield streamToArray stream
+            codes = arr.map (gc) -> gc.Code
+            expect(codes).to.deep.equal ['GC38XPR', 'GC1BAZ8']
+
+    streamToArray = (stream) ->
+        result = []
+        new Promise (resolve, reject) ->
+            stream.on 'data', (x) -> result.push x
+            stream.on 'end', -> resolve result
+            stream.on 'error', (err) -> reject err
