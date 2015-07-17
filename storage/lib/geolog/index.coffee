@@ -23,6 +23,6 @@ module.exports = (db) ->
             if result.rowCount is 0
                 return null
             else
-                return result.rows[0].id.toUpperCase()
+                return result.rows[0].id.trim().toUpperCase()
         finally
             done()
