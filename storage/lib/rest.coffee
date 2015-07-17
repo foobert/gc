@@ -55,6 +55,7 @@ module.exports = (services) ->
 
     require('./geocache/rest') app, geocache
     require('./poi/rest') app, geocache
+    require('./feed/rest') app, geocache
 
     app.use (err, req, res, next) ->
         console.error err.stack
