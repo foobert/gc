@@ -6,12 +6,15 @@ class NavigationStore extends Store
 
         @register flux.getActions('navigation').setPage, @handlePage
 
-        if window.location.hash?
-            page = window.location.hash.substring 1
+        page = if window.location.pathname.length > 1
+            window.location.pathname.substring 1
+        else if window.location.hash?
+            window.location.hash.substring 1
+        else
+            'poi'
 
         @state =
-            page: page ? 'poi'
-
+            page: page
 
     handlePage: (page) ->
         @setState
