@@ -73,8 +73,8 @@ PoiGenerator = React.createClass
                         onChange={ (ev) => @actions.setUsername ev.target.value }
                     />
                 </div>
-                <div className="inline fields">
-                    <label htmlFor="format">File Format:</label>
+                <div className="grouped fields">
+                    <label htmlFor="format">File Format</label>
                     <div className="field">
                         <div className="ui input radio checkbox">
                             <input
