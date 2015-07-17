@@ -1,4 +1,4 @@
-FROM iojs
+FROM iojs:slim
 RUN mkdir /app
 COPY . /app/
 RUN cd /app && npm install && npm run-script build
