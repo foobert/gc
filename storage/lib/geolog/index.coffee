@@ -26,3 +26,14 @@ module.exports = (db) ->
                 return result.rows[0].id.trim().toUpperCase()
         finally
             done()
+
+    deleteAll: Promise.coroutine ->
+        debug 'delete all'
+        [client, done] = yield db.connect()
+        try
+            sql = db.delete()
+                .from 'logs'
+                .toString()
+            yield client.queryAsync sql
+        finally
+            done()

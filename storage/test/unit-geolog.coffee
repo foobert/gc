@@ -60,3 +60,16 @@ describe 'geolog', ->
         it 'should return null if no geologs exist', Promise.coroutine ->
             latest = yield geologs.latest 'nobody'
             expect(latest).to.not.exist
+
+    describe 'deleteAll', ->
+        it 'should delete all logs', Promise.coroutine ->
+            yield geologs.upsert GL00001
+            yield geologs.upsert GL00002
+            yield geologs.deleteAll()
+            [client, done] = yield db.connect()
+            try
+                result = yield client.queryAsync 'SELECT count(*) FROM logs'
+                expect(result.rows[0].count).to.equal '0'
+            finally
+                done()
+
