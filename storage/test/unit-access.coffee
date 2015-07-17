@@ -3,7 +3,7 @@ uuid = require 'uuid'
 Promise = require 'bluebird'
 Promise.longStackTraces()
 
-describe 'access service', ->
+describe 'access', ->
     @timeout 5000
 
     access = null

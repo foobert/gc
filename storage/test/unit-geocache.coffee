@@ -2,7 +2,7 @@ fs = require 'fs'
 Promise = require 'bluebird'
 {expect} = require 'chai'
 
-describe 'geocache service', ->
+describe 'geocache', ->
     @timeout 5000
 
     db = null
