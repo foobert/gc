@@ -3,6 +3,8 @@ require 'semantic-ui-css/components/menu.css'
 require 'semantic-ui-css/components/sidebar.css'
 require '../../css/menu.css'
 
+api = require '../backend.coffee'
+
 React = require 'react'
 
 module.exports = React.createClass
@@ -26,5 +28,9 @@ module.exports = React.createClass
             <a className={active 'map'} onClick={=> @props.setPage 'map' }>
                 <i className="world icon"></i>
                 Geocache Map
+            </a>
+            <a className="item" href={api.url '/feed'}>
+                <i className="feed icon"></i>
+                Atom feed
             </a>
         </div>
