@@ -4,8 +4,6 @@ express = require 'express'
 JSONStream = require 'JSONStream'
 Promise = require 'bluebird'
 
-async = require './rest-async'
-
 module.exports = (services) ->
     {access, geocache, geolog} = services
 
@@ -35,11 +33,6 @@ module.exports = (services) ->
     app.get '/', (req, res, next) ->
         res.status 200
         res.send 'Okay'
-
-    app.post '/sillyRefresh', async (req, res, next) ->
-        yield geolog.refresh()
-        res.status 200
-        res.send 'Refreshed'
 
     require('./geocache/rest') app, geocache
     require('./poi/rest') app, geocache
