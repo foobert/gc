@@ -33,9 +33,8 @@ describe 'geolog', ->
         try
             result = yield client.queryAsync 'SELECT data FROM logs WHERE lower(id) = lower($1)', [id]
             return result.rows[0]?.data
-        catch err
+        finally
             done()
-            throw err
 
     describe 'upsert', ->
         it 'should insert a new geolog', Promise.coroutine ->
