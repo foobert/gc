@@ -1,7 +1,6 @@
 bodyParser = require 'body-parser'
 compression = require 'compression'
 express = require 'express'
-JSONStream = require 'JSONStream'
 Promise = require 'bluebird'
 
 module.exports = (services) ->
