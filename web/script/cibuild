@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+function remove_tag {
+    docker rmi ${ID}
+}
+
+ID=$(uuidgen | awk '{print tolower($0)}')
+${DIR}/build ${ID}
+trap remove_tag EXIT
+
+${DIR}/test ${ID}
+
+docker tag -f ${ID} foobert/gc-web
+echo Image passed all tests, tagged as foobert/gc-web

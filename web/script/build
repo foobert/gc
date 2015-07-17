@@ -1,0 +1,11 @@
+
+#!/bin/bash
+if [ $1 ]
+then
+    TAG=$1
+else
+    TAG=foobert/gc-web
+fi
+
+docker build -t $TAG .
+echo Build image $TAG
