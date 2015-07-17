@@ -52,9 +52,6 @@ describe 'REST routes for feed', ->
             password: process.env.DB_PASSWORD
             database: process.env.DB ? 'gc'
 
-        a = access db
-        token = yield a.getToken()
-
         tries = 5
         appRunning = false
         while tries-- > 0
