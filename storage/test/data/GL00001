@@ -1,0 +1,42 @@
+{
+   "ID":12345,
+   "Url":"http://coord.info/GL00001",
+   "Code":"GL00001",
+   "Guid":"0ca697f2-c430-421d-b408-70a4059f13e5",
+   "Finder":{
+      "Id":1234567,
+      "IsAdmin":false,
+      "UserName":"Foobar",
+      "AvatarUrl":"http://www.geocaching.com/images/default_avatar.jpg",
+      "FindCount":123,
+      "HideCount":0,
+      "MemberType":{
+         "MemberTypeId":1,
+         "MemberTypeName":"Basic"
+      },
+      "PublicGuid":"6be93967-663b-4cbf-bf7b-04a1fef2ad8f",
+      "HomeCoordinates":null,
+      "GalleryImageCount":null
+   },
+   "Images":[
+
+   ],
+   "LogText":"Tftc",
+   "LogType":{
+      "ImageURL":"http://www.geocaching.com/images/icons/icon_smile.gif",
+      "ImageName":"icon_smile",
+      "WptLogTypeId":2,
+      "WptLogTypeName":"Found it",
+      "AdminActionable":false,
+      "OwnerActionable":false
+   },
+   "CacheCode":"GCA0001",
+   "VisitDate":"/Date(1431889200000-0700)/",
+   "IsApproved":false,
+   "IsArchived":false,
+   "CannotDelete":false,
+   "LogIsEncoded":false,
+   "UTCCreateDate":"/Date(1431813667662)/",
+   "UpdatedLatitude":null,
+   "UpdatedLongitude":null
+}
