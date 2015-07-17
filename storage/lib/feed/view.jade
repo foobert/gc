@@ -1,5 +1,5 @@
 entry
-    id= geocache.Code
+    id https://www.geocaching.com/geocache/#{geocache.Code}
     author
         name= geocache.Owner.UserName
     title #{geocache.Code} - #{geocache.Name}
@@ -7,6 +7,7 @@ entry
     published= geocache.UTCPlaceDate
     updated= geocache.UTCPlaceDate
     content(type='xhtml')
-        h4 #{geocache.CacheType.GeocacheTypeName} / #{geocache.ContainerType.ContainerTypeName} / D: #{geocache.Difficulty} / T: #{geocache.Terrain} / Coord: #{geocache.Coordinates}
-        if typeof geocache.Distance != 'undefined'
-            p Distance: #{Math.round(geocache.Distance / 1000)} km
+        div(xmlns='http://www.w3.org/1999/xhtml')
+            h4 #{geocache.CacheType.GeocacheTypeName} / #{geocache.ContainerType.ContainerTypeName} / D: #{geocache.Difficulty} / T: #{geocache.Terrain} / Coord: #{geocache.Coordinates}
+            if typeof geocache.Distance != 'undefined'
+                p Distance: #{Math.round(geocache.Distance / 1000)} km
