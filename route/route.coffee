@@ -5,7 +5,8 @@ Promise.promisifyAll request
 
 calculateRoute = Promise.coroutine (
     startLatitude, startLongitude,
-    destinationLatitude, destinationLongitude) ->
+    destinationLatitude, destinationLongitude,
+    vehicle) ->
 
     debug "querying routing information " +
         "from [#{startLatitude}, #{startLongitude}] " +
@@ -23,7 +24,7 @@ calculateRoute = Promise.coroutine (
             flon: startLongitude
             tlat: destinationLatitude
             tlon: destinationLongitude
-            v: 'motorcar'
+            v: vehicle
             fast: 1
             layer: 'mapnik'
             format: 'geojson'

@@ -14,6 +14,7 @@ program
     .option '-v, --verbose', 'Verbose output'
     .option '-z, --zoom <n>', 'Zoom level for tiling algorithm', parseInt
     .option '-o, --output <file>', 'Write geocache ids to this file'
+    .option '-t, --type <type>', 'Type of vehicle motorcar, bicycle, ...'
     .parse process.argv
 
 log = (msg) ->
@@ -21,11 +22,13 @@ log = (msg) ->
 
 main = Promise.coroutine () ->
     coordinateArgs = program.args.map parseFloat
+    type = program.type or 'bicycle'
 
-    log 'Calculating route...'
+    log "Calculating route for #{type}..."
     log "Start       #{coordinateArgs[0]} #{coordinateArgs[1]}"
     log "Destination #{coordinateArgs[2]} #{coordinateArgs[3]}"
-    coordinates = yield route coordinateArgs...
+    coordinates = yield route coordinateArgs..., type
+    return
 
     log "Calculating tiles of #{coordinates.length} points @ #{program.zoom}..."
     tilesForPath = tiles.coverPath coordinates, program.zoom
