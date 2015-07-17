@@ -36,18 +36,6 @@ module.exports = (services) ->
         res.status 200
         res.send 'Okay'
 
-    app.post '/log', async (req, res, next) ->
-        yield geolog.upsert req.body
-        res.status 201
-        res.send ''
-
-    app.get '/logs/latest', async (req, res, next) ->
-        id = yield geolog.latest req.query.username
-        if id?
-            res.status(200).send id
-        else
-            res.status(404).send 'No logs'
-
     app.post '/sillyRefresh', async (req, res, next) ->
         yield geolog.refresh()
         res.status 200
@@ -56,6 +44,7 @@ module.exports = (services) ->
     require('./geocache/rest') app, geocache
     require('./poi/rest') app, geocache
     require('./feed/rest') app, geocache
+    require('./geolog/rest') app, geolog
 
     app.use (err, req, res, next) ->
         console.error err.stack
