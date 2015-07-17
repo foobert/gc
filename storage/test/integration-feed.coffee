@@ -5,7 +5,7 @@ request = require 'superagent-as-promised'
 geocacheService = require '../lib/geocache'
 
 describe 'REST routes for feed', ->
-    @timeout 5000
+    @timeout 15000
 
     db = null
     url = null
@@ -52,7 +52,7 @@ describe 'REST routes for feed', ->
             password: process.env.DB_PASSWORD
             database: process.env.DB ? 'gc'
 
-        tries = 5
+        tries = 10
         appRunning = false
         while tries-- > 0
             try
