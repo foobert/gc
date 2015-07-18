@@ -170,20 +170,24 @@ Map = React.createClass
                             selected={@props.selectedTypes} toggle={typeToggle}/>
                     </div>
                     <form onSubmit={@handleSubmit}>
-                        <div className="field">
+                        <div className="grouped fields">
                             <label>Exclude finds</label>
-                            <input
-                                type="text"
-                                id="username"
-                                placeholder="Username"
-                                ref="username"
-                            />
+                            <div className="ui action input">
+                                <input
+                                    type="text"
+                                    id="username"
+                                    placeholder="Username"
+                                    ref="username"
+                                />
+                                <button className="ui icon button">
+                                    <i className="plus icon"></i>
+                                </button>
+                            </div>
                             <ul className="ui list">
                                 { React.createElement(UserFilter, key: username, username: username, remove: @handleRemoveUser) for username in @props.filterUsers.toArray() }
                             </ul>
                         </div>
                     </form>
-                    {locateButton}
                     <div className="grouped fields">
                         <label>Location</label>
                         <div>
