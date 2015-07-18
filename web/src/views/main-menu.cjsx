@@ -33,4 +33,8 @@ module.exports = React.createClass
                 <i className="feed icon"></i>
                 Atom feed
             </a>
+            <a className="item" href="https://github.com/foobert/gc" target="_blank">
+                <i className="github icon"></i>
+                View Source
+            </a>
         </div>
