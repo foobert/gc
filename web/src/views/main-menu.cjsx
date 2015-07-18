@@ -15,6 +15,8 @@ module.exports = React.createClass
                 'active item'
             else
                 'item'
+        # log calculator -> book icon
+        # statistics -> bar chart icon
 
         <div className="ui left thin vertical inverted icon labeled sidebar menu">
             <div className="disabled header item">
