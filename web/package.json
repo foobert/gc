@@ -28,7 +28,7 @@
     "morgan": "^1.6.0",
     "node-safe-filesaver": "^0.1.0",
     "react": "^0.13.3",
-    "semantic-ui-css": "^2.0.3",
+    "semantic-ui-css": "^2.0.4",
     "superagent": "^1.2.0"
   },
   "devDependencies": {
