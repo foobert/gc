@@ -17,8 +17,8 @@ module.exports = React.createClass
                 'item'
 
         <div className="ui left thin vertical inverted icon labeled sidebar menu">
-            <div className="header item">
-                <i className="green home icon"></i>
+            <div className="disabled header item">
+                <i className="world icon"></i>
                 Cache Cache
             </div>
             <a className={active 'poi'} onClick={=> @props.setPage 'poi'}>
