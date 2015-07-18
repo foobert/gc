@@ -184,6 +184,13 @@ Map = React.createClass
                         </div>
                     </form>
                     {locateButton}
+                    <div className="grouped fields">
+                        <label>Location</label>
+                        <div>
+                            <Coordinates {...@props.center} />
+                        </div>
+                        {locateButton}
+                    </div>
                 </div>
             </div>
         </div>
