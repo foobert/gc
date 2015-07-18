@@ -44,7 +44,8 @@ class MapStore extends Store
             @setState selectedTypes: @state.selectedTypes.remove type
 
     handleAddUser: (username) ->
-        @setState filterUsers: @state.filterUsers.add username
+        if username? and username.trim().length > 0
+            @setState filterUsers: @state.filterUsers.add username
 
     handleRemoveUser: (username) ->
         @setState filterUsers: @state.filterUsers.remove username
