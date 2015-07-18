@@ -24,6 +24,15 @@
     padding: 0.5em;
 }
 
+.map-container .sidebar .grouped.fields {
+    margin-bottom: 3em;
+}
+
+/* override stupid semantic ui rule */
+.map-container .sidebar .grouped.fields:last-child {
+    margin-bottom: 3em;
+}
+
 .user .content {
     display: inline;
 }
