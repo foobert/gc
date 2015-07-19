@@ -7,7 +7,7 @@ class LogStore extends Store
             initialState:
                 geocaches: []
             serializer: (state) ->
-                _.omit state, ['loading', 'error']
+                _.omit state, ['parsing', 'error']
 
         actions = flux.getActions 'log'
         @registerAsync actions.uploadFile, @handleFileUploadBegin, @handleFileUploadSuccess, @handleFileUploadFail
