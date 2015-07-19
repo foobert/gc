@@ -7,6 +7,7 @@ FluxComponent = require 'flummox/component'
 MainMenu = require './main-menu.cjsx'
 PoiGenerator = require './poi-generator.cjsx'
 Map = require './map.cjsx'
+LogCalculator = require './log-calculator.cjsx'
 
 Page = React.createClass
     componentWillMount: ->
@@ -16,6 +17,7 @@ Page = React.createClass
         child = switch @props.page
             when 'poi' then PoiGenerator
             when 'map' then Map
+            when 'log' then LogCalculator
             else PoiGenerator
 
         <div className="container">

@@ -31,6 +31,10 @@ module.exports = React.createClass
                 <i className="world icon"></i>
                 Geocache Map
             </a>
+            <a className={active 'log'} onClick={=> @props.setPage 'log' }>
+                <i className="book icon"></i>
+                Log Calculator
+            </a>
             <a className="item" href={api.url '/feed'} target="_blank">
                 <i className="feed icon"></i>
                 Atom feed
