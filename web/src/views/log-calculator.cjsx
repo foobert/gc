@@ -92,9 +92,19 @@ LogCalculator = React.createClass
             <h1 className="ui header dividing">Log Generator</h1>
             <div className="ui warning message">
                 <div className="header">Experimental!</div>
-                <p>This feature is still highly experimental!</p>
-                <p>The uploaded file is only processed inside your browser. Data sent to the server includes the approximate area where you may have searched for a Geocache.</p>
+                <p>This feature is still highly experimental! Use with care and don't trust the data.</p>
             </div>
+            <p>
+                You can use the log generator to analyse GPX tracks from your
+                GPS device to identify possible Geocache finds. It will search
+                for Geocaches near locations where you spent some time and list
+                them below.
+            </p>
+            <p>
+                The uploaded file is only processed inside your browser. Data
+                sent to the server includes the approximate area where you may
+                have searched for a Geocache.
+            </p>
             <FileDrop {...@props}/>
             <ResultList geocaches={@props.geocaches}/>
         </div>
