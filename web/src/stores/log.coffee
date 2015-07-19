@@ -5,7 +5,7 @@ class LogStore extends Store
     constructor: (flux) ->
         super flux,
             initialState:
-                geocaches: []
+                geocaches: null
             serializer: (state) ->
                 _.omit state, ['parsing', 'error']
 
@@ -16,7 +16,7 @@ class LogStore extends Store
         @setState
             parsing: true
             error: null
-            geocaches: []
+            geocaches: null
 
     handleFileUploadSuccess: (geocaches) ->
         @setState
@@ -28,5 +28,6 @@ class LogStore extends Store
         @setState
             parsing: false
             error: err
+            geocaches: null
 
 module.exports = LogStore

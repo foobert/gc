@@ -77,7 +77,11 @@ Geocache = React.createClass
 
 ResultList = React.createClass
     render: ->
-        return false unless @props.geocaches.length > 0
+        return false unless @props.geocaches?
+        if @props.geocaches.length is 0
+            return <div className="result">
+                <p>No Geocaches could be found.</p>
+            </div>
 
         <div className="result">
             <p>Identified {@props.geocaches.length} possible Geocaches:</p>
