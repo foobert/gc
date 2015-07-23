@@ -78,7 +78,7 @@ async function getGeocaches(box) {
     }
 
     let response = await request.get('https://gc.funkenburg.net/api/geocaches')
-        .query({excludeDisabled: 0})
+        .query({excludeDisabled: 0, stale: 1})
         .query(_qs('bounds', box));
     return response.body;
 }
