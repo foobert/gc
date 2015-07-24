@@ -10,17 +10,24 @@ class LogStore extends Store
                 _.omit state, ['parsing', 'error']
 
         actions = flux.getActions 'log'
+        @register actions.show, @handleShow
         @registerAsync actions.uploadFile, @handleFileUploadBegin, @handleFileUploadSuccess, @handleFileUploadFail
+
+    handleShow: (geocache) ->
+        @setState
+            center: [geocache.Latitude, geocache.Longitude]
 
     handleFileUploadBegin: (file) ->
         @setState
             parsing: true
             error: null
             geocaches: null
+            track: null
 
-    handleFileUploadSuccess: (geocaches) ->
+    handleFileUploadSuccess: ({geocaches, track}) ->
         @setState
             geocaches: geocaches
+            track: track
             parsing: false
             error: null
 
@@ -29,5 +36,6 @@ class LogStore extends Store
             parsing: false
             error: err
             geocaches: null
+            track: null
 
 module.exports = LogStore

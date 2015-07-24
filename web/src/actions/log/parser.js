@@ -93,11 +93,14 @@ module.exports = async function(file) {
     let prevTime = null;
     let pool = [];
     let matches = {};
+    let track = [];
 
     for (var trk of json.gpx.trk) {
         for (var trkseg of trk.trkseg) {
             for (var trkpt of trkseg.trkpt) {
                 let coord = {lat: parseFloat(trkpt.$.lat), lon: parseFloat(trkpt.$.lon)};
+                track.push(coord);
+
                 let time = new Date(trkpt.time);
                 if (prevCoord !== null) {
                     let distance = getDistance(prevCoord, coord);
@@ -132,5 +135,5 @@ module.exports = async function(file) {
         result.push(matches[x]);
     }
 
-    return result;
+    return {geocaches: result, track: track};
 }
