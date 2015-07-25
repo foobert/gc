@@ -60,7 +60,7 @@ module.exports = (app, geocache) ->
         res.set 'Content-Type', 'text/csv'
         handleCsv(stream).pipe res
 
-    app.get '/poi.xml', async (req, res, next) ->
+    app.get '/poi.gpx', async (req, res, next) ->
         stream = yield geocache.getStream req.query, true
         res.set 'Content-Type', 'application/gpx+xml'
         handleXml(stream).pipe res
