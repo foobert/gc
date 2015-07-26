@@ -71,8 +71,9 @@ Map = React.createClass
         @refreshMap() if needsRefresh
 
     componentWillUnmount: ->
-        @actions.setZoom @map.getZoom()
-        @actions.setCenter @map.getCenter()
+        # TODO this will raise a cannot dispatch in the middle of a dispatch error
+        #@actions.setZoom @map.getZoom()
+        #@actions.setCenter @map.getCenter()
 
     refreshMap: ->
         _qs = (key, values) ->
