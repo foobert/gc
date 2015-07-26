@@ -13,6 +13,11 @@ Page = React.createClass
     componentWillMount: ->
         @actions = @props.flux.getActions 'navigation'
 
+    componentDidMount: ->
+        window.onpopstate = (ev) =>
+            page = ev.state
+            @actions.setPage page, false
+
     render: ->
         child = switch @props.page
             when 'poi' then PoiGenerator
