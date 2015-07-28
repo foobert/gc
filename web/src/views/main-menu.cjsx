@@ -23,15 +23,15 @@ module.exports = React.createClass
                 <i className="world icon"></i>
                 Cache Cache
             </div>
-            <a className={active 'poi'} onClick={=> @props.setPage 'poi'}>
+            <a className={active 'poi'} onClick={=> @props.app.navigationActions.navigate 'poi'}>
                 <i className="marker icon"></i>
                 POI Generator
             </a>
-            <a className={active 'map'} onClick={=> @props.setPage 'map' }>
+            <a className={active 'map'} onClick={=> @props.app.navigationActions.navigate 'map' }>
                 <i className="world icon"></i>
                 Geocache Map
             </a>
-            <a className={active 'log'} onClick={=> @props.setPage 'log' }>
+            <a className={active 'log'} onClick={=> @props.app.navigationActions.navigate 'log' }>
                 <i className="book icon"></i>
                 Log Calculator
             </a>

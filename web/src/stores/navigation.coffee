@@ -1,10 +1,9 @@
-{Store} = require 'flummox'
+{Store} = require 'marty'
+Constants = require '../constants.coffee'
 
 class NavigationStore extends Store
-    constructor: (flux) ->
-        super flux
-
-        @register flux.getActions('navigation').setPage, @handlePage
+    constructor: (options) ->
+        super options
 
         page = if window.location.pathname.length > 1
             window.location.pathname.substring 1
@@ -16,7 +15,11 @@ class NavigationStore extends Store
         @state =
             page: page
 
-    handlePage: (page) ->
+        @handlers =
+            navigatePage: Constants.NAVIGATE_PAGE
+
+    navigatePage: (page) ->
+        console.log "store setpage #{page}"
         @setState
             page: page
 

@@ -1,9 +1,12 @@
-{Actions} = require 'flummox'
+Marty = require 'marty'
+Constants = require '../constants.coffee'
 
-class NavigationActions extends Actions
-    setPage: (page, pushState = true) ->
+NavigationActions = Marty.createActionCreators
+    navigate: (page, pushState = true) ->
+        console.log 'inside navigate'
+        console.log this, this.prototype
         page or= ''
         history.pushState page, page, "/#{page}" if pushState
-        page
+        @dispatch Constants.NAVIGATE_PAGE, page
 
 module.exports = NavigationActions

@@ -1,21 +1,25 @@
-{Flummox} = require 'flummox'
+Marty = require 'marty'
 React = require 'react'
 
 Page = require './views/page.cjsx'
 
-class Flux extends Flummox
-    constructor: ->
-        super()
+class Application extends Marty.Application
+    constructor: (options) ->
+        super options
 
-        @createActions 'poi', require './actions/poi.coffee'
-        @createActions 'navigation', require './actions/navigation.coffee'
-        @createActions 'map', require './actions/map.coffee'
-        @createActions 'log', require './actions/log.coffee'
+        # TODO http://martyjs.org/guides/application/automatic-registration.html
+        @register 'navigationStore', require './stores/navigation.coffee'
+        @register 'navigationActions', require './actions/navigation.coffee'
+        #@createActions 'navigation', require './actions/navigation.coffee'
+        #@createActions 'poi', require './actions/poi.coffee'
+        #@createActions 'map', require './actions/map.coffee'
+        #@createActions 'log', require './actions/log.coffee'
 
-        @createStore 'poi', require('./stores/poi.coffee'), this
-        @createStore 'navigation', require('./stores/navigation.coffee'), this
-        @createStore 'map', require('./stores/map.coffee'), this
-        @createStore 'log', require('./stores/log.coffee'), this
+        #@createStore 'navigation', require('./stores/navigation.coffee'), this
+        #@createStore 'poi', require('./stores/poi.coffee'), this
+        #@createStore 'map', require('./stores/map.coffee'), this
+        #@createStore 'log', require('./stores/log.coffee'), this
 
-flux = new Flux()
-React.render React.createElement(Page, {flux}), document.body
+app = new Application()
+
+React.render React.createElement(Marty.ApplicationContainer, {app}, React.createElement(Page)), document.body

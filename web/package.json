@@ -26,6 +26,7 @@
     "jszip": "^2.5.0",
     "leaflet": "^1.0.0-beta.1",
     "lodash": "^3.10.0",
+    "marty": "^0.10.4",
     "morgan": "^1.6.1",
     "node-safe-filesaver": "^0.1.0",
     "react": "^0.13.3",
