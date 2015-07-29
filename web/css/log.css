@@ -32,6 +32,11 @@
 
 .log-generator .results .list {
     flex-grow: 1;
+    margin-right: 2em;
+}
+
+.log-generator .results > .list .item:hover {
+    background-color: #f5f5f5;
 }
 
 .log-generator .results .list .item p {

@@ -81,7 +81,7 @@ Geocache = React.createClass
     render: ->
         date = new Date(@props.gc._timestamp).toISOString()
         formattedDate = "#{date.slice 0, 10} #{date.slice 11, 16}"
-        <div className="item" onMouseEnter={=> @actions.show @props.gc}>
+        <div className="item" onClick={=> @actions.show @props.gc}>
             <div className="right floated content actions">
                 <div className="ui mini basic button" onClick={=> @actions.show @props.gc}><i className="unhide icon"/>Show</div>
                 <div className="ui mini basic button"><i className="external icon"/>Log</div>
