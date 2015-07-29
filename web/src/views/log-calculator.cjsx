@@ -141,7 +141,6 @@ Map = React.createClass
         track = L.polyline @props.track,
             color: '#ff0000'
             weight: 2
-            dashArray: '5, 10'
         track.addTo @overlay
         @map.fitBounds track.getBounds()
         @map.panTo @props.center
