@@ -171,10 +171,6 @@ LogCalculator = React.createClass
     render: ->
         <div className="log-generator">
             <h1 className="ui header dividing">Log Generator</h1>
-            <div className="ui warning message">
-                <div className="header">Experimental!</div>
-                <p>This feature is still highly experimental! Use with care and don't trust the data.</p>
-            </div>
             <p>
                 You can use the log generator to analyse GPX tracks from your
                 GPS device to identify possible Geocache finds. It will search
