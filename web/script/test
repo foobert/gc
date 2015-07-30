@@ -29,6 +29,9 @@ echo "Hub    ${HUB}"
 echo "Chrome ${CHROME}"
 echo "App    ${APP}"
 
+echo Sleeping 10 seconds to allow the containers to boot up
+sleep 10
+
 echo Running integration tests...
 docker run --rm -t --link ${APP}:APP --link ${HUB}:hub ${TAG} node_modules/.bin/mocha
 
