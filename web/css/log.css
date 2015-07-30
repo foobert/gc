@@ -35,6 +35,10 @@
     margin-right: 2em;
 }
 
+.log-generator .results > .list .item {
+    cursor: pointer;
+}
+
 .log-generator .results > .list .item:hover {
     background-color: #f5f5f5;
 }
