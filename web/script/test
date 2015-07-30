@@ -1,2 +1,35 @@
 #!/bin/bash
-echo No tests yet.
+set -e
+
+function rm_app {
+    docker rm -f ${APP} > /dev/null
+    docker rm -f ${CHROME} > /dev/null
+    docker rm -f ${HUB} > /dev/null
+}
+
+if [ "x$1" != x ]
+then
+    TAG=$1
+else
+    TAG=foobert/gc-web
+fi
+
+echo Running tests against image ${TAG}
+
+echo -n Starting containers.
+HUB=$(docker run -d -P selenium/hub)
+echo -n .
+CHROME=$(docker run -d --link ${HUB}:hub selenium/node-chrome)
+echo -n .
+APP=$(docker run -d --publish 8080:8080 ${TAG} npm start)
+echo .
+trap rm_app EXIT
+
+echo "Hub    ${HUB}"
+echo "Chrome ${CHROME}"
+echo "App    ${APP}"
+
+echo Running integration tests...
+docker run --rm -t --link ${APP}:APP --link ${HUB}:hub ${TAG} node_modules/.bin/mocha
+
+echo All passed!

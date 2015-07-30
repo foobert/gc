@@ -9,14 +9,17 @@ describe 'smoke tests', ->
     browser = null
 
     before Promise.coroutine ->
-        @timeout 5000
+        @timeout 30000
 
         {expect} = require 'chai'
         webdriver = require 'selenium-webdriver'
         {By: elementBy, until: till} = webdriver
-        browser = new webdriver.Builder().forBrowser('chrome').build()
+        browser = new webdriver.Builder()
+            .usingServer "http://#{process.env['HUB_PORT_4444_TCP_ADDR']}:#{process.env['HUB_PORT_4444_TCP_PORT']}/wd/hub"
+            .forBrowser 'chrome'
+            .build()
 
-        yield browser.get 'http://localhost:8080/'
+        yield browser.get "http://#{process.env['APP_PORT_8080_TCP_ADDR']}:#{process.env['APP_PORT_8080_TCP_PORT']}/"
 
         # wait until initial react render
         react = elementBy.css '[data-reactid]'
