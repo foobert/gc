@@ -2,6 +2,11 @@ var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var config = require('./webpack.config');
 
+config.plugins.push(new webpack.HotModuleReplacementPlugin());
+config.plugins.push(new webpack.NoErrorsPlugin());
+config.entry.push('webpack-dev-server/client?http://0.0.0.0:9090');
+config.entry.push('webpack/hot/only-dev-server');
+
 new WebpackDevServer(webpack(config), {
     publicPath: config.output.publicPath,
     hot: true,

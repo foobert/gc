@@ -1,11 +1,8 @@
-var webpack = require('webpack');
 var autoprefixer = require('autoprefixer-core');
 var path = require('path');
 
 module.exports = {
     entry: [
-        'webpack-dev-server/client?http://0.0.0.0:9090',
-        'webpack/hot/only-dev-server',
         './src/index.coffee'
     ],
     output: {
@@ -26,7 +23,5 @@ module.exports = {
     },
     postcss: [ autoprefixer({ browsers: ['last 2 version'] }) ],
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin()
     ]
 };
