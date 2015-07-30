@@ -17,11 +17,11 @@ fi
 echo Running tests against image ${TAG}
 
 echo -n Starting containers.
-HUB=$(docker run -d -P selenium/hub)
+HUB=$(docker run -d selenium/hub)
 echo -n .
 CHROME=$(docker run -d --link ${HUB}:hub selenium/node-chrome)
 echo -n .
-APP=$(docker run -d --publish 8080:8080 ${TAG} npm start)
+APP=$(docker run -d --expose 8080 ${TAG} npm start)
 echo .
 trap rm_app EXIT
 
