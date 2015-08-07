@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+if [ "x$1" != x ]
+then
+    TAG=$1
+else
+    TAG=foobert/gc-search
+fi
+
+echo Running tests against image ${TAG}
+
+# unit test
+echo Running unit tests
+docker run --rm -t ${TAG} ruby test/cachecache.rb
+
+echo All passed!
