@@ -6,11 +6,11 @@ require 'rest-client'
 
 module CacheCache
     class DB
-        def initialize
+        def initialize(uri, token)
             @logger = Logging.logger[self]
 
-            @db_uri = ENV['DB_URI']
-            @token = ENV['DB_TOKEN']
+            @db_uri = uri
+            @token = token
             @logger.debug "Using db #{@db_uri} with token #{@token}"
         end
 
@@ -75,7 +75,7 @@ module CacheCache
         def _get_gc(id)
             @logger.debug "GET #{id}"
             begin
-                res = RestClient.get _url("/geocaches/#{id}"), 'X-Token' => @token, :accept => :json
+                res = RestClient.get _url("/geocaches/#{id}"), :accept => :json
                 JSON.parse res.body
             rescue
                 return nil

@@ -4,24 +4,15 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'cachecache'
-require 'yaml'
-require 'ostruct'
 
-# TODO clean up config parsing once I figure out how I want to manage it
-config_defaults = File.exist?('config.yml') ? YAML.load_file('config.yml') : {}
-config = OpenStruct.new(config_defaults)
-config.accessToken = ENV['GC_ACCESS_TOKEN'] if ENV['GC_ACCESS_TOKEN']
-config.consumerKey = ENV['GC_CONSUMER_KEY'] if ENV['GC_CONSUMER_KEY']
-config.user = ENV['GC_USER'] if ENV['GC_USER']
-config.db = ENV['GC_DB'] if ENV['GC_DB']
-config.log = ENV['GC_LOG'] if ENV['GC_LOG']
+Logging.logger.root.appenders = Logging.appenders.stdout
+Logging.logger.root.level = ENV['GC_LOG'] || :info
 
-cacheCache = CacheCache2.new(config)
+cacheCache = CacheCache2.new accessToken: ENV['GC_ACCESS_TOKEN'], db: ENV['DB_URI'], token: ENV['DB_TOKEN']
 
-cmd = ARGV.shift
-case cmd
+case ARGV.shift
 when "login"
-    cacheCache.login ARGV.shift
+    cacheCache.login *ARGV
 when "logs"
     ARGV.each {|username| cacheCache.update_logs username }
 when "search"
@@ -33,8 +24,8 @@ else
     puts "Where CMD is one of"
     puts
     puts "login"
+    puts "logs"
     puts "search"
     puts "get"
-    puts "logs"
 end
 # vi: ft=ruby

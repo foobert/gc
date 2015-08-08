@@ -1,24 +1,19 @@
-require 'date'
-require 'time'
 require 'logging'
 
 require 'cachecache/geocaching'
 require 'cachecache/db2'
 
 class CacheCache2
-    def initialize(config)
-        Logging.logger.root.appenders = Logging.appenders.stdout
-        Logging.logger.root.level = config.log || :info
+    def initialize(accessToken: nil, db: nil, token: nil)
+        @accessToken = accessToken
 
         @logger = Logging.logger[self]
-        @config = config
-        @db = CacheCache::DB.new
+        @db = CacheCache::DB.new(db, token)
         @geo = CacheCache::Geocaching.new
     end
 
-    def login(password)
-        accessToken = @geo.login(@config.user, password, @config.consumerKey)
-        puts accessToken
+    def login(user, password, consumerKey)
+        @geo.login(user, password, consumerKey)
     end
 
     def update_logs(username)
@@ -42,25 +37,11 @@ class CacheCache2
         end
     end
 
-    def _get_logs(username, lastlog)
-        logs = []
-        @geo.get_user_logs(@config.accessToken, username) do |chunk|
-            chunk.each do |log|
-                return logs.reverse if log['Code'] == lastlog
-                logs << log
-                @db.save_log(log)
-            end
-            @logger.debug "Found #{logs.size} logs so far"
-        end
-        return logs.reverse
-    end
-
-
-    def search_caches(lat, lon)
+    def search_caches(lat, lon, count = 2000)
         count_total = 0
         count_updated = 0
-        @logger.debug "Searching near #{lat} #{lon}"
-        @geo.search_geocaches(@config.accessToken, lat, lon, 2000) do |caches|
+        @logger.debug "Searching near #{lat} #{lon}, limit #{count}"
+        @geo.search_geocaches(@accessToken, lat, lon, count) do |caches|
             @logger.debug "Found #{caches.size} caches"
             count_total += caches.size
 
@@ -69,11 +50,11 @@ class CacheCache2
                 if update
                     @logger.debug "Updating #{codes.size} caches"
                     count_updated += codes.size
-                    full = @geo.get_geocaches(@config.accessToken, codes)
-                    @db.save_geocaches full
+                    full = @geo.get_geocaches(@accessToken, codes)
+                    @db.save_geocaches(full)
                 else
                     @logger.debug "Touching #{codes.size} caches"
-                    @db.touch_geocaches codes
+                    @db.touch_geocaches(codes)
                 end
             end
         end
@@ -82,7 +63,21 @@ class CacheCache2
 
     def get(ids)
         @logger.debug "Updating #{ids.size} caches"
-        full = @geo.get_geocaches(@config.accessToken, ids)
-        @db.save_geocaches full
+        full = @geo.get_geocaches(@accessToken, ids)
+        @db.save_geocaches(full)
+    end
+
+    private
+    def _get_logs(username, lastlog)
+        logs = []
+        @geo.get_user_logs(@accessToken, username) do |chunk|
+            chunk.each do |log|
+                return logs.reverse if log['Code'] == lastlog
+                logs << log
+                @db.save_log(log)
+            end
+            @logger.debug "Found #{logs.size} logs so far"
+        end
+        return logs.reverse
     end
 end
