@@ -17,7 +17,9 @@ module CacheCache
 
         def need_update?(gc)
             stored = _get_gc(gc['Code'])
-            return stored.nil? || stored['DateLastUpdate'] != gc['DateLastUpdate']
+            return true if not stored
+            @logger.debug "got stored cache: #{stored['DateLastUpdate']} vs #{gc['DateLastUpdate']}"
+            return stored['DateLastUpdate'] != gc['DateLastUpdate']
         end
 
         def save_geocaches(data_array)

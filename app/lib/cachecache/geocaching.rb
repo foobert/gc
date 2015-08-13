@@ -177,6 +177,7 @@ module CacheCache
         private
         def _post(path, data)
             uri = URI("https://api.groundspeak.com#{path}?format=json")
+            @logger.debug "POST #{uri}"
             Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
                 request = Net::HTTP::Post.new(uri.request_uri)
                 if data.respond_to? :to_json
