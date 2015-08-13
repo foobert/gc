@@ -38,8 +38,9 @@ module CacheCache
             begin
                 res = RestClient.get _url("/logs/latest?username=#{username}"), 'X-Token' => @token
                 res.body
-            rescue
-                nil
+            rescue => ex
+                @logger.error ex
+                return nil
             end
         end
 
@@ -70,7 +71,8 @@ module CacheCache
             begin
                 res = RestClient.get _url("/geocaches/#{id}"), :accept => :json
                 JSON.parse res.body
-            rescue
+            rescue => ex
+                @logger.error ex
                 return nil
             end
         end
