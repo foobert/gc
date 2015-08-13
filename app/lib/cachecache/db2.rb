@@ -3,6 +3,7 @@ require 'time'
 require 'set'
 require 'uri'
 require 'rest-client'
+require 'open-uri'
 
 module CacheCache
     class DB
@@ -69,8 +70,10 @@ module CacheCache
         def _get_gc(id)
             @logger.debug "GET #{id}"
             begin
-                res = RestClient.get _url("/geocaches/#{id}"), :accept => :json
-                JSON.parse res.body
+                # RestClient has some strange problems detecting the proper
+                # encoding
+                res = open _url("/geocaches/#{id}")
+                JSON.parse res.read
             rescue => ex
                 @logger.error ex
                 return nil
