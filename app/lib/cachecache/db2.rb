@@ -46,13 +46,9 @@ module CacheCache
         def save_logs(data_array)
             @logger.debug "Updating #{data_array.size} Logs"
             data_array.each do |data|
-                save_log(data)
+                @logger.debug "POST #{data['Code']}"
+                RestClient.post _url('/log'), data.to_json, 'X-Token' => @token, :accept => :json, :content_type => :json
             end
-        end
-
-        def save_log(data)
-            @logger.debug "POST #{data['Code']}"
-            RestClient.post _url('/log'), data.to_json, 'X-Token' => @token, :accept => :json, :content_type => :json
         end
 
         def get_geocache_name(id)
