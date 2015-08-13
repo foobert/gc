@@ -14,7 +14,7 @@ etag = (gc) ->
 
 module.exports = (app, geocache) ->
     app.get '/geocaches', async (req, res, next) ->
-        res.set 'Content-Type', 'application/json'
+        res.set 'Content-Type', 'application/json; charset=utf-8'
         geocacheStream = yield geocache.getStream req.query, true
         geocacheStream
             .pipe JSONStream.stringify('[', ',', ']')
@@ -26,7 +26,8 @@ module.exports = (app, geocache) ->
             res.status 404
             res.send '404 - Geocache not found\n'
         else
-            res.header 'ETag', etag gc
+            res.set 'ETag', etag gc
+            res.set 'Content-Type', 'application/json; charset=utf-8'
             res.json gc
 
     app.head '/geocache/:gc', async (req, res, next) ->
@@ -35,7 +36,7 @@ module.exports = (app, geocache) ->
             res.status 404
             res.send '404 - Geocache not found\n'
         else
-            res.header 'ETag', etag gc
+            res.set 'ETag', etag gc
             res.end
 
     app.post '/geocache', async (req, res, next) ->
@@ -65,7 +66,7 @@ module.exports = (app, geocache) ->
         res.send ''
 
     app.get '/gcs', async (req, res, next) ->
-        res.set 'Content-Type', 'application/json'
+        res.set 'Content-Type', 'application/json; charset=utf-8'
         gcStream = yield geocache.getStream req.query, false
         gcStream
             .pipe JSONStream.stringify('[', ',', ']')
