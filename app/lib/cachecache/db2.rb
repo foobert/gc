@@ -20,14 +20,11 @@ module CacheCache
         end
 
         def save_geocaches(data_array)
-            #@logger.debug "Updating #{data_array.size} Geocaches"
+            @logger.debug "Updating #{data_array.size} Geocaches"
             data_array.each do |data|
                 @logger.debug "POST #{data['Code']}"
                 RestClient.post _url('/geocache'), data.to_json, 'X-Token' => @token, :accept => :json, :content_type => :json
             end
-
-            # request entitiy too large :-(
-            #RestClient.put _url('/geocaches'), data_array.to_json, 'X-Token' => @token, :accept => :json, :content_type => :json
         end
 
         def touch_geocaches(ids)
