@@ -1,4 +1,5 @@
 fs = require 'fs'
+moment = require 'moment'
 Promise = require 'bluebird'
 {expect} = require 'chai'
 
@@ -164,6 +165,25 @@ describe 'geocache', ->
             arr = yield streamToArray stream
             codes = arr.map (gc) -> gc.Code
             expect(codes).to.deep.equal ['GC38XPR', 'GC1BAZ8']
+
+        it 'should filter based on last update date', Promise.coroutine ->
+            gc1 = JSON.parse JSON.stringify GC1BAZ8
+            gc2 = JSON.parse JSON.stringify GC38XPR
+            gc1.meta = updated: moment().subtract(10, 'days').format()
+            gc2.meta = updated: moment().subtract(1, 'day').format()
+            yield geocaches.upsert gc1
+            yield geocaches.upsert gc2
+            yield geocaches.forceRefresh()
+
+            stream = yield geocaches.getStream
+                orderBy: 'updated'
+                order: 'desc'
+                stale: '> 5 days'
+            , true
+
+            arr = yield streamToArray stream
+            codes = arr.map (gc) -> gc.Code
+            expect(codes).to.deep.equal [gc1.Code]
 
     streamToArray = (stream) ->
         result = []

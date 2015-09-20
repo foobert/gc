@@ -5,6 +5,7 @@ Promise = require 'bluebird'
 QueryStream = require './query-stream'
 
 module.exports = (db) ->
+    STALE_REGEX = /^([<>]) (\d+) days?$/
     _mapRow = (row, options = {}) ->
         return null unless row?
         options.withData ?= true
@@ -51,9 +52,14 @@ module.exports = (db) ->
                 .field 'UTCPlaceDate'
                 .field 'UserName'
 
-        if query.stale not in ['1', 1, true]
-            sql = sql
-                .where "age(updated) < interval '3 days'"
+        switch
+            when STALE_REGEX.test query.stale
+                [_, direction, days] = query.stale.match STALE_REGEX
+                sql = sql.where "age(updated) #{direction} interval '#{days} days'"
+            when query.stale in ['1', 1, true]
+                # nothing to do, we want stale geocaches
+            else
+                sql = sql.where "age(updated) < interval '3 days'"
 
         if query.maxAge?
             sql = sql
