@@ -19,6 +19,8 @@ when "search"
     cacheCache.search_caches *ARGV.map {|x| x.to_f }
 when "get"
     cacheCache.get ARGV
+when "stale"
+    cacheCache.update_stale
 else
     puts "Usage: #{$0} CMD"
     puts "Where CMD is one of"
@@ -27,5 +29,6 @@ else
     puts "logs"
     puts "search"
     puts "get"
+    puts "stale"
 end
 # vi: ft=ruby

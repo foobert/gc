@@ -64,6 +64,11 @@ module CacheCache
             end
         end
 
+        def get_stale_geocaches(days)
+            res = open _url("/geocaches?stale=> #{days} days")
+            JSON.parse res.read
+        end
+
         private
         def _url(path)
             @db_uri + path

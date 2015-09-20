@@ -67,6 +67,20 @@ class CacheCache2
         @db.save_geocaches(full)
     end
 
+    def update_stale
+        @logger.debug "Getting geocaches older than 7 days"
+        jobs = @db.get_stale_geocaches 7
+        jobs.sort_by! {|job| job['meta']['updated'] }
+        @logger.debug "Found #{jobs.size} stale geocaches"
+
+        ids = jobs.map {|job| job["Code"] }
+        ids.each_slice CacheCache::Geocaching::MAX_PER_PAGE do |slice|
+            # no need to do a light search first, since they the geocaches are
+            # stale we assume that we'll need a full get anyway
+            get slice
+        end
+    end
+
     private
     def _get_logs(username, lastlog)
         logs = []
