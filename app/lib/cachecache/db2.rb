@@ -55,6 +55,11 @@ module CacheCache
             end
         end
 
+        def save_log(data)
+            @logger.debug "POST #{data['Code']}"
+            RestClient.post _url('/log'), data.to_json, 'X-Token' => @token, :accept => :json, :content_type => :json
+        end
+
         def get_geocache_name(id)
             gc = _get_gc(id)
             if gc
