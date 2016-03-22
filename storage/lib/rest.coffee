@@ -11,7 +11,7 @@ module.exports = (services) ->
     app.set 'x-powered-by', false
     app.set 'etag', false
     app.use compression()
-    app.use bodyParser.json()
+    app.use bodyParser.json(limit: '50mb')
 
     app.use Promise.coroutine (req, res, next) ->
         if req.method in ['GET', 'HEAD', 'OPTIONS']
