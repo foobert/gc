@@ -35,6 +35,15 @@ version="1.1" creator="cachecache">
             cmt: poi.description gc
             type: 'Geocache'
 
+    stream.pipe xml.transform pre, post, (gc) ->
+        wpt:
+            $:
+                lat: gc.Latitude
+                lon: gc.Longitude
+            name: poi.title gc
+            cmt: poi.description gc
+            type: 'Geocache'
+
 handleJson = (stream) ->
     stream
         .pipe streamTransform (gc) ->
