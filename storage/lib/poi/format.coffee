@@ -40,7 +40,7 @@ hint = (gc) ->
 
 module.exports =
     title: (gc) ->
-        "#{size gc}#{type gc} #{skill gc} #{updated gc}"
+        "GC#{code gc} #{size gc}#{type gc} #{skill gc}"
 
     description: (gc) ->
-        "#{code gc} #{name gc}\n#{hint gc}"[0...100]
+        "#{code gc} #{updated gc} #{name gc}\n#{hint gc}"[0...100]
