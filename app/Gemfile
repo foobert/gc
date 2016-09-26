@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
 gem 'logging'
-gem 'rest_client'
+gem 'rest-client'
 gem 'builder'
 gem 'minitest'

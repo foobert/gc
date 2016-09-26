@@ -13,7 +13,7 @@ class CacheCache2
     end
 
     def login(user, password, consumerKey)
-        @geo.login(user, password, consumerKey)
+        p @geo.login(user, password, consumerKey)
     end
 
     def update_logs(username)
@@ -63,8 +63,15 @@ class CacheCache2
 
     def get(ids)
         @logger.debug "Updating #{ids.size} caches"
-        full = @geo.get_geocaches(@accessToken, ids)
-        @db.save_geocaches(full)
+        ids.each_slice(50) do |slice|
+            slice.group_by {|gc| @db.get_geocache_name(gc).nil? }.each do |update, codes|
+                if update
+                    full = @geo.get_geocaches(@accessToken, codes)
+                    @db.save_geocaches(full)
+                else
+                end
+            end
+        end
     end
 
     def update_stale

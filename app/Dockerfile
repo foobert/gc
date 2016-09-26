@@ -8,4 +8,5 @@ COPY Gemfile.lock /usr/src/app/
 RUN bundle install
 
 COPY . /usr/src/app
-CMD ["/usr/src/app/bin/cachecache", "help"]
+ENTRYPOINT ["/usr/src/app/bin/cachecache"]
+CMD ["help"]
