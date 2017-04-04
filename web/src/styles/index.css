@@ -1,0 +1,6 @@
+@import "~font-awesome/css/font-awesome.css";
+
+#map {
+    width: 500px;
+    height: 500px;
+}

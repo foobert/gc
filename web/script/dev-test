@@ -1,2 +1,0 @@
-#!/bin/bash
-./script/test "-w /usr/src/app -v $PWD:/usr/src/app iojs:slim"

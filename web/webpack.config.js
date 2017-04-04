@@ -1,27 +1,70 @@
-var autoprefixer = require('autoprefixer-core');
-var path = require('path');
+var path = require('path')
+var webpack = require('webpack')
+var autoprefixer = require('autoprefixer')
+var ExtractTextPlugin = require('extract-text-webpack-plugin')
+
+var assetPath = '/assets/'
+var absolutePath = path.join(__dirname, 'build', assetPath)
 
 module.exports = {
-    entry: [
-        './src/index.coffee'
-    ],
-    output: {
-        path: path.join(__dirname, 'assets'),
-        publicPath: "/assets/",
-        filename: "bundle.js"
-    },
-    devtool: "cheap-module-eval-source-map",
-    module: {
-        loaders: [
-            { test: /\.css$/, loaders: ['style', 'css', 'postcss'] },
-            { test: /\.coffee$/, loaders: ['coffee'] },
-            { test: /\.js$/, exclude: /node_modules/, loaders: ['babel?optional[]=runtime&stage=1'] },
-            { test: /\.cjsx$/, loaders: ['react-hot', 'coffee', 'cjsx']},
-            { test: /\.(jpe?g|png|gif|svg)$/i, loaders: [ 'url?limit=2048!file?hash=sha512&digest=hex&name=[hash].[ext]' ] },
-            { test: /\.(woff2?|ttf|eot)$/i, loaders: [ 'file?hash=sha512&digest=hex&name=[hash].[ext]' ] }
-        ]
-    },
-    postcss: [ autoprefixer({ browsers: ['last 2 version'] }) ],
-    plugins: [
+  devtool: 'source-map',
+  entry: [
+    'webpack-hot-middleware/client',
+    './src/index'
+  ],
+  output: {
+    path: absolutePath,
+    filename: 'bundle.js',
+    publicPath: assetPath
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env':{
+        'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+      }
+    }),
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin(),
+    new ExtractTextPlugin("bundle.css")
+  ],
+  module: {
+    loaders: [
+      {
+        test: /\.js$/,
+        loaders: [ 'babel' ],
+        exclude: /node_modules/,
+        include: path.join(__dirname, 'src')
+      },
+      // fonts and svg
+      { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" },
+      { test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/font-woff" },
+      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/octet-stream" },
+      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: "file" },
+      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=image/svg+xml" },
+      {
+        // images
+        test: /\.(ico|jpe?g|png|gif)$/,
+        loader: "file"
+      },
+      {
+        // for some modules like foundation
+        test: /\.scss$/,
+        exclude: [/node_modules/], // sassLoader will include node_modules explicitly
+        loader: ExtractTextPlugin.extract("style", "css?sourceMap!postcss!sass?sourceMap&outputStyle=expanded")
+      },
+      {
+        test: /\.css$/,
+        loader: ExtractTextPlugin.extract("style", "css?sourceMap!postcss")
+      }
     ]
-};
+  },
+  postcss: function(webpack) {
+    return [
+      autoprefixer({browsers: ['last 2 versions', 'ie >= 9', 'and_chr >= 2.3']})
+    ]
+  },
+  sassLoader: {
+    includePaths: [path.resolve(__dirname, "node_modules")]
+  }
+}
