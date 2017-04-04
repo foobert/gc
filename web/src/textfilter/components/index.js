@@ -1,9 +1,11 @@
 import React from 'react';
-import classnames from 'classnames';
 
-import LabelPlural from './labelPlural';
+// TODO ARGH PATH!
+import LabelPlural from '../../components/labelPlural';
 
-class TextFilter extends React.Component {
+import TextFilterEntry from './entry';
+
+export default class TextFilter extends React.Component {
     constructor(props) {
         super(props);
         this.state = {value: ''};
@@ -47,7 +49,7 @@ class TextFilter extends React.Component {
                         plural={this.props.labelPlural}/>
                 </div>
                 <div style={{display: this.props.expanded ? 'block' : 'none'}}>
-                    { this.props.entries.map((x) => <TextFilterEntry key={x} user={x} onRemoveClick={(e) => this.handleRemove(e, x) }/>) }
+                    { this.props.entries.map((x) => <TextFilterEntry key={x} label={x} onRemoveClick={(e) => this.handleRemove(e, x) }/>) }
                     <div>
                         <form onSubmit={(e) => this.handleAdd(e)}>
                             <input name='newEntry' type='text' value={this.state.value} onChange={(e) => this.handleChange(e)}/>
@@ -69,42 +71,3 @@ TextFilter.propTypes = {
     onAddEntry: React.PropTypes.func,
     onRemoveEntry: React.PropTypes.func,
 };
-
-function TextFilterEntry(props) {
-    return (
-        <div>{ props.user } <span onClick={props.onRemoveClick}>X</span></div>
-    );
-}
-
-function TypeFilter(props) {
-    const filtered = props.filteredTypes || [];
-    const label = filtered.length === 1 ? 'Filtering one geocache type' : `Filtering ${filtered.length} geocache types`;
-    return (
-        <div>
-            <div>{ label }</div>
-            { filtered.map((x) => <TypeFilterEntry key={x} type={x}/>) }
-        </div>
-    );
-}
-
-function TypeFilterEntry(props) {
-    return (
-        <div>{ props.type }</div>
-    );
-}
-
-export default function MapControls(props) {
-    return (
-        <div>
-            <TextFilter
-                labelSingular='person'
-                labelPlural='people'
-                entries={props.userFilterEntries}
-                expanded={props.userFilterExpanded}
-                onAddEntry={props.onAddUserFilter}
-                onRemoveEntry={props.onRemoveUserFilter}
-                onToggleMenu={props.onToggleUserFilter}/>
-            <TypeFilter/>
-        </div>
-    );
-}
