@@ -1,4 +1,4 @@
-FROM ruby:slim
+FROM ruby:latest
 RUN bundle config --global frozen 1
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app

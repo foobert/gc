@@ -26,6 +26,7 @@ module CacheCache
             @logger.debug "Updating #{data_array.size} Geocaches"
             data_array.each do |data|
                 @logger.debug "POST #{data['Code']}"
+                @logger.debug _url('/geocache')
                 RestClient.post _url('/geocache'), data.to_json, 'X-Token' => @token, :accept => :json, :content_type => :json
             end
         end
@@ -87,7 +88,7 @@ module CacheCache
                 res = open _url("/geocaches/#{id}")
                 JSON.parse res.read
             rescue => ex
-                @logger.error ex
+                #@logger.error ex
                 return nil
             end
         end

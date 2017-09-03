@@ -177,41 +177,6 @@ module CacheCache
 
         private
         def _post(path, data)
-            uri = URI("https://sokl74e355.execute-api.eu-central-1.amazonaws.com/prod/groundspeak")
-            @logger.debug "POST #{uri}"
-            Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
-                request = Net::HTTP::Post.new(uri.request_uri)
-                lambda_object = {}
-                if data.respond_to? :to_json
-                    lambda_object[:data] = data
-                else
-                    lambda_object[:data] = data.to_s
-                end
-                headers = {}
-                headers['Content-Type'] = 'application/json'
-                headers['Accept-Language'] = 'en-us'
-                headers['Accept'] = '*/*'
-                headers['Accept-Encoding'] = 'gzip, deflate'
-                headers['User-Agent'] = 'Geocaching/6.1 CFNetwork/672.0.8 Darwin/14.0.0'
-                headers['Connection'] = 'keep-alive'
-                lambda_object[:headers] = headers
-
-                lambda_object[:path] = path + '?format=json'
-                lambda_object[:method] = 'POST'
-
-                request.body = lambda_object.to_json
-                puts request.body
-
-                response = http.request(request)
-                if response.code != '200'
-                    raise GeocachingError, "Received non 200-OK response: #{response.code} #{response.message}"
-                end
-
-                data = JSON.parse(response.body)
-                return data
-            end
-        end
-        def _post_orig(path, data)
             uri = URI("https://api.groundspeak.com#{path}?format=json")
             @logger.debug "POST #{uri}"
             Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
