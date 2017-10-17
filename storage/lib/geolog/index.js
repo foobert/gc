@@ -1,55 +1,72 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const debug = require('debug')('gc:geologs');
-const upsert = require('../db/upsert');
-const Promise = require('bluebird');
+const moment = require('moment');
 
-module.exports = db =>
-    ({
-        upsert(data) {
-            debug(`upsert ${(data.Code != null ? data.Code.toLowerCase() : undefined)}`);
-            return upsert(db, 'logs', data);
+function getId(data) {
+    if (typeof data === 'string') {
+        return data.toLowerCase();
+    }
+    return data
+        && data.Code
+        && data.Code.toLowerCase();
+}
+
+function getUsername(data) {
+    return data
+        && data.Finder
+        && data.Finder.UserName
+        && data.Finder.UserName.toLowerCase();
+}
+
+function getVisitDate(data) {
+    return data && moment(data.VisitDate).toDate();
+}
+
+function getCode(data) {
+    return data && data.CacheCode;
+}
+
+module.exports = function(db) {
+    const geologs = db.collection('geologs');
+    const founds = db.collection('founds');
+    return {
+        async upsert(data) {
+            const id = getId(data);
+            const username = getUsername(data);
+            const visitDate = getVisitDate(data);
+            const code = getCode(data);
+
+            debug('Upsert', id);
+            const result = await geologs.update(
+                {_id: id},
+                {_id: id, username, visitDate, data},
+                {upsert: true}
+            );
+            const found = await founds.update(
+                {_id: username},
+                {$addToSet: {geocaches: code}},
+                {upsert: true}
+            );
+            debug(`Upsert ${id}:`, result.result.nModified);
         },
 
-        latest: Promise.coroutine(function*(username) {
-            debug(`latest ${username}`);
-            const [client, done] = Array.from(yield db.connect());
-            try {
-                let sql = db.select()
-                    .from('logsRel')
-                    .field('id')
-                    .order('visitdate', false)
-                    .limit(1);
-                if (username != null) { sql = sql.where('lower(username) = ?', username.trim().toLowerCase()); }
-                sql = sql.toString();
-
-                const result = yield client.queryAsync(sql);
-                if (result.rowCount === 0) {
-                    return null;
-                } else {
-                    return result.rows[0].id.trim().toUpperCase();
-                }
-            } finally {
-                done();
+        async latest(username) {
+            debug('Latest', username);
+            let select = {};
+            if (username != null) {
+                select.username = {$eq: username.toLowerCase()};
             }
-        }),
 
-        deleteAll: Promise.coroutine(function*() {
-            debug('delete all');
-            const [client, done] = Array.from(yield db.connect());
-            try {
-                const sql = db.delete()
-                    .from('logs')
-                    .toString();
-                return yield client.queryAsync(sql);
-            } finally {
-                done();
-            }
-        })
-    })
-;
+            const cursor = await geologs.find(select, {_id: 1}).limit(1).sort({visitDate: -1});
+            const doc = await cursor.hasNext() ? await cursor.next() : null;
+            debug(`Latest ${username}`, doc);
+            return doc && doc._id.toUpperCase();
+        },
+
+        async deleteAll() {
+            debug('Delete all');
+            const result = await geologs.deleteMany({});
+            await founds.deleteMany({});
+            debug('Delete all', result.result);
+        },
+    };
+}
